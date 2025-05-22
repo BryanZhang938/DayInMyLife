@@ -3,9 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Sleep Data Analysis</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/scrollama@3.2.0/build/scrollama.min.js"></script>
+    <script src="sleep.js"></script>
 </head>
 <body>
-    
+    <div class="container">
+        <h1>Sleep Data Analysis</h1>
+        
+        <!-- Participant Selector -->
+        <div class="selector-container">
+            <label for="participant-select">Select Participant:</label>
+            <select id="participant-select">
+                <option value="">Select a participant...</option>
+            </select>
+        </div>
+
+        <!-- Sleep Metrics Display -->
+        <div id="sleep-metrics" class="metrics"></div>
+    </div>
 </body>
 </html>
