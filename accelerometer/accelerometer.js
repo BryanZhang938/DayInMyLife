@@ -83,8 +83,10 @@ d3.csv("../cleaned_data/acc.csv", d => {
         const step = 50; // pixels per tick
   
         if (current + step >= maxScroll) {
-          stopAutoScroll();
-        } else {
+          window.scrollTo({ top: maxScroll });
+        // …then flip to ↻ Reset
+        stopAutoScroll();
+              } else {
           isAutoScrolling = true;
           lastScrollTime = Date.now();
           window.scrollTo({ top: current + step, behavior: "smooth" });
@@ -117,6 +119,14 @@ d3.csv("../cleaned_data/acc.csv", d => {
   dropdown.on("change", function () {
     updateChart(this.value);
   });
+  // if we’re in “↻ Reset” but the user scrolls up off the bottom, flip back to ▶ Auto-Scroll
+window.addEventListener("scroll", () => {
+  const maxScroll = document.body.scrollHeight - window.innerHeight;
+  // only when we're showing Reset and we're no longer at the bottom
+  if (playPauseBtn.text() === "↻ Reset" && window.scrollY < maxScroll) {
+    playPauseBtn.text("▶ Auto-Scroll");
+  }
+}, { passive: true });
 
   function updateChart(user) {
     const userData = accData.filter(d => d.user === user);
