@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Movement Intensity Visualization</title>
+  <script type="module" src="../accelerometer/accelerometer.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <link rel="stylesheet" href="../styles.css"> <!-- optional -->
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      height: 1000vh; /* allows scroll */
+      background-color: #fafafa;
+      padding: 20px;
+    }
+
+    #control-panel {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: white;
+      padding: 10px 15px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      border-radius: 8px;
+      z-index: 10;
+    }
+
+    #chart-container {
+      position: fixed;
+      top: 100px;
+      left: 20px;
+      width: 900px;
+      z-index: 5;
+    }
+
+    #chart {
+      border: 1px solid #ccc;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+
+    #play-pause-btn {
+      margin-top: 10px;
+      padding: 6px 12px;
+      font-size: 14px;
+      border: none;
+      background-color: #007acc;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #play-pause-btn:hover {
+      background-color: #005f99;
+    }
+
+    #loading-overlay {
+      position: fixed;
+      top: 100px;
+      left: 20px;
+      width: 900px;
+      height: 400px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.85);
+      font-size: 18px;
+      color: #333;
+      border: 1px solid #ccc;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      z-index: 100;
+    }
+
+    #loading-text {
+      font-weight: bold;
+    }
+
+
+  </style>
+</head>
+<body>
+
+  <div id="control-panel">
+    <h2>Movement Intensity Over Time</h2>
+    <label for="user-select">Select User:</label>
+    <select id="user-select"></select>
+    <button id="play-pause-btn">▶ Auto-Scroll</button>
+  </div>
+
+  <div id="chart-container" style="overflow-x: auto; width: 900px;">
+    <svg id="chart" height="400"></svg>
+  </div>
+
+  <div id="loading-overlay">
+    <div id="loading-text">Loading data...</div>
+  </div>
+
+</body>
+</html>
