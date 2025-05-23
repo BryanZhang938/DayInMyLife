@@ -164,4 +164,27 @@
     color: #ff7f0e;
     margin-bottom: 5px;
   }
+  #tooltip {
+    position: absolute;
+    visibility: hidden;
+    background: white;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    pointer-events: none;
+    z-index: 10;
+    color: #333;
+    line-height: 1.4;
+  }
+  .grid line {
+    stroke: #ccc;
+    stroke-opacity: 0.4;
+    shape-rendering: crispEdges;
+  }
+  
+  .grid path {
+    display: none;
+  }
   
