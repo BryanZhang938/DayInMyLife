@@ -11,6 +11,14 @@ const svg = d3.select("#chart")
 
 const dropdown = d3.select("#user-select");
 
+const loadingOverlay = d3.select("#loading-overlay");
+const loadingText = d3.select("#loading-text");
+
+let isPlaying = false;
+let autoScrollInterval = null;
+let isAutoScrolling = false; 
+let lastScrollTime = 0;
+
 let tooltip = d3.select("#tooltip-div");
 if (tooltip.empty()) {
   tooltip = d3.select("body").append("div")
@@ -26,6 +34,9 @@ if (tooltip.empty()) {
     .style("display", "none")
     .style("z-index", "9999");
 }
+
+loadingOverlay.style("display", "flex");
+loadingText.text("Loading data...");
 
 d3.csv("../cleaned_data/acc.csv", d => {
   const time = parseTime(d.time);
@@ -47,7 +58,47 @@ d3.csv("../cleaned_data/acc.csv", d => {
     .attr("value", d => d)
     .text(d => d);
 
+  loadingText.text("Loading graph...");
   updateChart(users[0]);
+
+  const playPauseBtn = d3.select("#play-pause-btn");
+  playPauseBtn.on("click", () => {
+    if (isPlaying) {
+      // If currently playing, pause auto-scroll
+      isPlaying = false;
+      clearInterval(autoScrollInterval);
+      playPauseBtn.text("▶ Auto-Scroll");
+    } else if (playPauseBtn.text() === "↻ Reset") {
+      // If button says Reset, scroll top and switch to play
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      playPauseBtn.text("▶ Auto-Scroll");
+    } else {
+      // Start auto-scroll
+      isPlaying = true;
+      playPauseBtn.text("⏸ Pause");
+  
+      autoScrollInterval = setInterval(() => {
+        const maxScroll = document.body.scrollHeight - window.innerHeight;
+        const current = window.scrollY;
+        const step = 50; // pixels per tick
+  
+        if (current + step >= maxScroll) {
+          stopAutoScroll();
+        } else {
+          isAutoScrolling = true;
+          lastScrollTime = Date.now();
+          window.scrollTo({ top: current + step, behavior: "smooth" });
+        }
+      }, 100);
+    }
+  });
+  
+  function stopAutoScroll() {
+    isPlaying = false;
+    clearInterval(autoScrollInterval);
+    playPauseBtn.text("↻ Reset");
+  }
+  
 
   dropdown.on("change", function () {
     updateChart(this.value);
@@ -190,4 +241,6 @@ function renderChart(dataSlice, windowStart, windowEnd, yExtent) {
       hoverLine.style("display", "none");
       hoverDot.style("display", "none");
     });
+
+    loadingOverlay.style("display", "none");
 }
