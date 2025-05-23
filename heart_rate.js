@@ -3,7 +3,12 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 const width = 900;
 const height = 400;
 const margin = { top: 40, right: 40, bottom: 40, left: 60 };
+const params = new URLSearchParams(window.location.search);
+const selectedUser = params.get("user");
 
+if (!selectedUser) {
+  console.error("No user specified in URL.");
+}
 const svg = d3.select("#chart")
   .attr("viewBox", [0, 0, width, height]);
 
@@ -67,21 +72,7 @@ Promise.all([
 ]).then(([hrData, activityData]) => {
   hrData = hrData.filter(d => d !== null);
 
-  const users = Array.from(new Set(hrData.map(d => d.user)))
-    .sort((a, b) => parseInt(a.split("_")[1]) - parseInt(b.split("_")[1]));
-
-  dropdown.selectAll("option")
-    .data(users)
-    .enter()
-    .append("option")
-    .attr("value", d => d)
-    .text(d => d);
-
-  updateChart(users[0]);
-
-  dropdown.on("change", function () {
-    updateChart(this.value);
-  });
+  updateChart(selectedUser);
 
   function updateChart(user) {
     const userData = hrData.filter(d => d.user === user);
