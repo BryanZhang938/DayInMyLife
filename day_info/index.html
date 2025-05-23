@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Heart Rate Visualization</title>
+  <script type="module" src="../heart_rate.js"></script>
+  <link rel="stylesheet" href="../styles.css"> <!-- optional -->
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      height: 300vh; /* allows scroll */
+      background-color: #fafafa;
+      padding: 20px;
+    }
+
+    #control-panel {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: white;
+      padding: 10px 15px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      border-radius: 8px;
+      z-index: 10;
+    }
+
+    #chart-container {
+      position: fixed;
+      top: 100px;
+      left: 20px;
+      width: 900px;
+      z-index: 5;
+    }
+
+    #chart {
+      border: 1px solid #ccc;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="control-panel">
+    <h2>Heart Rate Over Time</h2>
+    <label for="user-select">Select User:</label>
+    <select id="user-select"></select>
+  </div>
+
+  <div id="chart-container">
+    <svg id="chart" width="900" height="400"></svg>
+  </div>
+
+</body>
+</html>
