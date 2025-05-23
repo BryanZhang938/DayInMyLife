@@ -11,7 +11,7 @@ const svg = d3.select("body")
   .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    d3.csv("cleaned_data/relevent_user_info.csv", d3.autoType).then(data => {  // Scales
+d3.csv("cleaned_data/relevent_user_info.csv", d3.autoType).then(data => {
   const x = d3.scaleLinear()
     .domain(d3.extent(data, d => d.Age)).nice()
     .range([0, width]);
@@ -20,15 +20,10 @@ const svg = d3.select("body")
     .domain(d3.extent(data, d => d.BMI)).nice()
     .range([height, 0]);
 
-  const color = d3.scaleOrdinal()
-    .domain(["M", "F"])
-    .range(["steelblue", "crimson"]);
-
-  // Axes
   svg.append("g")
     .attr("transform", `translate(0,${height})`)
     .call(d3.axisBottom(x));
-  
+
   svg.append("g")
     .call(d3.axisLeft(y));
 
@@ -45,32 +40,17 @@ const svg = d3.select("body")
     .attr("text-anchor", "middle")
     .text("BMI");
 
-  // Points
   svg.selectAll("circle")
     .data(data)
     .join("circle")
       .attr("cx", d => x(d.Age))
       .attr("cy", d => y(d.BMI))
       .attr("r", 5)
-      .attr("fill", d => color(d.Gender))
+      .attr("fill", "steelblue")
       .attr("opacity", 0.8);
 
-  // Legend
-  const legend = svg.selectAll(".legend")
-    .data(color.domain())
-    .join("g")
-      .attr("class", "legend")
-      .attr("transform", (d, i) => `translate(0,${i * 20})`);
-
-  legend.append("rect")
-    .attr("x", width - 15)
-    .attr("width", 12)
-    .attr("height", 12)
-    .attr("fill", color);
-
-  legend.append("text")
-    .attr("x", width - 20)
-    .attr("y", 10)
-    .attr("text-anchor", "end")
-    .text(d => d === "M" ? "Male" : "Female");
+  // Optional: Tooltip on hover
+  svg.selectAll("circle")
+    .append("title")
+    .text(d => `User: ${d.user}\nAge: ${d.Age}\nBMI: ${d.BMI}`);
 });
