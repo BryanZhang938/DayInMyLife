@@ -99,7 +99,21 @@ d3.csv("../cleaned_data/acc.csv", d => {
     playPauseBtn.text("↻ Reset");
   }
   
-
+  window.addEventListener("wheel", () => {
+    if (isPlaying) {
+      isPlaying = false;
+      clearInterval(autoScrollInterval);
+      playPauseBtn.text("▶ Auto-Scroll");
+    }
+  }, { passive: true });
+  
+  window.addEventListener("touchmove", () => {
+    if (isPlaying) {
+      isPlaying = false;
+      clearInterval(autoScrollInterval);
+      playPauseBtn.text("▶ Auto-Scroll");
+    }
+  }, { passive: true });
   dropdown.on("change", function () {
     updateChart(this.value);
   });
