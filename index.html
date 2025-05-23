@@ -9,7 +9,7 @@
     <script src="https://unpkg.com/scrollama@3.2.0/build/scrollama.min.js"></script>
     <script type="module" src="sleep.js"></script>
     <script type="module" src="global.js"></script>
-
+    <script type="module" src="script.js"></script>
 </head>
 <body>
     <div class="container">
@@ -25,6 +25,18 @@
 
         <!-- Sleep Metrics Display -->
         <div id="sleep-metrics" class="metrics"></div>
+
+        <section id="activity" class="section">
+          <h2>Activity Visualization</h2>
+          <div id="activity-metrics" class="metrics"></div>
+          <svg id="activity-chart" class="chart"></svg>
+        </section>
+
+        <section id="heartrate" class="section">
+          <h2>Heart Rate Analysis</h2>
+          <div id="heartrate-metrics" class="metrics"></div>
+          <svg id="heartrate-chart" class="chart"></svg>
+        </section>
     </div>
 
 </body>
