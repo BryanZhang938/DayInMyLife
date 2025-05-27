@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Heart Rate Visualization</title>
+  <title>A Day In My Life</title>
   <script type="module" src="../heart_rate.js"></script>
+  <script type="module" src="../accelerometer.js"></script>
   <link rel="stylesheet" href="../styles.css"> <!-- optional -->
   <style>
     body {
@@ -27,28 +28,83 @@
 
     #chart-container {
       position: fixed;
-      top: 100px;
+      top: 150px;
       left: 20px;
       width: 900px;
       z-index: 5;
     }
 
-    #chart {
+    #chart-container-acc {
+      position: fixed;
+      top: 350px;
+      left: 20px;
+      width: 900px;
+      z-index: 5;
+    }
+
+    #chart, #chart-acc {
       border: 1px solid #ccc;
       background-color: white;
       box-shadow: 0 0 10px rgba(0,0,0,0.05);
     }
+
+    #play-pause-btn {
+      margin-top: 10px;
+      padding: 6px 12px;
+      font-size: 14px;
+      border: none;
+      background-color: #007acc;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #play-pause-btn:hover {
+      background-color: #005f99;
+    }
+
+    #loading-overlay {
+      position: fixed;
+      top: 150px;
+      left: 20px;
+      width: 500px;
+      height: 400px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.85);
+      font-size: 18px;
+      color: #333;
+      border: 1px solid #ccc;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      z-index: 100;
+    }
+
+    #loading-text {
+      font-weight: bold;
+    }
+
   </style>
 </head>
 <body>
 
   <div id="control-panel">
-    <h2>Heart Rate Over Time</h2>
+    <h2>A Day In My Life</h2>
+    <button id="play-pause-btn">▶ Auto-Scroll</button>
   </div>
 
   <div id="chart-container">
-    <svg id="chart" width="900" height="400"></svg>
+    <svg id="chart" width="500" height="200"></svg>
+  </div>
+
+  <div id="chart-container-acc" style="overflow-x: auto; width: 500px;">
+    <svg id="chart-acc" width="500" height="200"></svg>
+  </div>
+
+  <div id="loading-overlay">
+    <div id="loading-text">Loading data...</div>
   </div>
 
 </body>
 </html>
+

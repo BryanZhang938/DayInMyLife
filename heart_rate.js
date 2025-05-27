@@ -2,7 +2,7 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 const width = 900;
 const height = 400;
-const margin = { top: 40, right: 40, bottom: 40, left: 60 };
+const margin = { top: 40, right: 20, bottom: 40, left: 20 };
 const params = new URLSearchParams(window.location.search);
 const selectedUser = params.get("user");
 
@@ -11,8 +11,6 @@ if (!selectedUser) {
 }
 const svg = d3.select("#chart")
   .attr("viewBox", [0, 0, width, height]);
-
-const dropdown = d3.select("#user-select");
 
 const activityLabels = {
   1: "Sleeping",
@@ -28,9 +26,6 @@ const activityLabels = {
   11: "Smoking",
   12: "Alcohol"
 };
-
-let lastScrollPosition = 0;
-let scrollThrottleTimeout;
 
 let tooltip = d3.select("#tooltip-div");
 if (tooltip.empty()) {
@@ -198,7 +193,7 @@ function renderChart(dataSlice, windowStart, windowEnd, yExtent, activities) {
 
   svg.append("text")
     .attr("x", -height / 2)
-    .attr("y", 15)
+    .attr("y", -margin.left)
     .attr("transform", "rotate(-90)")
     .attr("text-anchor", "middle")
     .text("Average BPM");

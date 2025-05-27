@@ -2,11 +2,17 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 const width = 900;
 const height = 400;
-const margin = { top: 40, right: 40, bottom: 40, left: 60 };
+const margin = { top: 40, right: 20, bottom: 40, left: 20 };
+const params = new URLSearchParams(window.location.search);
+const selectedUser = params.get("user");
+
+if (!selectedUser) {
+  console.error("No user specified in URL.");
+}
 
 const parseTime = d3.timeParse("%H:%M:%S");
 
-const svg = d3.select("#chart")
+const svg = d3.select("#chart-acc")
   .attr("viewBox", [0, 0, width, height]);
 
 const dropdown = d3.select("#user-select");
@@ -19,10 +25,10 @@ let autoScrollInterval = null;
 let isAutoScrolling = false; 
 let lastScrollTime = 0;
 
-let tooltip = d3.select("#tooltip-div");
+let tooltip = d3.select("#tooltip-div-acc");
 if (tooltip.empty()) {
   tooltip = d3.select("body").append("div")
-    .attr("id", "tooltip-div")
+    .attr("id", "tooltip-div-acc")
     .style("position", "fixed")
     .style("background", "#fff")
     .style("border", "1px solid #ccc")
@@ -59,7 +65,7 @@ d3.csv("../cleaned_data/acc.csv", d => {
     .text(d => d);
 
   loadingText.text("Loading graph...");
-  updateChart(users[0]);
+  updateChart(selectedUser);
 
   const playPauseBtn = d3.select("#play-pause-btn");
   playPauseBtn.on("click", () => {
@@ -116,9 +122,7 @@ d3.csv("../cleaned_data/acc.csv", d => {
       playPauseBtn.text("▶ Auto-Scroll");
     }
   }, { passive: true });
-  dropdown.on("change", function () {
-    updateChart(this.value);
-  });
+  
   // if we’re in “↻ Reset” but the user scrolls up off the bottom, flip back to ▶ Auto-Scroll
 window.addEventListener("scroll", () => {
   const maxScroll = document.body.scrollHeight - window.innerHeight;
@@ -205,7 +209,7 @@ function renderChart(dataSlice, windowStart, windowEnd, yExtent) {
 
   svg.append("text")
     .attr("x", -height / 2)
-    .attr("y", 15)
+    .attr("y", -margin.left)
     .attr("transform", "rotate(-90)")
     .attr("text-anchor", "middle")
     .text("Vector Magnitude (Smoothed)");
