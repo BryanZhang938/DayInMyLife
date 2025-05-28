@@ -2,10 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>A Day In My Life</title>
   <script type="module" src="../heart_rate.js"></script>
   <script type="module" src="../accelerometer.js"></script>
-  <link rel="stylesheet" href="../styles.css"> <!-- optional -->
+  <script type="module" src="activity_display.js"></script>
+  <link rel="stylesheet" href="../styles.css">
   <style>
     body {
       margin: 0;
@@ -82,10 +84,66 @@
       font-weight: bold;
     }
 
+    .activity-section {
+      position: fixed;
+      top: 80px;
+      left: 20px;
+      width: 220px;
+      z-index: 10;
+    }
+
+    .activity-title {
+      background: white;
+      padding: 10px;
+      margin: 0;
+      border-radius: 8px 8px 0 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      text-align: center;
+    }
+
+    .activity-container {
+      background: white;
+      padding: 10px;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .video-wrapper {
+      width: 100%;
+      height: 180px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid #eee;
+      border-radius: 4px;
+      background: #f8f8f8;
+    }
+
+    #activity-animation-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    #no-activity-msg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      text-align: center;
+      color: #666;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 10px;
+      border-radius: 4px;
+      margin: 0;
+    }
+
   </style>
 </head>
 <body>
-
   <div id="control-panel">
     <h2>A Day In My Life</h2>
     <button id="play-pause-btn">▶ Auto-Scroll</button>
