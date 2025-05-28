@@ -10,8 +10,6 @@ if (!selectedUser) {
   console.error("No user specified in URL.");
 }
 
-const parseTime = d3.timeParse("%H:%M:%S");
-
 const svg = d3.select("#chart-acc")
   .attr("viewBox", [0, 0, width, height]);
 
@@ -22,8 +20,6 @@ const loadingText = d3.select("#loading-text");
 
 let isPlaying = false;
 let autoScrollInterval = null;
-let isAutoScrolling = false; 
-let lastScrollTime = 0;
 
 let tooltip = d3.select("#tooltip-div-acc");
 if (tooltip.empty()) {
@@ -45,10 +41,10 @@ loadingOverlay.style("display", "flex");
 loadingText.text("Loading data...");
 
 d3.csv("../cleaned_data/acc.csv", d => {
-  const time = parseTime(d.time);
+  // const time = parseTime(d.time);
   return {
     user: d.user,
-    time,
+    time: new Date(d.time),
     magnitude: +d["Vector Magnitude_smoothed"]
   };
 }).then(accData => {
@@ -212,7 +208,7 @@ function renderChart(dataSlice, windowStart, windowEnd, yExtent) {
     .attr("y", -margin.left)
     .attr("transform", "rotate(-90)")
     .attr("text-anchor", "middle")
-    .text("Vector Magnitude (Smoothed)");
+    .text("Movement Intensity");
 
   const hoverLine = svg.append("line")
     .attr("stroke", "gray")
