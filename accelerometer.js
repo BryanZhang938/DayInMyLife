@@ -20,6 +20,8 @@ const loadingText = d3.select("#loading-text");
 
 let isPlaying = false;
 let autoScrollInterval = null;
+let isAutoScrolling = false;
+let lastScrollTime = 0;
 
 let tooltip = d3.select("#tooltip-div-acc");
 if (tooltip.empty()) {
