@@ -185,11 +185,11 @@ function renderChart(dataSlice, windowStart, windowEnd, yExtent, activities) {
     .attr("transform", `translate(${margin.left},0)`)
     .call(d3.axisLeft(y));
 
-  svg.append("text")
+  /* svg.append("text")
     .attr("x", width / 2)
     .attr("y", height - 5)
     .attr("text-anchor", "middle")
-    .text("Time (1-Hour Window)");
+    .text("Time (1-Hour Window)"); */
 
   svg.append("text")
     .attr("x", -height / 2)
