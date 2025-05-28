@@ -187,4 +187,16 @@
   .grid path {
     display: none;
   }
+
+  #tooltip-activity, #tooltip-heartrate {
+    position: absolute;
+    text-align: center;
+    padding: 6px;
+    font: 12px sans-serif;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    pointer-events: none;
+    opacity: 0;
+  }
   

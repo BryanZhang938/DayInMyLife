@@ -80,6 +80,8 @@ function drawHeartRate(data) {
     .domain([0, d3.max(hourlyData, d => d.avgRate)]).nice()
     .range([height - margin.bottom, margin.top]);
 
+  const tooltip = d3.select("#tooltip-heartrate");
+
   // Add bars
   const barW = ((width - margin.left - margin.right) / hourlyData.length) * 0.8;
   svg.append("g")
@@ -91,7 +93,25 @@ function drawHeartRate(data) {
     .attr("width", barW)
     .attr("height", d => y(0) - y(d.avgRate))
     .attr("fill", d => peakHour && d.hour.getTime() === peakHour.hour.getTime() ? "#ff7f0e" : "steelblue")
-    .attr("opacity", 0.6);
+    .attr("opacity", 0.6)
+    .on("mouseover", function (event, d) {
+      tooltip
+        .style("opacity", 1)
+        .html(`
+          Time: ${d3.timeFormat("%-I %p")(d.hour)}<br>
+          Heart Rate: ${d.avgRate.toFixed(1)} bpm
+        `);
+      d3.select(this).attr("opacity", 1);
+    })
+    .on("mousemove", function (event) {
+      tooltip
+        .style("left", (event.pageX + 10) + "px")
+        .style("top", (event.pageY - 28) + "px");
+    })
+    .on("mouseout", function () {
+      tooltip.style("opacity", 0);
+      d3.select(this).attr("opacity", 0.6);
+    });
 
   // Add axes
   svg.append("g")
@@ -136,7 +156,7 @@ function drawHeartRate(data) {
     .style("text-anchor", "middle")
     .style("font-size", "20px")
     .style("font-weight", "bold")
-    .text("Hourly Average Heart Rate");
+    .text("Average Heart Rate Per Hour");
 }
 
 // Export functions for use in other modules
