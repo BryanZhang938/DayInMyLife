@@ -98,13 +98,8 @@ async function loadAndParseActivityData() {
         console.log("Activity data loaded and processed:", allActivityData.slice(0, 3));
         if (loadingOverlay) loadingOverlay.style.display = 'none';
 
-        // Initial display and set up periodic updates
+        // Initial display
         updateActivityAnimationView();
-        // Sync with main visualization's time updates instead of a fixed interval if possible
-        // For example, if your other scripts dispatch a custom event:
-        // window.addEventListener('visualizationTimeUpdate', updateActivityAnimationView);
-        // Otherwise, a simple interval for demonstration:
-        setInterval(updateActivityAnimationView, 1000); // Update every second
 
     } catch (error) {
         console.error("Error loading or parsing activity data:", error);
@@ -314,7 +309,7 @@ function updateActivityAnimationView() {
     }
 }
 
-// Add click handler to play video if autoplay fails
+// --- Initialization ---
 document.addEventListener('DOMContentLoaded', async () => {
     // First set up the DOM elements
     setupActivityDisplayElements();
@@ -339,4 +334,30 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
     }
+
+    // Listen for scroll events to update the activity display
+    window.addEventListener('scroll', () => {
+        // Calculate the current time based on scroll position
+        const scrollPosition = window.scrollY;
+        const totalHeight = document.body.scrollHeight - window.innerHeight;
+        const scrollPercentage = scrollPosition / totalHeight;
+        
+        // Assuming the day starts at 00:00 and ends at 24:00
+        const totalMinutesInDay = 24 * 60;
+        const currentMinutes = Math.floor(scrollPercentage * totalMinutesInDay);
+        
+        // Create a date object for the current time
+        const currentDate = new Date(2000, 0, 1); // Use a consistent base date
+        currentDate.setHours(Math.floor(currentMinutes / 60));
+        currentDate.setMinutes(currentMinutes % 60);
+        
+        // Update the global time for the visualization
+        window.currentVizTime = currentDate;
+        
+        // Update the activity display
+        updateActivityAnimationView();
+    });
+
+    // Initial update
+    updateActivityAnimationView();
 });
