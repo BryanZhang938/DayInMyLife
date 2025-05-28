@@ -193,10 +193,12 @@ function renderChart(dataSlice, windowStart, windowEnd, yExtent, activities) {
 
   svg.append("text")
     .attr("x", -height / 2)
-    .attr("y", -margin.left)
+    .attr("y", -margin.left - 5)
     .attr("transform", "rotate(-90)")
     .attr("text-anchor", "middle")
-    .text("Average BPM");
+    .text("Beats Per Minute")
+    .style("font-size", "20px")
+    .style("font-weight", "bold");
 
   const hoverLine = svg.append("line")
     .attr("stroke", "gray")
@@ -274,4 +276,12 @@ function renderChart(dataSlice, windowStart, windowEnd, yExtent, activities) {
       hoverLine.style("display", "none");
       hoverDot.style("display", "none");
     });
+
+  svg.selectAll(".tick text")
+  .style("font-size", "17px");
+
+  svg.selectAll(".domain, .tick line")
+  .style("stroke", "#333")
+  .style("stroke-width", 1.5);
+
 }
