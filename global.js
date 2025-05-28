@@ -62,7 +62,7 @@ const svg = d3.select("body")
       
       .on("mouseover", function (event, d) {
         tooltip.style("visibility", "visible")
-               .html(`<strong>${d.user}</strong><br>` +
+        .html(`<strong>Participant ${d.user.replace('user_', '')}</strong><br>` +
                 `Age: ${d.Age}<br>` +
                 `Height: ${d.Height} cm<br>` +
                 `Weight: ${d.Weight} kg<br>` +
