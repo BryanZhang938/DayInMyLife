@@ -53,7 +53,7 @@ function drawActivity(data) {
   // Create chart
   const svg = d3.select("#activity-chart");
   const { width, height } = svg.node().getBoundingClientRect();
-  const margin = { top: 20, right: 20, bottom: 40, left: 50 };
+  const margin = { top: 20, right: 20, bottom: 50, left: 50 };
 
   svg.selectAll("*").remove();
 
@@ -93,17 +93,22 @@ function drawActivity(data) {
       .ticks(d3.timeHour.every(2))
       .tickFormat(d3.timeFormat("%-I %p")))
     .selectAll("text")
-    .style("text-anchor", "middle");
+    .style("text-anchor", "middle")
+    .style("font-size", "12px");
 
   svg.append("g")
     .attr("transform", `translate(${margin.left},0)`)
-    .call(d3.axisLeft(y));
+    .call(d3.axisLeft(y))
+    .selectAll("text")
+    .style("font-size", "12px");
 
   // Add axis labels
   svg.append("text")
     .attr("class", "axis-label")
-    .attr("transform", `translate(${width / 2}, ${height - 5})`)
+    .attr("transform", `translate(${width / 2}, ${height-5})`)
     .style("text-anchor", "middle")
+    .style("font-size", "17px")
+    .style("font-weight", "bold")
     .text("Hour of Day");
 
   svg.append("text")
@@ -112,6 +117,8 @@ function drawActivity(data) {
     .attr("x", -height / 2)
     .attr("y", 15)
     .style("text-anchor", "middle")
+    .style("font-size", "17px")
+    .style("font-weight", "bold")
     .text("Average Activity Level");
 
   // Add title
@@ -120,6 +127,8 @@ function drawActivity(data) {
     .attr("x", width / 2)
     .attr("y", margin.top / 1.5)
     .style("text-anchor", "middle")
+    .style("font-size", "20px")
+    .style("font-weight", "bold")
     .text("Average Activity Level Per Hour");
 }
 

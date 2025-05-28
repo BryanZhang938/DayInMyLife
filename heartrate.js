@@ -62,7 +62,7 @@ function drawHeartRate(data) {
   // Create chart
   const svg = d3.select("#heartrate-chart");
   const { width, height } = svg.node().getBoundingClientRect();
-  const margin = { top: 40, right: 20, bottom: 30, left: 40 };
+  const margin = { top: 40, right: 20, bottom: 50, left: 50 };
 
   svg.selectAll("*").remove();
 
@@ -75,10 +75,6 @@ function drawHeartRate(data) {
   const x = d3.scaleTime()
     .domain(paddedDomain)
     .range([margin.left, width - margin.right]);
-
-  // const x = d3.scaleTime()
-  //   .domain(d3.extent(hourlyData, d => d.hour))
-  //   .range([margin.left, width - margin.right]);
 
   const y = d3.scaleLinear()
     .domain([0, d3.max(hourlyData, d => d.avgRate)]).nice()
@@ -102,17 +98,24 @@ function drawHeartRate(data) {
     .attr("transform", `translate(0,${height - margin.bottom})`)
     .call(d3.axisBottom(x)
       .ticks(d3.timeHour.every(2))
-      .tickFormat(d3.timeFormat("%-I %p")));
+      .tickFormat(d3.timeFormat("%-I %p")))
+    .selectAll("text")
+    .style("text-anchor", "middle")
+    .style("font-size", "12px");
 
   svg.append("g")
     .attr("transform", `translate(${margin.left},0)`)
-    .call(d3.axisLeft(y));
+    .call(d3.axisLeft(y))
+    .selectAll("text")
+    .style("font-size", "12px");;
 
   // Add labels
   svg.append("text")
     .attr("class", "axis-label")
     .attr("transform", `translate(${width/2}, ${height - 5})`)
     .style("text-anchor", "middle")
+    .style("font-size", "17px")
+    .style("font-weight", "bold")
     .text("Hour of Day");
 
   svg.append("text")
@@ -121,6 +124,8 @@ function drawHeartRate(data) {
     .attr("x", -height/2)
     .attr("y", 15)
     .style("text-anchor", "middle")
+    .style("font-size", "17px")
+    .style("font-weight", "bold")
     .text("Average Heart Rate (bpm)");
 
   // Add title
@@ -129,6 +134,8 @@ function drawHeartRate(data) {
     .attr("x", width/2)
     .attr("y", margin.top/1.5)
     .style("text-anchor", "middle")
+    .style("font-size", "20px")
+    .style("font-weight", "bold")
     .text("Hourly Average Heart Rate");
 }
 
