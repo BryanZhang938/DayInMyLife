@@ -81,7 +81,7 @@ function displaySleepMetrics(summary) {
   d3.select('#sleep-metrics')
     .html(`
       <div class="metric">
-        <strong>${Math.round(totalSleep/60)} h ${totalSleep%60} m</strong>
+        <strong>${Math.floor(totalSleep/60)} h ${totalSleep%60} m</strong>
         <div class="label">Total Sleep</div>
       </div>
       <div class="metric">
