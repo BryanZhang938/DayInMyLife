@@ -62,13 +62,23 @@ function drawHeartRate(data) {
   // Create chart
   const svg = d3.select("#heartrate-chart");
   const { width, height } = svg.node().getBoundingClientRect();
-  const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+  const margin = { top: 40, right: 20, bottom: 30, left: 40 };
 
   svg.selectAll("*").remove();
 
+  const hourExtent = d3.extent(hourlyData, d => d.hour);
+  const paddedDomain = [
+    d3.timeHour.offset(hourExtent[0], -1),  
+    d3.timeHour.offset(hourExtent[1], 1)   
+  ];
+
   const x = d3.scaleTime()
-    .domain(d3.extent(hourlyData, d => d.hour))
+    .domain(paddedDomain)
     .range([margin.left, width - margin.right]);
+
+  // const x = d3.scaleTime()
+  //   .domain(d3.extent(hourlyData, d => d.hour))
+  //   .range([margin.left, width - margin.right]);
 
   const y = d3.scaleLinear()
     .domain([0, d3.max(hourlyData, d => d.avgRate)]).nice()
@@ -117,7 +127,7 @@ function drawHeartRate(data) {
   svg.append("text")
     .attr("class", "chart-title")
     .attr("x", width/2)
-    .attr("y", margin.top/2)
+    .attr("y", margin.top/1.5)
     .style("text-anchor", "middle")
     .text("Hourly Average Heart Rate");
 }
