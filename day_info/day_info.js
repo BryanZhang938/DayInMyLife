@@ -66,10 +66,15 @@ if (tooltip.empty()) {
 function parseTimeToDate(timeStr, dayNumber) {
     if (!timeStr) return null;
     const [hours, minutes] = timeStr.split(':').map(Number);
-    return new Date(2000, 0, dayNumber, hours, minutes, 0);
+    return new Date(2024, 0, dayNumber, hours, minutes, 0);
 }
 
 function getActiveActivity(nowDateTime, activities) {
+    if (!activities || activities.length === 0) {
+        console.warn('No activities provided');
+        return null;
+    }
+
     const userActivities = activities
         .filter(act => act.user === selectedUser)
         .map(act => {
@@ -85,6 +90,11 @@ function getActiveActivity(nowDateTime, activities) {
         })
         .filter(act => act.startDateTime)
         .sort((a, b) => a.startDateTime - b.startDateTime);
+
+    if (userActivities.length === 0) {
+        console.warn(`No activities found for user ${selectedUser}`);
+        return null;
+    }
 
     let currentActivity = null;
 
@@ -103,8 +113,10 @@ function getActiveActivity(nowDateTime, activities) {
 
         if (nowDateTime >= activity.startDateTime && nowDateTime < effectiveEndTime) {
             currentActivity = activity;
+            break;
         }
     }
+
     return currentActivity;
 }
 
@@ -439,8 +451,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             }),
             d3.csv("../assets/cleaned_data/all_activity.csv", d => ({
                 activity: +d.Activity,
-                start: new Date(`2024-01-${String(d.Day).padStart(2, '0')}T${d.Start}`),
-                end: new Date(`2024-01-${String(d.Day).padStart(2, '0')}T${d.End}`),
+                start: parseTimeToDate(d.Start, +d.Day),
+                end: d.End ? parseTimeToDate(d.End, +d.Day) : null,
                 user: d.user,
                 startStr: d.Start,
                 endStr: d.End,
@@ -486,6 +498,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             );
 
             renderChart(visibleData, windowStart, windowEnd, yExtent, visibleActivities);
+            
+            // Update activity animation based on the middle of the current time window
+            const currentTime = new Date(windowStart.getTime() + (windowEnd.getTime() - windowStart.getTime()) / 2);
+            updateActivityAnimationView(currentTime, userActivities);
         });
 
         const initialStart = timeExtent[0];
@@ -498,6 +514,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         );
 
         renderChart(initialData, initialStart, initialEnd, yExtent, initialActivities);
+        
+        // Set initial activity animation
+        const initialTime = new Date(initialStart.getTime() + (initialEnd.getTime() - initialStart.getTime()) / 2);
+        updateActivityAnimationView(initialTime, userActivities);
 
         // Add click handler for video playback
         const animationContainer = document.querySelector('.video-wrapper');
