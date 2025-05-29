@@ -1,11 +1,18 @@
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
+const params = new URLSearchParams(window.location.search);
+const selectedUser = params.get("user");
+
 // Function to parse activity data
 function parseActivity(d) {
   return {
+    user: d.user,
     datetime: d3.timeParse("%H:%M:%S")(d.time),
     activity: +d["Vector Magnitude"]
   };
 }
 
+// Function to draw activity chart
 function drawActivity(data) {
   // Validate data
   if (!data || data.length === 0) {
@@ -35,10 +42,10 @@ function drawActivity(data) {
     ? hourlyData.reduce((a, b) => b.avgActivity > a.avgActivity ? b : a, hourlyData[0])
     : null;
 
-  // Update metrics display with overall average activity
+  // Update metrics display
   d3.select("#activity-metrics").html(`
     <div class="metric">
-      <strong>${peakHour ? peakHour.avgActivity.toFixed(1) : 'N/A'}</strong><br>Peak Activity Level
+      <strong>${peakHour ? peakHour.avgActivity.toFixed(1) : 'N/A'}</strong><br>Peak Hourly Activity Level
     </div>
     <div class="metric">
       <strong>${peakHour ? d3.timeFormat("%-I %p")(peakHour.hour) : 'N/A'}</strong><br>Peak Hour
@@ -53,7 +60,7 @@ function drawActivity(data) {
   // Create chart
   const svg = d3.select("#activity-chart");
   const { width, height } = svg.node().getBoundingClientRect();
-  const margin = { top: 20, right: 20, bottom: 50, left: 50 };
+  const margin = { top: 40, right: 20, bottom: 50, left: 50 };
 
   svg.selectAll("*").remove();
 
@@ -71,12 +78,23 @@ function drawActivity(data) {
     .domain([0, d3.max(hourlyData, d => d.avgActivity)]).nice()
     .range([height - margin.bottom, margin.top]);
 
-  const tooltip = d3.select("#tooltip-activity");
+  // Add tooltip container if not present
+  if (d3.select("body").select("#tooltip-activity").empty()) {
+    d3.select("body")
+      .append("div")
+      .attr("id", "tooltip-activity")
+      .style("position", "absolute")
+      .style("background", "#fff")
+      .style("padding", "6px")
+      .style("border", "1px solid #999")
+      .style("border-radius", "4px")
+      .style("pointer-events", "none")
+      .style("opacity", 0);
+  }
 
-  // Calculate bar width based on time difference between hours
+  const tooltip = d3.select("#tooltip-activity");
   const barWidth = (width - margin.left - margin.right) / hourlyData.length * 0.8;
 
-  // Draw bars
   svg.append("g")
     .selectAll("rect")
     .data(hourlyData)
@@ -91,8 +109,8 @@ function drawActivity(data) {
       tooltip
         .style("opacity", 1)
         .html(`
-          Time: ${d3.timeFormat("%-I %p")(d.hour)}<br>
-          Activity Level: ${d.avgActivity.toFixed(1)}
+          <strong>Time:</strong> ${d3.timeFormat("%-I %p")(d.hour)}<br>
+          <strong>Activity Level:</strong> ${d.avgActivity.toFixed(1)}
         `);
       d3.select(this).attr("opacity", 1);
     })
@@ -106,7 +124,6 @@ function drawActivity(data) {
       d3.select(this).attr("opacity", 0.6);
     });
 
-  // Add axes
   svg.append("g")
     .attr("transform", `translate(0,${height - margin.bottom})`)
     .call(d3.axisBottom(x)
@@ -122,10 +139,9 @@ function drawActivity(data) {
     .selectAll("text")
     .style("font-size", "12px");
 
-  // Add axis labels
   svg.append("text")
     .attr("class", "axis-label")
-    .attr("transform", `translate(${width / 2}, ${height-5})`)
+    .attr("transform", `translate(${width / 2}, ${height - 5})`)
     .style("text-anchor", "middle")
     .style("font-size", "17px")
     .style("font-weight", "bold")
@@ -141,7 +157,6 @@ function drawActivity(data) {
     .style("font-weight", "bold")
     .text("Average Activity Level");
 
-  // Add title
   svg.append("text")
     .attr("class", "chart-title")
     .attr("x", width / 2)
@@ -152,6 +167,19 @@ function drawActivity(data) {
     .text("Average Activity Level Per Hour");
 }
 
+// Export functions
+export { parseActivity, drawActivity };
 
-// Export functions for use in other modules
-export { parseActivity, drawActivity }; 
+// Auto-load activity data if on a user-specific page
+if (selectedUser) {
+  d3.csv("../cleaned_data/all_actigraph.csv", parseActivity).then(activityData => {
+    const filtered = activityData.filter(d => d.user === selectedUser);
+    if (filtered.length > 0) {
+      drawActivity(filtered);
+    } else {
+      console.warn(`No activity data found for user: ${selectedUser}`);
+    }
+  }).catch(error => {
+    console.error("Failed to load activity CSV:", error);
+  });
+}

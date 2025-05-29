@@ -54,7 +54,7 @@ function drawHeartRate(data) {
   // Create metrics display
   d3.select("#heartrate-metrics").html(`
     <div class="metric">
-      <strong>${peakHour ? peakHour.avgRate.toFixed(1) : 'N/A'}</strong><br>Peak Heart Rate
+      <strong>${peakHour ? peakHour.avgRate.toFixed(1) : 'N/A'}</strong><br>Peak Hourly Heart Rate
     </div>
     <div class="metric">
       <strong>${peakHour ? d3.timeFormat("%-I %p")(peakHour.hour) : 'N/A'}</strong><br>Peak Hour
