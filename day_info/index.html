@@ -4,10 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>A Day In My Life</title>
+  <link rel="stylesheet" href="../styles.css">
   <script type="module" src="../heart_rate.js"></script>
   <script type="module" src="../accelerometer.js"></script>
   <script type="module" src="activity_display.js"></script>
-  <link rel="stylesheet" href="../styles.css">
+  <script type="module" src="../sleep.js"></script>
+  <script type="module" src="../heartrate.js"></script>
+  <script type="module" src="../activity.js"></script>
   <style>
     body {
       margin: 0;
@@ -160,6 +163,27 @@
   <div id="loading-overlay">
     <div id="loading-text">Loading data...</div>
   </div>
+  <h2>Sleep Summary</h2>
+
+  <!-- Sleep Metrics -->
+<!-- Spacer to simulate the scroll timeline -->
+  <div id="sleep-metrics" class="metrics" style="padding: 40px;"></div>
+
+  <section id="heartrate" class="section">
+    <h2>Heart Rate Analysis</h2>
+    <div id="heartrate-metrics" class="metrics"></div>
+    <svg id="heartrate-chart" class="chart" width="650" height="300"></svg>
+    <div id="tooltip-heartrate"></div>
+  </section>
+    
+  <!-- Activity -->
+  <section id="activity" class="section">
+    <h3>Activity Visualization</h3>
+    <div id="activity-metrics" class="metrics"></div>
+    <svg id="activity-chart" class="chart" width="650" height="250"></svg>
+  </section>
+  
+</div>
 
 </body>
 </html>
