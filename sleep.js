@@ -2,7 +2,7 @@ const data = {};
 
 function parseSleep(d) {
   return {
-    user: d.user,
+    user: d.user.trim(),
     datetime: d3.timeParse("%Y-%m-%d %H:%M")(d["In Bed Date"] + " " + d["In Bed Time"]),
     efficiency: +d.Efficiency,
     totalSleep: +d["Total Sleep Time (TST)"],
@@ -24,12 +24,31 @@ d3.csv("cleaned_data/all_sleep.csv", parseSleep).then(sleep => {
   console.error("Error loading sleep data:", error);
 });
 
+function summarizeSleepByUser(sleepData) {
+  const summary = d3.rollups(
+    sleepData,
+    v => ({
+      totalSleep: d3.sum(v, d => d.totalSleep),
+      count: v.length,
+      avgEfficiency: d3.mean(v, d => d.efficiency),
+      latest: v[v.length - 1]
+    }),
+    d => d.user
+  );
+  
+  return Object.fromEntries(summary);
+}
+
 function initParticipantSelector() {
   // Get unique participants
   const participants = [...new Set(data.sleep.map(d => d.user))];
-  
+
+  const summary = summarizeSleepByUser(data.sleep);
+  data.sleepSummary = summary;
+
   // Populate dropdown
   const select = d3.select('#participant-select');
+  select.selectAll('option').remove(); 
   
   select.selectAll('option')
     .data(participants)
@@ -38,51 +57,59 @@ function initParticipantSelector() {
     .attr('value', d => d)
     .text(d => `Participant ${d.replace('user_', '')}`);
   
+  const defaultUser = "user_1";
+  if (participants.includes(defaultUser)) {
+    select.property("value", defaultUser);
+    displaySleepMetrics(data.sleepSummary[defaultUser]);
+  }
+
   // Add change event listener
   select.on('change', function() {
     const selectedUser = this.value;
     if (selectedUser) {
-      const userData = data.sleep.find(d => d.user === selectedUser);
-      if (userData) {
-        displaySleepMetrics(userData);
+      const summary = data.sleepSummary[selectedUser];
+      if (summary) {
+        displaySleepMetrics(summary);
       }
     }
   });
 }
 
-function displaySleepMetrics(sleepData) {
+function displaySleepMetrics(summary) {
+  const { totalSleep, avgEfficiency, latest } = summary;
+
   d3.select('#sleep-metrics')
     .html(`
       <div class="metric">
-        <strong>${Math.round(sleepData.totalSleep/60)} h ${sleepData.totalSleep%60} m</strong>
+        <strong>${Math.floor(totalSleep/60)} h ${totalSleep%60} m</strong>
         <div class="label">Total Sleep</div>
       </div>
       <div class="metric">
-        <strong>${sleepData.efficiency.toFixed(1)} %</strong>
+        <strong>${isNaN(avgEfficiency) ? "N/A" : avgEfficiency.toFixed(1)} %</strong>
         <div class="label">Sleep Efficiency</div>
       </div>
       <div class="metric">
-        <strong>${sleepData.latency} m</strong>
+        <strong>${latest.latency} m</strong>
         <div class="label">Sleep Latency</div>
       </div>
       <div class="metric">
-        <strong>${sleepData.awakenings}</strong>
+        <strong>${latest.awakenings}</strong>
         <div class="label">Number of Awakenings</div>
       </div>
       <div class="metric">
-        <strong>${sleepData.avgAwakeningLength.toFixed(1)} m</strong>
+        <strong>${latest.avgAwakeningLength.toFixed(1)} m</strong>
         <div class="label">Average Awakening Length</div>
       </div>
       <div class="metric">
-        <strong>${sleepData.waso} m</strong>
+        <strong>${latest.waso} m</strong>
         <div class="label">Wake After Sleep Onset</div>
       </div>
       <div class="metric">
-        <strong>${sleepData.movementIndex.toFixed(1)}</strong>
+        <strong>${latest.movementIndex.toFixed(1)}</strong>
         <div class="label">Movement Index</div>
       </div>
       <div class="metric">
-        <strong>${sleepData.fragmentationIndex.toFixed(1)}</strong>
+        <strong>${latest.fragmentationIndex.toFixed(1)}</strong>
         <div class="label">Fragmentation Index</div>
       </div>
     `);
