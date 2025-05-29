@@ -44,7 +44,7 @@ if (tooltip.empty()) {
 }
 
 Promise.all([
-  d3.csv("../cleaned_data/all_actigraph.csv", d => {
+  d3.csv("../assets/cleaned_data/all_actigraph.csv", d => {
     const hr = +d.HR;
     if (isNaN(hr)) return null;
     const timestamp = new Date(`2024-01-${String(d.day).padStart(2, '0')}T${d.time}`);
@@ -56,7 +56,7 @@ Promise.all([
       heartRate: hr
     };
   }),
-  d3.csv("../cleaned_data/all_activity.csv", d => {
+  d3.csv("../assets/cleaned_data/all_activity.csv", d => {
     return {
       activity: +d.Activity,
       start: new Date(`2024-01-${String(d.Day).padStart(2, '0')}T${d.Start}`),
