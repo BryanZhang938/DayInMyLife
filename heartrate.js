@@ -173,7 +173,7 @@ export { parseHeartRate, drawHeartRate };
 const userParam = new URLSearchParams(window.location.search).get("user");
 
 if (userParam) {
-  d3.csv("../cleaned_data/all_actigraph.csv", parseHeartRate).then(hrData => {
+  d3.csv("../assets/cleaned_data/all_actigraph.csv", parseHeartRate).then(hrData => {
     const filtered = hrData.filter(d => d.user === userParam);
     if (filtered.length > 0) {
       drawHeartRate(filtered);

@@ -33,22 +33,22 @@ const params = new URLSearchParams(window.location.search);
 const selectedUser = params.get("user");
 
 // load CSV once at startup
-d3.csv("../cleaned_data/all_sleep.csv", parseSleep).then(sleep => {
-  console.log("Sleep data loaded:", sleep);
-  data.sleep = sleep;
-
-});
-if (selectedUser) {
-  const userData = sleep.filter(d => d.user === selectedUser);
-  if (userData.length > 0) {
-    displaySleepMetrics(userData[userData.length - 1]); // latest entry
-    // drawSleep(userData);
+d3.csv("../assets/cleaned_data/all_sleep.csv", parseSleep).then(sleepData => {
+  console.log("Sleep data loaded:", sleepData);
+  data.sleep = sleepData;
+  
+  if (selectedUser) {
+    const userData = sleepData.filter(d => d.user === selectedUser);
+    if (userData.length > 0) {
+      displaySleepMetrics(userData[userData.length - 1]); // latest entry
+      // drawSleep(userData);
+    } else {
+      console.warn(`No sleep data found for user: ${selectedUser}`);
+    }
   } else {
-    console.warn(`No sleep data found for user: ${selectedUser}`);
+    console.error("No user specified in the URL (use ?user=user_01)");
   }
-} else {
-  console.error("No user specified in the URL (use ?user=user_01)");
-}
+});
 
 function summarizeSleepByUser(sleepData) {
   const summary = d3.rollups(
@@ -101,41 +101,42 @@ function initParticipantSelector() {
   });
 }
 
-function displaySleepMetrics(summary) {
-  const { totalSleep, avgEfficiency, latest } = summary;
+function displaySleepMetrics(data) {
+  // Handle both single records and summary objects
+  const metrics = data.latest ? data : { latest: data };
 
   d3.select('#sleep-metrics')
     .html(`
       <div class="metric">
-        <strong>${Math.floor(totalSleep/60)} h ${totalSleep%60} m</strong>
+        <strong>${Math.floor(metrics.latest.totalSleep/60)} h ${metrics.latest.totalSleep%60} m</strong>
         <div class="label">Total Sleep</div>
       </div>
       <div class="metric">
-        <strong>${isNaN(avgEfficiency) ? "N/A" : avgEfficiency.toFixed(1)} %</strong>
+        <strong>${isNaN(metrics.latest.efficiency) ? "N/A" : metrics.latest.efficiency.toFixed(1)} %</strong>
         <div class="label">Sleep Efficiency</div>
       </div>
       <div class="metric">
-        <strong>${latest.latency} m</strong>
+        <strong>${metrics.latest.latency} m</strong>
         <div class="label">Sleep Latency</div>
       </div>
       <div class="metric">
-        <strong>${latest.awakenings}</strong>
+        <strong>${metrics.latest.awakenings}</strong>
         <div class="label">Number of Awakenings</div>
       </div>
       <div class="metric">
-        <strong>${latest.avgAwakeningLength.toFixed(1)} m</strong>
+        <strong>${metrics.latest.avgAwakeningLength.toFixed(1)} m</strong>
         <div class="label">Average Awakening Length</div>
       </div>
       <div class="metric">
-        <strong>${latest.waso} m</strong>
+        <strong>${metrics.latest.waso} m</strong>
         <div class="label">Wake After Sleep Onset</div>
       </div>
       <div class="metric">
-        <strong>${latest.movementIndex.toFixed(1)}</strong>
+        <strong>${metrics.latest.movementIndex.toFixed(1)}</strong>
         <div class="label">Movement Index</div>
       </div>
       <div class="metric">
-        <strong>${latest.fragmentationIndex.toFixed(1)}</strong>
+        <strong>${metrics.latest.fragmentationIndex.toFixed(1)}</strong>
         <div class="label">Fragmentation Index</div>
       </div>
     `);

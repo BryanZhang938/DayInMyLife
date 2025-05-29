@@ -172,7 +172,7 @@ export { parseActivity, drawActivity };
 
 // Auto-load activity data if on a user-specific page
 if (selectedUser) {
-  d3.csv("../cleaned_data/all_actigraph.csv", parseActivity).then(activityData => {
+  d3.csv("../assets/cleaned_data/all_actigraph.csv", parseActivity).then(activityData => {
     const filtered = activityData.filter(d => d.user === selectedUser);
     if (filtered.length > 0) {
       drawActivity(filtered);

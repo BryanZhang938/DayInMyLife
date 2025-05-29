@@ -210,34 +210,39 @@ function updateActivityAnimationView(nowDateTime, activities) {
     if (activeActivity && activeActivity.activityCode !== null) {
         const details = activityDetailsMap[activeActivity.activityCode];
         if (details) {
+            // Reset video state
+            animationVideo.style.display = 'none';
             noActivityMsg.textContent = "Loading activity...";
             noActivityMsg.style.display = 'block';
             
+            // Set up video event handlers
             animationVideo.onloadeddata = () => {
                 noActivityMsg.style.display = 'none';
                 animationVideo.style.display = 'block';
+                animationVideo.play().catch(error => {
+                    console.warn("Video autoplay failed:", error);
+                    noActivityMsg.textContent = "Click to play activity";
+                    noActivityMsg.style.display = 'block';
+                });
             };
             
-            animationVideo.onerror = () => {
+            animationVideo.onerror = (error) => {
+                console.error("Video loading error:", error);
                 noActivityMsg.textContent = `Failed to load activity: ${details.name}`;
                 noActivityMsg.style.display = 'block';
                 animationVideo.style.display = 'none';
             };
 
+            // Only update src if it's different to avoid unnecessary reloads
             if (animationVideo.src !== details.file) {
                 animationVideo.src = details.file;
+                animationVideo.load(); // Explicitly load the video
             }
             
             videoWrapper.title = `User ${selectedUser}: ${details.name}`;
-            
-            animationVideo.play().catch(error => {
-                console.warn("Video autoplay failed:", error);
-                noActivityMsg.textContent = "Click to play activity";
-                noActivityMsg.style.display = 'block';
-            });
         } else {
             animationVideo.style.display = 'none';
-            noActivityMsg.textContent = `Activity (Code: ${activeActivity.activityCode}) - No animation.`;
+            noActivityMsg.textContent = `Activity (Code: ${activeActivity.activityCode}) - No animation available.`;
             noActivityMsg.style.display = 'block';
             videoWrapper.title = `User ${selectedUser}: Unmapped Activity ${activeActivity.activityCode}`;
         }
