@@ -1,6 +1,13 @@
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
+const params = new URLSearchParams(window.location.search);
+const selectedUser = params.get("user");
+
+
 // Function to parse heart rate data
 function parseHeartRate(d) {
   return {
+    user: d.user,
     datetime: d3.timeParse("%H:%M:%S")(d.time),
     heartRate: +d["HR"]
   };
@@ -161,3 +168,19 @@ function drawHeartRate(data) {
 
 // Export functions for use in other modules
 export { parseHeartRate, drawHeartRate }; 
+
+// Auto-load heart rate data if on a user-specific page
+const userParam = new URLSearchParams(window.location.search).get("user");
+
+if (userParam) {
+  d3.csv("../cleaned_data/all_actigraph.csv", parseHeartRate).then(hrData => {
+    const filtered = hrData.filter(d => d.user === userParam);
+    if (filtered.length > 0) {
+      drawHeartRate(filtered);
+    } else {
+      console.warn(`No heart rate data found for user: ${userParam}`);
+    }
+  }).catch(error => {
+    console.error("Failed to load heart rate CSV:", error);
+  });
+}

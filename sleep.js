@@ -1,9 +1,24 @@
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 const data = {};
-
 function parseSleep(d) {
+  const anchor = new Date(2000, 0, 1); // Jan 1, 2000
+  const dayOffset = +d["In Bed Date"];
+  const timeStr = d["In Bed Time"];
+  if (!timeStr || !d["In Bed Date"]) {
+    console.warn("Invalid datetime –", d["In Bed Date"], timeStr);
+    return null;
+  }
+
+  const [hour, minute] = timeStr.split(":").map(Number);
+
+  const datetime = new Date(anchor);
+  datetime.setDate(anchor.getDate() + dayOffset - 1);
+  datetime.setHours(hour);
+  datetime.setMinutes(minute);
+
   return {
     user: d.user.trim(),
-    datetime: d3.timeParse("%Y-%m-%d %H:%M")(d["In Bed Date"] + " " + d["In Bed Time"]),
+    datetime: datetime,
     efficiency: +d.Efficiency,
     totalSleep: +d["Total Sleep Time (TST)"],
     waso: +d["Wake After Sleep Onset (WASO)"],
@@ -14,15 +29,26 @@ function parseSleep(d) {
     fragmentationIndex: +d["Fragmentation Index"]
   };
 }
+const params = new URLSearchParams(window.location.search);
+const selectedUser = params.get("user");
 
 // load CSV once at startup
-d3.csv("assets/cleaned_data/all_sleep.csv", parseSleep).then(sleep => {
+d3.csv("../cleaned_data/all_sleep.csv", parseSleep).then(sleep => {
   console.log("Sleep data loaded:", sleep);
   data.sleep = sleep;
-  initParticipantSelector();
-}).catch(error => {
-  console.error("Error loading sleep data:", error);
+
 });
+if (selectedUser) {
+  const userData = sleep.filter(d => d.user === selectedUser);
+  if (userData.length > 0) {
+    displaySleepMetrics(userData[userData.length - 1]); // latest entry
+    // drawSleep(userData);
+  } else {
+    console.warn(`No sleep data found for user: ${selectedUser}`);
+  }
+} else {
+  console.error("No user specified in the URL (use ?user=user_01)");
+}
 
 function summarizeSleepByUser(sleepData) {
   const summary = d3.rollups(
