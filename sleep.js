@@ -16,7 +16,7 @@ function parseSleep(d) {
 }
 
 // load CSV once at startup
-d3.csv("cleaned_data/all_sleep.csv", parseSleep).then(sleep => {
+d3.csv("assets/cleaned_data/all_sleep.csv", parseSleep).then(sleep => {
   console.log("Sleep data loaded:", sleep);
   data.sleep = sleep;
   initParticipantSelector();

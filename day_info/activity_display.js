@@ -42,7 +42,7 @@ async function loadAndParseActivityData() {
     if (loadingText) loadingText.textContent = 'Loading activity data...';
 
     try {
-        const response = await fetch('../cleaned_data/all_activity.csv');
+        const response = await fetch('../assets/cleaned_data/all_activity.csv');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status} for all_activity.csv`);
         }

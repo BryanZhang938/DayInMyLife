@@ -12,7 +12,7 @@ const svg = d3.select("body")
   .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    d3.csv("cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
+    d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
     data = data.filter(d => d.user !== "user_11");
   const x = d3.scaleLinear()
     .domain(d3.extent(data, d => d.Age)).nice()

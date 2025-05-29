@@ -42,7 +42,7 @@ if (tooltip.empty()) {
 loadingOverlay.style("display", "flex");
 loadingText.text("Loading data...");
 
-d3.csv("../cleaned_data/acc.csv", d => {
+d3.csv("../assets/cleaned_data/acc.csv", d => {
   // const time = parseTime(d.time);
   return {
     user: d.user,
