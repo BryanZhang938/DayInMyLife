@@ -64,10 +64,11 @@
       font-family: monospace;
       font-size: 1.5rem;
       font-weight: bold;
+      margin-top: -50px;
     }
 
     .progress-bar {
-      margin-top: 1rem;
+      margin-top: -3rem;
       width: 100%;
       height: 4px;
       background: rgba(255, 255, 255, 0.2);
@@ -95,6 +96,8 @@
     .animation-section {
       width: 50%;
       position: relative;
+      display: flex;
+      justify-content: flex-end;
     }
 
     .card {
@@ -119,9 +122,8 @@
 
     .activity-info {
       position: fixed;
-      bottom: 1.5rem;
-      left: 1.5rem;
-      right: 1.5rem;
+      bottom: 3rem;
+      right: 20px;
       z-index: 40;
       max-width: 32rem;
       margin: 0 auto;
@@ -151,9 +153,10 @@
     /* Activity Section Styles */
     .activity-section {
       position: fixed;
-      top: 80px;
-      left: 20px;
-      width: 220px;
+      top: 130px;
+      right: 20px;
+      width: 600px;
+      height: 500px;
       z-index: 10;
     }
 
@@ -179,7 +182,7 @@
 
     .video-wrapper {
       width: 100%;
-      height: 180px;
+      height: 270px;
       position: relative;
       overflow: hidden;
       border: 1px solid rgba(255, 255, 255, 0.2);
@@ -332,33 +335,33 @@
       </div>
   </div>
 
-<button id="view-summary-btn"
-  style="display: none; position: fixed; bottom: 20px; right: 20px; z-index: 10000; padding: 10px 20px; font-size: 1rem;">
-  View Summary Stats
-</button>
+  <button id="view-summary-btn"
+    style="display: none; position: fixed; bottom: 20px; right: 20px; z-index: 10000; padding: 10px 20px; font-size: 1rem;">
+    View Summary Stats
+  </button>
 
 
-<script>
-  const summaryButton = document.getElementById("view-summary-btn");
-const selectedUser = new URLSearchParams(window.location.search).get("user");
+  <script>
+    const summaryButton = document.getElementById("view-summary-btn");
+    const selectedUser = new URLSearchParams(window.location.search).get("user");
 
-// Check if user scrolled to bottom
-window.addEventListener("scroll", () => {
-  const scrollBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 10;
+    // Check if user scrolled to bottom
+    window.addEventListener("scroll", () => {
+      const scrollBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 10;
 
-  if (scrollBottom) {
-    summaryButton.style.display = "block";
-  }
-});
+      if (scrollBottom) {
+        summaryButton.style.display = "block";
+      }
+    });
 
-summaryButton.addEventListener("click", () => {
-  if (selectedUser) {
-    window.location.href = `summary.html?user=${selectedUser}`;
-  } else {
-    alert("User not specified.");
-  }
-});
-</script>
+    summaryButton.addEventListener("click", () => {
+      if (selectedUser) {
+        window.location.href = `summary.html?user=${selectedUser}`;
+      } else {
+        alert("User not specified.");
+      }
+    });
+  </script>
 
 
 
