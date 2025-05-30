@@ -216,6 +216,34 @@
       pointer-events: none;
     }
 
+    #loading-overlay-hr, #loading-overlay-acc {
+      position: fixed;
+      left: 21px;
+      width: 40%;
+      height: 290px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.85);
+      font-size: 18px;
+      color: #333;
+      border: 1px solid #ccc;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      z-index: 100;
+    }
+
+    #loading-overlay-hr {
+      top: 150px;
+    } 
+
+    #loading-overlay-acc {
+      top: 450px;
+    } 
+
+    #loading-text, #loading-text-hr, #loading-text-acc {
+      font-weight: bold;
+    }
+
     /* Theme-specific styles */
     .theme-dawn {
       --accent-color: #ea580c;
@@ -333,7 +361,14 @@
 
     <div id="loading-overlay">
         <div id="loading-text">Loading data...</div>
-      </div>
+    </div>
+    <div id="loading-overlay-hr">
+      <div id="loading-text-hr">Loading heart rates...</div>
+    </div>
+    <div id="loading-overlay-acc">
+      <div id="loading-text-acc">Loading activity...</div>
+    </div>
+
   </div>
 
   <button id="view-summary-btn"

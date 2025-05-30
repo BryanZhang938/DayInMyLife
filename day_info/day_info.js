@@ -217,7 +217,7 @@ function updateActivityAnimationView(nowDateTime, activities) {
                 // Show loading message ONLY if the active video isn't already playing something.
                 // This is key for seamless transition.
                 if (currentVideoElement.style.display === 'none' || !currentVideoElement.currentSrc) {
-                    noActivityMsgElement.textContent = "Loading activity...";
+                    // noActivityMsgElement.textContent = "Loading activity...";
                     noActivityMsgElement.style.display = 'block';
                     currentVideoElement.style.display = 'none'; // Ensure current is hidden if it was blank
                 }
@@ -554,8 +554,8 @@ function updateActivityInfo(activity) {
 document.addEventListener('DOMContentLoaded', async () => {
     setupActivityDisplayElements(); // Setup video elements first
 
-    const loadingOverlay = document.getElementById('loading-overlay');
-    const loadingText = document.getElementById('loading-text');
+    const loadingOverlay = document.getElementById('loading-overlay-hr');
+    const loadingText = document.getElementById('loading-text-hr');
 
     try {
         loadingText.textContent = 'Loading HR data...';
@@ -567,7 +567,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return { user: d.user, minute: timestamp, heartRate: hr };
         });
         
-        loadingText.textContent = 'Loading activity data...';
+        // loadingText.textContent = 'Loading activity data...';
         const activityDataFull = await d3.csv("../assets/cleaned_data/all_activity.csv", d => {
             if (d.user !== selectedUser) return null; // Filter by user early
             return {

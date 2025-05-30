@@ -15,8 +15,8 @@ const svg = d3.select("#chart-acc")
 
 const dropdown = d3.select("#user-select");
 
-const loadingOverlay = d3.select("#loading-overlay");
-const loadingText = d3.select("#loading-text");
+const loadingOverlay = d3.select("#loading-overlay-acc");
+const loadingText = d3.select("#loading-text-acc");
 
 let isPlaying = false;
 let autoScrollInterval = null;
