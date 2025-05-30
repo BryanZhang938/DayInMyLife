@@ -3,7 +3,7 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 // --- Constants and Configuration ---
 const width = 900;
 const height = 400; // Main chart height, not video
-const margin = { top: 40, right: 20, bottom: 60, left: 70 };
+const margin = { top: 40, right: 10, bottom: 60, left: 20 };
 const params = new URLSearchParams(window.location.search);
 const selectedUser = params.get("user");
 
