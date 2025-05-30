@@ -1,8 +1,8 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
-const width = 900;
+const width = 1000;
 const height = 400;
-const margin = { top: 40, right: 10, bottom: 60, left: 20 };
+const margin = { top: 5, right: 0, bottom: 60, left: 20 };
 const params = new URLSearchParams(window.location.search);
 const selectedUser = params.get("user");
 
@@ -209,7 +209,7 @@ function renderChart(dataSlice, windowStart, windowEnd, yExtent) {
 
   svg.append("text")
     .attr("x", -height / 2)
-    .attr("y", margin.left-50)
+    .attr("y", margin.left-55)
     .attr("transform", "rotate(-90)")
     .attr("text-anchor", "middle")
     .text("Movement Intensity")

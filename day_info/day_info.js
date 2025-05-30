@@ -1,9 +1,9 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 // --- Constants and Configuration ---
-const width = 900;
-const height = 400; // Main chart height, not video
-const margin = { top: 40, right: 10, bottom: 60, left: 20 };
+const width = 1000;
+const height = 400;
+const margin = { top: 5, right: 0, bottom: 60, left: 20 };
 const params = new URLSearchParams(window.location.search);
 const selectedUser = params.get("user");
 
@@ -352,7 +352,7 @@ function renderChart(dataSlice, windowStart, windowEnd, yExtent, activitiesForCh
 
     svg.append("text")
         .attr("x", width / 2)
-        .attr("y", height - 7)
+        .attr("y", height - 6)
         .attr("text-anchor", 'middle')
         .text("Time (1-Hour Window)")
         .style("font-size", "25px")
