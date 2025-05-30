@@ -3,18 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sleep Data Analysis</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <title>A Day in My Data</title> <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet"> <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://unpkg.com/scrollama@3.2.0/build/scrollama.min.js"></script>
-    <script type="module" src="sleep.js"></script>
     <script type="module" src="global.js"></script>
+    <script type="module" src="sleep.js"></script>
     <script type="module" src="script.js"></script>
 </head>
 <body>
-    <div class="container">
-        <h1>Participant Analysis</h1>
-        
+    <header class="page-header">
+        <h1>A Day in My Data</h1>
+        <p class="subtitle">Explore the rhythms of real people through the lens of their biometric data. Click a circle to begin the journey.</p>
+        <a href="#participant-overview-section" class="start-exploring">
+            Start Exploring <span class="chevron-down">&#9660;</span> </a>
+    </header>
+
+    <nav class="controls-bar">
+        <div class="controls-left">
+            <button class="control-button filter-button">
+                <span class="icon filter-icon">&#128270;</span> Filters
+            </button>
+            <span class="color-by-label">Color by:</span>
+            <div class="segmented-control">
+                <button class="segment-button active">Mood</button>
+                <button class="segment-button">Sleep Quality</button>
+            </div>
+        </div>
+        <div class="controls-right">
+            <button class="control-button tutorial-button">
+                <span class="icon info-icon">&#ℹ;</span> Show Tutorial
+            </button>
+        </div>
+    </nav>
+
+    <main id="participant-overview-section" class="participant-overview-container">
+        <div class="overview-header">
+            <h2>Participant Overview</h2>
+            <p class="overview-subtitle">10 participants - Hover to preview - Click to explore</p>
+        </div>
+        <div class="chart-area-wrapper">
+            <div id="d3-chart-container">
+                </div>
+            <div class="hover-preview-helper">
+                <span class="icon hand-icon">&#128075;</span> <h3>Hover to Preview</h3>
+                <p>Move your cursor over any circle to see participant details and begin exploring their data story.</p>
+            </div>
+        </div>
+    </main>
+
     <div id="tooltip"></div>
 
 </body>

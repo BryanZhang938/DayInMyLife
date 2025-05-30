@@ -5,7 +5,7 @@ const width = 600 - margin.left - margin.right;
 const height = 400 - margin.top - margin.bottom;
 const tooltip = d3.select("#tooltip");
 
-const svg = d3.select("body")
+const svg = d3.select("#d3-chart-container")
   .append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
