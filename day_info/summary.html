@@ -24,7 +24,19 @@
   </style>
 </head>
 <body>
+  <script>
+    const user = new URLSearchParams(window.location.search).get("user");
+  </script>
+  <div class="nav-buttons">
+    <button onclick="window.location.href=`index.html?user=${user}`">
+      ← Back to Day View
+    </button>
+    <button onclick="window.location.href='../index.html'">
+      🏠 Home
+    </button>
+  </div>
   <h1>Summary Statistics</h1>
+  
 
   <div class="card">
     <h2>Sleep Summary</h2>
