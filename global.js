@@ -13,19 +13,25 @@ const svg = d3.select("body")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
 d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
-  data = data.filter(d => d.user !== "user_11");
+  data = data.filter(d => d.user !== "user_11" && d.user !== "user_8");
+
+  // Reassign user IDs: user_1, user_2, ...
+  data.forEach((d, i) => {
+    d.original_user = d.user;
+    d.user = `user_${i + 1}`;
+  });
 
   const x = d3.scaleLinear()
     .domain(d3.extent(data, d => d.Age)).nice()
     .range([0, width]);
 
   const y = d3.scaleLinear()
-    .domain(d3.extent(data, d => d.avg_HR)).nice()
+    .domain(d3.extent(data, d => d.BMI)).nice()
     .range([height, 0]);
 
   const r = d3.scaleSqrt()
-    .domain(d3.extent(data, d => d.BMI))
-    .range([8, 24]); // Circle radius represents BMI
+    .domain(d3.extent(data, d => d.avg_HR))
+    .range([8, 24]); // Circle radius represents Avg HR
 
   svg.append("g")
     .attr("transform", `translate(0,${height})`)
@@ -45,20 +51,20 @@ d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
     .attr("x", -height / 2)
     .attr("y", -40)
     .attr("text-anchor", "middle")
-    .text("Average Heart Rate (bpm)");
+    .text("BMI");
 
   svg.selectAll("circle")
     .data(data)
     .join("circle")
       .attr("cx", d => x(d.Age))
-      .attr("cy", d => y(d.avg_HR))
-      .attr("r", d => r(d.BMI))
+      .attr("cy", d => y(d.BMI))
+      .attr("r", d => r(d.avg_HR))
       .attr("fill", "steelblue")
       .attr("opacity", 0.8)
       .attr("stroke", "#333")
       .attr("stroke-width", 0.5)
       .on("click", function(event, d) {
-        const encodedUser = encodeURIComponent(d.user);
+        const encodedUser = encodeURIComponent(d.original_user);
         window.location.href = `day_info/index.html?user=${encodedUser}`;
       })
       .on("mouseover", function (event, d) {
