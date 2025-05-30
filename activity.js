@@ -37,12 +37,14 @@ function drawActivity(data) {
     ? hourlyData.reduce((a, b) => b.avgActivity > a.avgActivity ? b : a, hourlyData[0])
     : null;
 
-  d3.select("#activity-metrics").html(`
+    d3.select("#activity-metrics").html(`
     <div class="metric">
-      <strong>${peakHour ? peakHour.avgActivity.toFixed(1) : 'N/A'}</strong><br>Peak Hourly Activity Level
+      <div class="metric-value">${peakHour ? peakHour.avgActivity.toFixed(1) : 'N/A'}</div>
+      <div class="metric-label">Peak Hourly Activity Level</div>
     </div>
     <div class="metric">
-      <strong>${peakHour ? d3.timeFormat("%-I %p")(peakHour.hour) : 'N/A'}</strong><br>Peak Hour
+      <div class="metric-value">${peakHour ? d3.timeFormat("%-I %p")(peakHour.hour) : 'N/A'}</div>
+      <div class="metric-label">Peak Hour</div>
     </div>
   `);
 
