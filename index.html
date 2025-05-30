@@ -15,7 +15,8 @@
         <h1>A Day in My Data</h1>
         <p class="subtitle">Explore the rhythms of real people through the lens of their biometric data. Click a circle to begin the journey.</p>
         <a href="#participant-overview-section" class="start-exploring">
-            Start Exploring <span class="chevron-down">&#9660;</span> </a>
+            Start Exploring <span class="chevron-down">&#9660;</span>
+        </a>
     </header>
 
     <nav class="controls-bar">
@@ -25,8 +26,8 @@
             </button>
             <span class="color-by-label">Color by:</span>
             <div class="segmented-control">
-                <button class="segment-button active">Mood</button>
-                <button class="segment-button">Sleep Quality</button>
+                <button class="segment-button active" data-colorby="mood">Mood</button>
+                <button class="segment-button" data-colorby="sleepQuality">Sleep Quality</button>
             </div>
         </div>
         <div class="controls-right">
@@ -35,6 +36,25 @@
             </button>
         </div>
     </nav>
+
+    <div id="filter-panel" class="filter-panel" style="display: none;">
+        <div class="filter-content">
+            <div class="filter-group">
+                <label for="age-range-min">Age Range: <span id="age-value-display">18 - 26</span></label>
+                <div class="slider-container">
+                    Min: <input type="range" id="age-range-min" name="age-range-min" min="18" max="26" value="18">
+                    Max: <input type="range" id="age-range-max" name="age-range-max" min="18" max="26" value="26">
+                </div>
+            </div>
+            <div class="filter-group">
+                <label for="hr-range-min">Resting HR Range: <span id="hr-value-display">60 - 85</span> bpm</label>
+                <div class="slider-container">
+                    Min: <input type="range" id="hr-range-min" name="hr-range-min" min="60" max="85" value="60">
+                    Max: <input type="range" id="hr-range-max" name="hr-range-max" min="60" max="85" value="85">
+                </div>
+            </div>
+        </div>
+    </div>
 
     <main id="participant-overview-section" class="participant-overview-container">
         <div class="overview-header">
