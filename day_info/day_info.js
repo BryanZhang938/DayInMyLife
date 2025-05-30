@@ -3,7 +3,7 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 // --- Constants and Configuration ---
 const width = 900;
 const height = 400; // Main chart height, not video
-const margin = { top: 40, right: 20, bottom: 40, left: 20 };
+const margin = { top: 40, right: 20, bottom: 60, left: 70 };
 const params = new URLSearchParams(window.location.search);
 const selectedUser = params.get("user");
 
@@ -344,26 +344,30 @@ function renderChart(dataSlice, windowStart, windowEnd, yExtent, activitiesForCh
     // Axes
     svg.append("g")
         .attr("transform", `translate(0,${height - margin.bottom})`)
-        .call(d3.axisBottom(x).ticks(Math.max(2, Math.round(width / 150))).tickFormat(d3.timeFormat("%-I:%M %p")));
+        .call(d3.axisBottom(x).ticks(6).tickFormat(d3.timeFormat("%-I:%M %p")));
 
     svg.append("g")
         .attr("transform", `translate(${margin.left},0)`)
         .call(d3.axisLeft(y));
+
+    svg.append("text")
+        .attr("x", width / 2)
+        .attr("y", height - 7)
+        .attr("text-anchor", 'middle')
+        .text("Time (1-Hour Window)")
+        .style("font-size", "25px")
+        .style("font-weight", "bold");
     
-    // Y-axis Label (ensure it's added only once or cleared if re-rendering)
-    svg.selectAll(".y-axis-label").remove(); // Remove previous label if any
     svg.append("text")
         .attr("class", "y-axis-label")
         .attr("x", -(height / 2))
-        .attr("y", -margin.left + 15) // Adjust y position if needed
+        .attr("y", margin.left - 50) 
         .attr("transform", "rotate(-90)")
         .attr("text-anchor", "middle")
         .text("Beats Per Minute")
-        .style("font-size", "14px") // Adjusted font size
+        .style("font-size", "25px") 
         .style("font-weight", "bold");
 
-
-    // Hover elements
     const hoverLine = svg.append("line")
         .attr("stroke", "gray").attr("stroke-width", 1).attr("stroke-dasharray", "4").style("display", "none");
     const hoverDot = svg.append("circle")
@@ -458,8 +462,8 @@ function renderChart(dataSlice, windowStart, windowEnd, yExtent, activitiesForCh
 
         });
 
-    svg.selectAll(".tick text").style("font-size", "12px"); // Adjusted tick font size
-    svg.selectAll(".domain, .tick line").style("stroke", "#333").style("stroke-width", 1); // Adjusted stroke
+    svg.selectAll(".tick text").style("font-size", "20px"); // Adjusted tick font size
+    svg.selectAll(".domain, .tick line").style("stroke", "#333").style("stroke-width", 1.5); // Adjusted stroke
 }
 // --- Main Data Loading and Initialization ---
 let allUserActivities = []; // To store all activities for the selected user
