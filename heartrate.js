@@ -77,8 +77,20 @@ function drawHeartRate(data) {
     .domain([0, d3.max(hourlyData, d => d.avgRate)]).nice()
     .range([height - margin.bottom, margin.top]);
 
-  const tooltip = d3.select("#tooltip-heartrate");
-  const barW = ((width - margin.left - margin.right) / hourlyData.length) * 0.8;
+    let tooltip = d3.select("body").select("#tooltip-heartrate");
+
+    if (tooltip.empty()) {
+      tooltip = d3.select("body")
+        .append("div")
+        .attr("id", "tooltip-heartrate")
+        .style("position", "absolute")
+        .style("background", "#fff")
+        .style("padding", "6px")
+        .style("border", "1px solid #999")
+        .style("border-radius", "4px")
+        .style("pointer-events", "none")
+        .style("opacity", 0);
+    }  const barW = ((width - margin.left - margin.right) / hourlyData.length) * 0.8;
 
   svg.append("g")
     .selectAll("rect")
@@ -94,9 +106,9 @@ function drawHeartRate(data) {
       tooltip
         .style("opacity", 1)
         .html(`
-          Time: ${d3.timeFormat("%-I %p")(d.hour)}<br>
-          Heart Rate: ${d.avgRate.toFixed(1)} bpm
-        `);
+  <strong>Time:</strong> ${d3.timeFormat("%-I %p")(d.hour)}<br>
+  <strong>Heart Rate:</strong> ${d.avgRate.toFixed(1)} bpm
+`);
       d3.select(this).attr("opacity", 1);
     })
     .on("mousemove", function (event) {
