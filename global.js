@@ -12,17 +12,20 @@ const svg = d3.select("body")
   .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
-    data = data.filter(d => d.user !== "user_11");
+d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
+  data = data.filter(d => d.user !== "user_11");
+
   const x = d3.scaleLinear()
     .domain(d3.extent(data, d => d.Age)).nice()
     .range([0, width]);
-    const r = d3.scaleLinear()
-    .domain(d3.extent(data, d => d.avg_HR))
-    .range([8, 24]); // Adjust min/max size as needed
+
   const y = d3.scaleLinear()
-    .domain(d3.extent(data, d => d.BMI)).nice()
+    .domain(d3.extent(data, d => d.avg_HR)).nice()
     .range([height, 0]);
+
+  const r = d3.scaleSqrt()
+    .domain(d3.extent(data, d => d.BMI))
+    .range([8, 24]); // Circle radius represents BMI
 
   svg.append("g")
     .attr("transform", `translate(0,${height})`)
@@ -42,33 +45,30 @@ const svg = d3.select("body")
     .attr("x", -height / 2)
     .attr("y", -40)
     .attr("text-anchor", "middle")
-    .text("BMI");
+    .text("Average Heart Rate (bpm)");
 
-    svg.selectAll("circle")
+  svg.selectAll("circle")
     .data(data)
     .join("circle")
       .attr("cx", d => x(d.Age))
-      .attr("cy", d => y(d.BMI))
-      .attr("r", d => r(d.avg_HR))
+      .attr("cy", d => y(d.avg_HR))
+      .attr("r", d => r(d.BMI))
       .attr("fill", "steelblue")
       .attr("opacity", 0.8)
       .attr("stroke", "#333")
       .attr("stroke-width", 0.5)
       .on("click", function(event, d) {
-        const encodedUser = encodeURIComponent(d.user); // handles spaces
+        const encodedUser = encodeURIComponent(d.user);
         window.location.href = `day_info/index.html?user=${encodedUser}`;
       })
-      
-      
       .on("mouseover", function (event, d) {
         tooltip.style("visibility", "visible")
-        .html(`<strong>Participant ${d.user.replace('user_', '')}</strong><br>` +
+          .html(`<strong>Participant ${d.user.replace('user_', '')}</strong><br>` +
                 `Age: ${d.Age}<br>` +
                 `Height: ${d.Height} cm<br>` +
                 `Weight: ${d.Weight} kg<br>` +
                 `BMI: ${d.BMI}<br>` +
-                `Avg HR: ${d.avg_HR.toFixed(1)} bpm`
-              );
+                `Avg HR: ${d.avg_HR.toFixed(1)} bpm`);
         d3.select(this).attr("stroke-width", 1.5);
       })
       .on("mousemove", function (event) {
@@ -80,17 +80,14 @@ const svg = d3.select("body")
         tooltip.style("visibility", "hidden");
         d3.select(this).attr("stroke-width", 0.5);
       });
-      svg.append("g")
+
+  // Gridlines
+  svg.append("g")
     .attr("class", "grid")
-    .call(d3.axisLeft(y)
-      .tickSize(-width)
-      .tickFormat("")  // no labels
-    );
-    svg.append("g")
+    .call(d3.axisLeft(y).tickSize(-width).tickFormat(""));
+
+  svg.append("g")
     .attr("class", "grid")
     .attr("transform", `translate(0,${height})`)
-    .call(d3.axisBottom(x)
-      .tickSize(-height)
-      .tickFormat("")  // no labels
-    );
+    .call(d3.axisBottom(x).tickSize(-height).tickFormat(""));
 });

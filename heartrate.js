@@ -55,8 +55,15 @@ function drawHeartRate(data) {
   if (hourlyData.length === 0) return;
 
   const svg = d3.select("#heartrate-chart");
-  const { width, height } = svg.node().getBoundingClientRect();
+  const width = svg.node().getBoundingClientRect().width;
+  const height = 400;
   const margin = { top: 40, right: 20, bottom: 50, left: 50 };
+
+  svg
+    .attr("viewBox", `0 0 ${width} ${height}`)
+    .attr("preserveAspectRatio", "xMidYMid meet")
+    .style("width", "100%")
+    .style("height", `${height}px`);
 
   svg.selectAll("*").remove();
 
