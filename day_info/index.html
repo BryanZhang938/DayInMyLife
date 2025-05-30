@@ -86,6 +86,21 @@
       font-weight: bold;
     }
 
+    #time-display {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      font-size: 24px;
+      font-weight: bold;
+      z-index: 100;
+      text-align: center;
+    }
+
     .activity-section {
       position: fixed;
       top: 80px;
@@ -153,6 +168,8 @@
     <h2>A Day In My Life</h2>
     <button id="play-pause-btn">▶ Auto-Scroll</button>
   </div>
+
+  <div id="time-display">00:00 AM</div>
 
   <div id="chart-container">
     <svg id="chart" width="650" height="250"></svg>

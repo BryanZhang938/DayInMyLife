@@ -490,6 +490,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             const windowStart = new Date(timeExtent[0].getTime() + offsetMs);
             const windowEnd = new Date(windowStart.getTime() + 1 * 60 * 60 * 1000);
 
+            // Update time display
+            const timeDisplay = document.getElementById('time-display');
+            if (timeDisplay) {
+                const currentTime = new Date(windowStart.getTime() + (windowEnd.getTime() - windowStart.getTime()) / 2);
+                const hours = currentTime.getHours();
+                const minutes = currentTime.getMinutes().toString().padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                const displayHours = hours % 12 || 12;
+                timeDisplay.textContent = `${displayHours}:${minutes} ${ampm}`;
+            }
+
             const visibleData = bpmPerMinute.filter(d =>
                 d.minute >= windowStart && d.minute <= windowEnd
             );
