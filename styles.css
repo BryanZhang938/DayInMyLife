@@ -235,7 +235,7 @@ body {
 
 .page-header {
   text-align: center;
-  padding: 60px 20px 30px; /* Increased top padding */
+  padding: 50px 20px 40px; /* Increased top padding */
   /* background-color: rgba(255, 255, 255, 0.7); Slightly transparent white background if desired */
   /* border-bottom: 1px solid #e0e0e0; Optional separator */
 }
@@ -380,29 +380,31 @@ body {
 }
 
 .participant-overview-container {
-  background: white; /* */
-  max-width: 1200px; /* */
-  margin: 0 auto 30px auto; /* */
-  padding: 25px 30px; /* */
-  border-radius: 8px; /* */
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* */
+  background: white; /* Solid white background for the card */
+  max-width: 1200px;
+  margin: 0 auto 30px auto;
+  padding: 25px 30px;
+  border-radius: 12px; /* Slightly larger radius for a more modern card */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* More prominent shadow */
+  border: 1px solid #e5e7eb; /* Consistent border */
 }
 
 .overview-header {
-  margin-bottom: 20px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #eee;
+  margin-bottom: 25px; /* Increased margin */
+  padding-bottom: 20px; /* Increased padding */
+  border-bottom: 1px solid #f3f4f6; /* Lighter separator line */
 }
 
 .overview-header h2 {
-  font-size: 1.8em;
-  color: #2c3e50; /* */
-  margin: 0 0 5px 0;
+  font-size: 1.6em; /* Target is text-lg/xl for such titles */
+  color: #1f2937; /* Darker gray */
+  margin: 0 0 8px 0; /* Adjusted margin */
+  font-weight: 600;
 }
 
 .overview-header .overview-subtitle {
   font-size: 0.95em;
-  color: #666; /* */
+  color: #6b7280; /* gray-500 */
   margin: 0;
 }
 
@@ -412,48 +414,61 @@ body {
   align-items: flex-start; /* Align items to the top */
 }
 
-#d3-chart-container {
-  flex-grow: 1; /* Allow chart container to take available space */
-  /* The D3 chart script global.js sets its own width and height.
-     Ensure this container can accommodate it, or adjust D3 sizing. */
+.chart-area-wrapper {
+  display: flex;
+  gap: 25px; /* Gap between chart and sidebar */
+  align-items: flex-start; /* Align items to the top */
+  /* background-color: #f9fafb; /* Optional light bg for the chart area itself */
+  /* padding: 20px; */
+  /* border-radius: 8px; */
 }
 
-/* Ensure the SVG itself is responsive if needed, or fits its container */
-#d3-chart-container svg {
-  display: block; /* Removes extra space below inline SVG */
-  max-width: 100%;
-  height: auto;
+#d3-chart-container {
+  flex-grow: 1; /* Chart takes available space */
+  /* Ensure your D3 chart is sized appropriately within this container.
+     You might need to adjust the D3 script's width/height settings or
+     make the SVG responsive if it's not already. */
+  /* background-color: #fff; /* If chart needs a distinct background */
+  /* border: 1px solid #e5e7eb; */
+  /* border-radius: 8px; */
+  /* min-height: 450px; /* Ensure it has enough height */
 }
 
 .hover-preview-helper {
-  width: 220px; /* Adjust width as needed */
-  flex-shrink: 0; /* Prevent shrinking */
-  background-color: #f8f9fa;
-  padding: 20px;
-  border-radius: 8px; /* */
-  text-align: center;
-  color: #555;
+  width: 280px; /* Wider sidebar as in target */
+  flex-shrink: 0;
+  background-color: #f9fafb; /* Light gray background (gray-50) */
+  padding: 25px; /* Increased padding */
+  border-radius: 8px;
+  text-align: left; /* Align text to left for details */
+  color: #4b5563; /* gray-600 */
+  border: 1px solid #e5e7eb; /* Consistent border */
+  /* min-height: 450px; /* Match chart container height if desired */
 }
 
-.hover-preview-helper .icon {
-  font-size: 2.5em; /* Adjust if using actual image/svg icons */
+.hover-preview-helper .icon { /* Icon for "Hover to Preview" state */
+  font-size: 2.8em; /* Adjust if using actual image/svg icons */
   display: block;
-  margin-bottom: 10px;
-  color: #ffc107; /* Example color for the hand icon */
+  margin-bottom: 15px;
+  color: #fbbf24; /* amber-400, similar to target's hand icon color */
+  text-align: center; /* Center the icon if it's for the placeholder text */
 }
 
-.hover-preview-helper h3 {
-  font-size: 1.1em;
-  color: #2c3e50; /* */
+.hover-preview-helper h3 { /* For "Hover to Preview" or Participant Name */
+  font-size: 1.2em;
+  color: #1f2937; /* Darker gray */
   margin-top: 0;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  font-weight: 600;
+  text-align: center; /* Center placeholder title */
+}
+.hover-preview-helper p { /* For placeholder text or participant details */
+  font-size: 0.9em;
+  line-height: 1.6;
+  color: #4b5563; /* gray-600 */
+  margin-bottom: 8px; /* Spacing between detail lines */
 }
 
-.hover-preview-helper p {
-  font-size: 0.85em;
-  line-height: 1.5;
-  color: #666; /* */
-}
 
 /* Adjust existing tooltip style if necessary. The current one looks fine. */
 #tooltip { /* */
@@ -481,26 +496,112 @@ body {
   display: none; /* */
 }
 
-#home-button {
-  position: fixed;
-  top: 10px;
-  left: 20px;
-  background-color: #3b82f6;
-  color: white;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 0.75rem;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  transition: background-color 0.2s ease;
-  z-index: 9999; /* stays on top */
+/* Filter Panel Styling */
+.filter-panel {
+  max-width: 1200px;
+  margin: 0 auto 20px auto; /* Sits below controls-bar */
+  background-color: rgba(255, 255, 255, 0.9); /* Match controls-bar background */
+  border: 1px solid #e5e7eb; /* Lighter border */
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  padding: 20px;
+  overflow: hidden; /* For potential animation later */
+  /* display: none; /* Will be controlled by JavaScript */
 }
 
-#home-button:hover {
-  background-color: #2563eb;
+.filter-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive columns */
+  gap: 20px;
 }
-.time-display {
-  margin-top: -70px !important; /* higher up */
+
+.filter-group {
+  padding: 10px;
+  /* border: 1px solid #f3f4f6; /* Optional border for each group */
+  /* border-radius: 6px; */
+}
+
+.filter-group label {
+  display: block;
+  font-size: 0.9em;
+  font-weight: 500;
+  color: #374151; /* gray-700 */
+  margin-bottom: 12px;
+}
+
+.filter-group .slider-container {
+  display: flex;
+  flex-direction: column; /* Stack min/max sliders or labels */
+  gap: 8px;
+  font-size: 0.85em;
+  color: #4b5563; /* gray-600 */
+}
+
+/* Basic styling for range inputs */
+/* Note: Styling range inputs fully cross-browser is complex. This is a basic pass. */
+.filter-group input[type="range"] {
+  width: 100%;
+  cursor: pointer;
+  -webkit-appearance: none; /* Hides default styling on WebKit/Blink */
+  appearance: none;
+  height: 8px;
+  background: #d1d5db; /* Track color (gray-300) */
+  border-radius: 5px;
+  outline: none;
+}
+
+.filter-group input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: #3b82f6; /* Thumb color (blue-600) */
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid white; /* White border around thumb */
+  box-shadow: 0 0 2px rgba(0,0,0,0.2);
+}
+
+.filter-group input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: #3b82f6;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 0 2px rgba(0,0,0,0.2);
+}
+
+/* You'll need JavaScript to update the #age-value-display and #hr-value-display spans */
+.participant-detail-card {
+  text-align: left; /* Ensure details are left-aligned */
+}
+.participant-detail-card h3 { /* Participant Name */
+  text-align: left;
+  margin-bottom: 12px;
+}
+.participant-detail-card .avatar {
+  font-size: 2.5em;
+  margin-bottom: 10px;
+  /* Add other avatar styles here */
+}
+.participant-detail-card .detail-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 0.9em;
+}
+.participant-detail-card .detail-item strong {
+  font-weight: 500;
+  color: #374151; /* gray-700 */
+}
+
+.control-button.active-filter {
+  background-color: #e0e7ff; /* Example: A light blue background like target's active states */
+  border-color: #3b82f6; /* A matching blue border */
+  color: #3b82f6; /* Blue text */
+}
+
+.control-button.active-filter .filter-icon {
+  color: #3b82f6; /* Blue icon */
 }
