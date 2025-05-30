@@ -32,6 +32,17 @@ function parseSleep(d) {
 const params = new URLSearchParams(window.location.search);
 const selectedUser = params.get("user");
 
+const metricDescriptions = {
+  totalSleep: "Total time the user spent sleeping, in minutes.",
+  efficiency: "Percentage of time in bed that the user was actually asleep.",
+  latency: "Time it took to fall asleep after going to bed.",
+  awakenings: "Number of times the user woke up during sleep.",
+  avgAwakeningLength: "Average duration of each awakening, in minutes.",
+  waso: "Total number of minutes the participant spent awake after initially falling asleep.",
+  movementIndex: "Percentage of time spent immobile (no arm movement) during the movement phase of sleep.",
+  fragmentationIndex: "Percentage of time spent moving during what should have been immobile sleep phases."
+};
+
 // load CSV once at startup
 d3.csv("../assets/cleaned_data/all_sleep.csv", parseSleep).then(sleepData => {
   console.log("Sleep data loaded:", sleepData);
@@ -102,45 +113,67 @@ function initParticipantSelector() {
 }
 
 function displaySleepMetrics(data) {
-  // Handle both single records and summary objects
-  const metrics = data.latest ? data : { latest: data };
+  if (!data.latest) {
+    data = { latest: data };
+  }
+  const metricsContainer = d3.select('#sleep-metrics');
+  metricsContainer.html(""); // clear existing
 
-  d3.select('#sleep-metrics')
-    .html(`
-      <div class="metric">
-        <strong>${Math.floor(metrics.latest.totalSleep/60)} h ${metrics.latest.totalSleep%60} m</strong>
-        <div class="label">Total Sleep</div>
-      </div>
-      <div class="metric">
-        <strong>${isNaN(metrics.latest.efficiency) ? "N/A" : metrics.latest.efficiency.toFixed(1)} %</strong>
-        <div class="label">Sleep Efficiency</div>
-      </div>
-      <div class="metric">
-        <strong>${metrics.latest.latency} m</strong>
-        <div class="label">Sleep Latency</div>
-      </div>
-      <div class="metric">
-        <strong>${metrics.latest.awakenings}</strong>
-        <div class="label">Number of Awakenings</div>
-      </div>
-      <div class="metric">
-        <strong>${metrics.latest.avgAwakeningLength.toFixed(1)} m</strong>
-        <div class="label">Average Awakening Length</div>
-      </div>
-      <div class="metric">
-        <strong>${metrics.latest.waso} m</strong>
-        <div class="label">Wake After Sleep Onset</div>
-      </div>
-      <div class="metric">
-        <strong>${metrics.latest.movementIndex.toFixed(1)}</strong>
-        <div class="label">Movement Index</div>
-      </div>
-      <div class="metric">
-        <strong>${metrics.latest.fragmentationIndex.toFixed(1)}</strong>
-        <div class="label">Fragmentation Index</div>
-      </div>
-    `);
+  const metrics = [
+    { key: 'totalSleep', label: 'Total Sleep', value: `${Math.floor(data.latest.totalSleep/60)} h ${data.latest.totalSleep%60} m` },
+    { key: 'efficiency', label: 'Sleep Efficiency', value: `${isNaN(data.latest.efficiency) ? "N/A" : data.latest.efficiency.toFixed(1)} %` },
+    { key: 'latency', label: 'Sleep Latency', value: `${data.latest.latency} m` },
+    { key: 'awakenings', label: 'Number of Awakenings', value: `${data.latest.awakenings}` },
+    { key: 'avgAwakeningLength', label: 'Average Awakening Length', value: `${data.latest.avgAwakeningLength.toFixed(1)} s` },
+    { key: 'waso', label: 'Wake After Sleep Onset', value: `${data.latest.waso} m` },
+    { key: 'movementIndex', label: 'Movement Index', value: `${data.latest.movementIndex.toFixed(1)} %` },
+    { key: 'fragmentationIndex', label: 'Fragmentation Index', value: `${data.latest.fragmentationIndex.toFixed(1)} %` }
+  ];
+
+  metrics.forEach(metric => {
+    const div = metricsContainer.append('div').attr('class', 'metric');
+    div.append('strong').text(metric.value);
+    const labelDiv = div.append('div').attr('class', 'label');
+    labelDiv.text(metric.label);
+
+    // Add info icon with tooltip
+    labelDiv.append('span')
+      .attr('class', 'info-icon')
+      .text(' ⓘ')
+      .on('mouseover', (event) => {
+        showInfoTooltip(event.pageX, event.pageY, metricDescriptions[metric.key]);
+      })
+      .on('mouseout', hideInfoTooltip);
+  });
 }
+
+function showInfoTooltip(x, y, text) {
+  let tooltip = d3.select("#metric-info-tooltip");
+  if (tooltip.empty()) {
+    tooltip = d3.select("body").append("div")
+      .attr("id", "metric-info-tooltip")
+      .style("position", "absolute")
+      .style("max-width", "240px")
+      .style("padding", "8px 12px")
+      .style("background", "#999")
+      .style("color", "white")
+      .style("border-radius", "5px")
+      .style("font-size", "13px")
+      .style("pointer-events", "none")
+      .style("z-index", 1000);
+  }
+
+  tooltip
+    .html(text)
+    .style("left", `${x + 12}px`)
+    .style("top", `${y - 10}px`)
+    .style("visibility", "visible");
+}
+
+function hideInfoTooltip() {
+  d3.select("#metric-info-tooltip").style("visibility", "hidden");
+}
+
 
 function initScrolly() {
   console.log("Initializing Scrollama");
