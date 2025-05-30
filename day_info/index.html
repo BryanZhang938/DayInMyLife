@@ -39,7 +39,7 @@
 
     #chart-container-acc {
       position: fixed;
-      top: 410px;
+      top: 410px; /* Adjusted from 410px, assuming heart rate chart is 250px + some margin */
       right: 20px;
       z-index: 5;
     }
@@ -69,8 +69,8 @@
       position: fixed;
       top: 150px;
       right: 20px;
-      width: 650px;
-      height: 510px;
+      width: 650px; /* Width of chart */
+      height: 510px; /* Combined height of charts + spacing if applicable */
       display: flex;
       align-items: center;
       justify-content: center;
@@ -79,7 +79,7 @@
       color: #333;
       border: 1px solid #ccc;
       box-shadow: 0 0 10px rgba(0,0,0,0.05);
-      z-index: 100;
+      z-index: 100; /* Should be high */
     }
 
     #loading-text {
@@ -101,12 +101,13 @@
       text-align: center;
     }
 
+    /* Activity Section Styles - Copied from your JS for completeness in HTML context */
     .activity-section {
       position: fixed;
       top: 80px;
       left: 20px;
       width: 220px;
-      z-index: 10;
+      z-index: 10; /* Ensure it's above other elements if needed, but below time/control panels if they overlap */
     }
 
     .activity-title {
@@ -127,23 +128,23 @@
 
     .video-wrapper {
       width: 100%;
-      height: 180px;
+      height: 180px; /* Or your desired height */
       position: relative;
       overflow: hidden;
       border: 1px solid #eee;
       border-radius: 4px;
       background: #f8f8f8;
-      cursor: pointer;
+      cursor: pointer; /* Added from your JS */
     }
 
-    #activity-animation-video {
+    /* Style for both video players */
+    .activity-animation-video {
       width: 100%;
       height: 100%;
       object-fit: cover;
       position: absolute;
       top: 0;
       left: 0;
-      display: none; /* Start hidden until loaded */
     }
 
     #no-activity-msg {
@@ -158,7 +159,7 @@
       padding: 10px;
       border-radius: 4px;
       margin: 0;
-      pointer-events: none;
+      pointer-events: none; /* So it doesn't interfere with clicks on the wrapper */
     }
 
   </style>
@@ -184,8 +185,6 @@
   </div>
   <h2>Sleep Summary</h2>
 
-  <!-- Sleep Metrics -->
-<!-- Spacer to simulate the scroll timeline -->
   <div id="sleep-metrics" class="metrics" style="padding: 40px;"></div>
 
   <section id="heartrate" class="section">
@@ -195,15 +194,11 @@
     <div id="tooltip-heartrate"></div>
   </section>
     
-  <!-- Activity -->
   <section id="activity" class="section">
     <h3>Activity Visualization</h3>
     <div id="activity-metrics" class="metrics"></div>
     <svg id="activity-chart" class="chart" width="650" height="250"></svg>
   </section>
   
-</div>
-
 </body>
 </html>
-

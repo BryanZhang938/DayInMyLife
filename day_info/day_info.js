@@ -2,29 +2,21 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 // --- Constants and Configuration ---
 const width = 900;
-const height = 400;
+const height = 400; // Main chart height, not video
 const margin = { top: 40, right: 20, bottom: 40, left: 20 };
 const params = new URLSearchParams(window.location.search);
 const selectedUser = params.get("user");
 
 if (!selectedUser) {
   console.error("No user specified in URL.");
+  // Potentially display this error to the user on the page
 }
 
 // Activity mappings and details
 const activityLabels = {
-  1: "Sleeping",
-  2: "Laying down",
-  3: "Sitting",
-  4: "Light movement",
-  5: "Medium activity",
-  6: "Heavy activity",
-  7: "Eating",
-  8: "Small screen",
-  9: "Large screen",
-  10: "Caffeine",
-  11: "Smoking",
-  12: "Alcohol"
+  1: "Sleeping", 2: "Laying down", 3: "Sitting", 4: "Light movement",
+  5: "Medium activity", 6: "Heavy activity", 7: "Eating", 8: "Small screen",
+  9: "Large screen", 10: "Caffeine", 11: "Smoking", 12: "Alcohol"
 };
 
 const activityDetailsMap = {
@@ -39,39 +31,44 @@ const activityDetailsMap = {
     9: { name: "large screen usage (e.g. TV, cinema)", file: "../assets/animations/large_screen_usage.mp4" },
     10: { name: "caffeinated drink consumption", file: "../assets/animations/caffeinated_drink_consumption.mp4" },
     11: { name: "smoking", file: "../assets/animations/smoking.mp4" },
-    12: { name: "alcohol consumption", file: "../assets/animations/alcohol_assumption.mp4" }
+    12: { name: "alcohol consumption", file: "../assets/animations/alcohol_assumption.mp4" } // Assuming typo "assumption" -> "consumption"
 };
+
+// --- DOM Elements (will be assigned in DOMContentLoaded) ---
+let currentVideoElement;
+let preloadVideoElement;
+let noActivityMsgElement;
+let videoWrapperElement;
 
 // --- DOM Setup ---
 const svg = d3.select("#chart")
-  .attr("viewBox", [0, 0, width, height]);
+  .attr("viewBox", [0, 0, width, height]); // Main D3 chart, not video
 
-let tooltip = d3.select("#tooltip-div");
+let tooltip = d3.select("#tooltip-div"); // Tooltip for D3 chart
 if (tooltip.empty()) {
   tooltip = d3.select("body").append("div")
     .attr("id", "tooltip-div")
-    .style("position", "fixed")
-    .style("background", "#fff")
-    .style("border", "1px solid #ccc")
-    .style("padding", "6px 10px")
-    .style("font-size", "13px")
-    .style("pointer-events", "none")
-    .style("border-radius", "4px")
-    .style("box-shadow", "0 0 8px rgba(0,0,0,0.1)")
-    .style("display", "none")
-    .style("z-index", "9999");
+    // ... (tooltip styles from original code)
+    .style("position", "fixed").style("background", "#fff").style("border", "1px solid #ccc")
+    .style("padding", "6px 10px").style("font-size", "13px").style("pointer-events", "none")
+    .style("border-radius", "4px").style("box-shadow", "0 0 8px rgba(0,0,0,0.1)")
+    .style("display", "none").style("z-index", "9999");
 }
 
 // --- Helper Functions ---
 function parseTimeToDate(timeStr, dayNumber) {
     if (!timeStr) return null;
     const [hours, minutes] = timeStr.split(':').map(Number);
-    return new Date(2024, 0, dayNumber, hours, minutes, 0);
+    const date = new Date(2024, 0, dayNumber, hours, minutes, 0); // Ensure consistent base year/month for comparisons
+    // Handle potential overnight activities for end times
+    // This logic might need refinement if start/end are on different "day numbers" but part of same activity block
+    return date;
 }
+
 
 function getActiveActivity(nowDateTime, activities) {
     if (!activities || activities.length === 0) {
-        console.warn('No activities provided');
+        // console.warn('No activities provided');
         return null;
     }
 
@@ -82,17 +79,18 @@ function getActiveActivity(nowDateTime, activities) {
             let endDateTime = null;
             if (act.endStr) {
                 endDateTime = parseTimeToDate(act.endStr, act.day);
+                // If end time is earlier than start time on the same day, assume it's the next day
                 if (startDateTime && endDateTime && endDateTime < startDateTime) {
                     endDateTime.setDate(endDateTime.getDate() + 1);
                 }
             }
             return { ...act, startDateTime, endDateTime };
         })
-        .filter(act => act.startDateTime)
+        .filter(act => act.startDateTime) // Ensure start time is valid
         .sort((a, b) => a.startDateTime - b.startDateTime);
 
     if (userActivities.length === 0) {
-        console.warn(`No activities found for user ${selectedUser}`);
+        // console.warn(`No activities found for user ${selectedUser}`);
         return null;
     }
 
@@ -100,23 +98,24 @@ function getActiveActivity(nowDateTime, activities) {
 
     for (let i = 0; i < userActivities.length; i++) {
         const activity = userActivities[i];
-        if (activity.startDateTime > nowDateTime) continue;
+        if (activity.startDateTime > nowDateTime) continue; // Activity hasn't started yet
 
+        // Determine effective end time
         let effectiveEndTime = activity.endDateTime;
-        if (!effectiveEndTime) {
+        if (!effectiveEndTime) { // If no explicit end time
             if (i + 1 < userActivities.length) {
-                effectiveEndTime = userActivities[i + 1].startDateTime;
+                effectiveEndTime = userActivities[i + 1].startDateTime; // Ends when next activity starts
             } else {
-                effectiveEndTime = new Date(nowDateTime.getFullYear() + 10, 0, 1);
+                // Last activity, assume it continues for a very long time or until end of data
+                effectiveEndTime = new Date(nowDateTime.getFullYear() + 10, 0, 1); // Arbitrary far future date
             }
         }
-
+        
         if (nowDateTime >= activity.startDateTime && nowDateTime < effectiveEndTime) {
             currentActivity = activity;
             break;
         }
     }
-
     return currentActivity;
 }
 
@@ -124,96 +123,55 @@ function getActiveActivity(nowDateTime, activities) {
 function setupActivityDisplayElements() {
     const activitySection = document.createElement('div');
     activitySection.className = 'activity-section';
-    Object.assign(activitySection.style, {
-        position: 'fixed',
-        top: '80px',
-        left: '20px',
-        width: '220px',
-        zIndex: '10'
-    });
+    // Styles are now in HTML/CSS, but you can override or set here if needed
+    // Object.assign(activitySection.style, { /* ... */ });
 
     const title = document.createElement('h4');
     title.className = 'activity-title';
     title.textContent = 'Current Activity';
-    Object.assign(title.style, {
-        background: 'white',
-        padding: '10px',
-        margin: '0',
-        borderRadius: '8px 8px 0 0',
-        boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
-        textAlign: 'center'
-    });
+    // Styles are now in HTML/CSS
 
     const container = document.createElement('div');
     container.className = 'activity-container';
-    Object.assign(container.style, {
-        background: 'white',
-        padding: '10px',
-        borderRadius: '0 0 8px 8px',
-        boxShadow: '0 2px 6px rgba(0,0,0,0.15)'
-    });
+    // Styles are now in HTML/CSS
 
-    const videoWrapper = document.createElement('div');
-    videoWrapper.className = 'video-wrapper';
-    Object.assign(videoWrapper.style, {
-        width: '100%',
-        height: '180px',
-        position: 'relative',
-        overflow: 'hidden',
-        border: '1px solid #eee',
-        borderRadius: '4px',
-        background: '#f8f8f8'
-    });
+    videoWrapperElement = document.createElement('div'); // Assign to global
+    videoWrapperElement.className = 'video-wrapper';
+    // Styles are now in HTML/CSS
 
-    const video = document.createElement('video');
-    video.id = 'activity-animation-video';
-    Object.assign(video, {
-        autoplay: true,
-        loop: true,
-        muted: true,
-        playsinline: true
-    });
-    Object.assign(video.style, {
-        width: '100%',
-        height: '100%',
-        objectFit: 'cover',
-        position: 'absolute',
-        top: '0',
-        left: '0'
-    });
+    // Active video player
+    currentVideoElement = document.createElement('video'); // Assign to global
+    currentVideoElement.id = 'activity-animation-video-active';
+    currentVideoElement.className = 'activity-animation-video';
+    Object.assign(currentVideoElement, { autoplay: true, loop: true, muted: true, playsinline: true });
+    currentVideoElement.style.display = 'none'; // Start hidden
 
-    const msg = document.createElement('p');
-    msg.id = 'no-activity-msg';
-    msg.textContent = 'Loading activity data...';
-    Object.assign(msg.style, {
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: '90%',
-        textAlign: 'center',
-        color: '#666',
-        background: 'rgba(255, 255, 255, 0.9)',
-        padding: '10px',
-        borderRadius: '4px',
-        margin: '0'
-    });
+    // Standby video player (for preloading)
+    preloadVideoElement = document.createElement('video'); // Assign to global
+    preloadVideoElement.id = 'activity-animation-video-standby';
+    preloadVideoElement.className = 'activity-animation-video';
+    Object.assign(preloadVideoElement, { autoplay: true, loop: true, muted: true, playsinline: true });
+    preloadVideoElement.style.display = 'none'; // Start hidden
 
-    videoWrapper.appendChild(video);
-    videoWrapper.appendChild(msg);
-    container.appendChild(videoWrapper);
+    noActivityMsgElement = document.createElement('p'); // Assign to global
+    noActivityMsgElement.id = 'no-activity-msg';
+    noActivityMsgElement.textContent = 'Loading activity data...';
+    // Styles are now in HTML/CSS
+
+    videoWrapperElement.appendChild(currentVideoElement);
+    videoWrapperElement.appendChild(preloadVideoElement);
+    videoWrapperElement.appendChild(noActivityMsgElement);
+    container.appendChild(videoWrapperElement);
     activitySection.appendChild(title);
     activitySection.appendChild(container);
-    document.body.appendChild(activitySection);
+    
+    // Prepend to body or append to a specific placeholder if you have one
+    document.body.insertBefore(activitySection, document.body.firstChild);
 }
 
 function updateActivityAnimationView(nowDateTime, activities) {
-    const animationVideo = document.getElementById('activity-animation-video');
-    const noActivityMsg = document.getElementById('no-activity-msg');
-    const videoWrapper = document.querySelector('.video-wrapper');
-
-    if (!animationVideo || !noActivityMsg || !videoWrapper) {
-        console.warn("Activity display DOM elements not found. Skipping update.");
+    if (!currentVideoElement || !preloadVideoElement || !noActivityMsgElement || !videoWrapperElement) {
+        console.warn("Activity display DOM elements not yet initialized. Skipping update.");
         return;
     }
 
@@ -222,62 +180,118 @@ function updateActivityAnimationView(nowDateTime, activities) {
     if (activeActivity && activeActivity.activityCode !== null) {
         const details = activityDetailsMap[activeActivity.activityCode];
         if (details) {
-            // Reset video state
-            animationVideo.style.display = 'none';
-            noActivityMsg.textContent = "Loading activity...";
-            noActivityMsg.style.display = 'block';
-            
-            // Set up video event handlers
-            animationVideo.onloadeddata = () => {
-                noActivityMsg.style.display = 'none';
-                animationVideo.style.display = 'block';
-                animationVideo.play().catch(error => {
-                    console.warn("Video autoplay failed:", error);
-                    noActivityMsg.textContent = "Click to play activity";
-                    noActivityMsg.style.display = 'block';
-                });
-            };
-            
-            animationVideo.onerror = (error) => {
-                console.error("Video loading error:", error);
-                noActivityMsg.textContent = `Failed to load activity: ${details.name}`;
-                noActivityMsg.style.display = 'block';
-                animationVideo.style.display = 'none';
-            };
+            const targetSrc = new URL(details.file, window.location.href).href; // Get absolute URL
 
-            // Only update src if it's different to avoid unnecessary reloads
-            if (animationVideo.src !== details.file) {
-                animationVideo.src = details.file;
-                animationVideo.load(); // Explicitly load the video
+            // If current video is already showing the target, do nothing
+            if (currentVideoElement.style.display !== 'none' && currentVideoElement.currentSrc === targetSrc) {
+                if (currentVideoElement.paused) {
+                    currentVideoElement.play().catch(e => console.warn("Failed to play current video:", e));
+                }
+                noActivityMsgElement.style.display = 'none';
+                videoWrapperElement.title = `User ${selectedUser}: ${details.name}`;
+                return;
             }
-            
-            videoWrapper.title = `User ${selectedUser}: ${details.name}`;
-        } else {
-            animationVideo.style.display = 'none';
-            noActivityMsg.textContent = `Activity (Code: ${activeActivity.activityCode}) - No animation available.`;
-            noActivityMsg.style.display = 'block';
-            videoWrapper.title = `User ${selectedUser}: Unmapped Activity ${activeActivity.activityCode}`;
+
+            // If preload video is ready with the target, swap them
+            if (preloadVideoElement.currentSrc === targetSrc && preloadVideoElement.readyState >= 3) { // HAVE_FUTURE_DATA
+                currentVideoElement.style.display = 'none';
+                currentVideoElement.pause();
+
+                preloadVideoElement.style.display = 'block';
+                if (preloadVideoElement.paused) {
+                    preloadVideoElement.play().catch(e => console.warn("Failed to play preloaded video:", e));
+                }
+                noActivityMsgElement.style.display = 'none';
+
+                // Swap roles
+                let temp = currentVideoElement;
+                currentVideoElement = preloadVideoElement;
+                preloadVideoElement = temp;
+                videoWrapperElement.title = `User ${selectedUser}: ${details.name}`;
+                return;
+            }
+
+            // Otherwise, load target into preloadVideoElement (if not already loading it or loaded)
+            if (preloadVideoElement.currentSrc !== targetSrc || preloadVideoElement.readyState < 2) { // Not loaded or loading something else
+                
+                // Show loading message ONLY if the active video isn't already playing something.
+                // This is key for seamless transition.
+                if (currentVideoElement.style.display === 'none' || !currentVideoElement.currentSrc) {
+                    noActivityMsgElement.textContent = "Loading activity...";
+                    noActivityMsgElement.style.display = 'block';
+                    currentVideoElement.style.display = 'none'; // Ensure current is hidden if it was blank
+                }
+                // else: currentVideoElement continues playing its current content
+
+                preloadVideoElement.onloadeddata = () => {
+                    // Check if this video is still the desired one (user might have scrolled fast)
+                    const stillRelevantActivity = getActiveActivity(nowDateTime, activities);
+                    if (stillRelevantActivity && activityDetailsMap[stillRelevantActivity.activityCode] &&
+                        new URL(activityDetailsMap[stillRelevantActivity.activityCode].file, window.location.href).href === preloadVideoElement.currentSrc) {
+                        
+                        currentVideoElement.style.display = 'none';
+                        currentVideoElement.pause();
+
+                        preloadVideoElement.style.display = 'block';
+                        if (preloadVideoElement.paused) {
+                             preloadVideoElement.play().catch(error => {
+                                console.warn("Video autoplay failed after preload:", error);
+                                noActivityMsgElement.textContent = "Click to play activity";
+                                noActivityMsgElement.style.display = 'block';
+                            });
+                        }
+                        noActivityMsgElement.style.display = 'none';
+
+                        let temp = currentVideoElement;
+                        currentVideoElement = preloadVideoElement;
+                        preloadVideoElement = temp; // Preload is now active, old active is standby
+                    }
+                    // else: this preloaded video is stale, next update call will handle new target.
+                };
+                preloadVideoElement.onerror = (error) => {
+                    console.error("Video loading error for preload:", error, preloadVideoElement.src);
+                    // If this error is for the video we are currently trying to load:
+                    if (new URL(details.file, window.location.href).href === preloadVideoElement.src) {
+                        noActivityMsgElement.textContent = `Failed to load: ${details.name}`;
+                        noActivityMsgElement.style.display = 'block';
+                        preloadVideoElement.style.display = 'none'; // Hide the failed video
+                        // If active video was also hidden, the message stays.
+                        // If active video was playing something else, it continues.
+                    }
+                };
+                preloadVideoElement.src = targetSrc;
+                preloadVideoElement.load();
+            }
+            videoWrapperElement.title = `User ${selectedUser}: ${details.name}`;
+        } else { // No animation detail for this activity code
+            currentVideoElement.style.display = 'none'; currentVideoElement.pause();
+            preloadVideoElement.style.display = 'none'; preloadVideoElement.pause();
+            noActivityMsgElement.textContent = `Activity (Code: ${activeActivity.activityCode}) - No animation available.`;
+            noActivityMsgElement.style.display = 'block';
+            videoWrapperElement.title = `User ${selectedUser}: Unmapped Activity ${activeActivity.activityCode}`;
         }
-    } else {
-        animationVideo.style.display = 'none';
-        noActivityMsg.textContent = `No specific activity tracked for ${selectedUser} at this time.`;
-        noActivityMsg.style.display = 'block';
-        videoWrapper.title = `User ${selectedUser}: No activity`;
+    } else { // No specific activity tracked at this time
+        currentVideoElement.style.display = 'none'; currentVideoElement.pause();
+        preloadVideoElement.style.display = 'none'; preloadVideoElement.pause();
+        noActivityMsgElement.textContent = `No specific activity tracked for ${selectedUser} at this time.`;
+        noActivityMsgElement.style.display = 'block';
+        videoWrapperElement.title = `User ${selectedUser}: No activity`;
     }
 }
 
-// --- Main Visualization Functions ---
-function renderChart(dataSlice, windowStart, windowEnd, yExtent, activities) {
+// --- Main Visualization Functions (renderChart, etc. - Keep as is) ---
+function renderChart(dataSlice, windowStart, windowEnd, yExtent, activitiesForChart) { // Renamed 'activities' to avoid conflict
     svg.selectAll("*").remove();
 
-    activities = activities.filter(d => activityLabels[d.activity] !== undefined);
+    // Filter activities for the D3 chart, not to be confused with the global activities array
+    const chartDisplayActivities = activitiesForChart.filter(d => activityLabels[d.activity] !== undefined);
 
     const x = d3.scaleTime()
         .domain([windowStart, windowEnd])
         .range([margin.left, width - margin.right]);
 
     const y = d3.scaleLinear()
-        .domain([yExtent[0] - 5, yExtent[1] + 5])
+        .domain(yExtent ? [yExtent[0] - 5, yExtent[1] + 5] : [0, 100]) // Added fallback for yExtent
         .range([height - margin.bottom, margin.top]);
 
     const line = d3.line()
@@ -285,12 +299,12 @@ function renderChart(dataSlice, windowStart, windowEnd, yExtent, activities) {
         .y(d => y(d.avgHR));
 
     const activityColor = d3.scaleOrdinal()
-        .domain(d3.range(1, 13))
-        .range(d3.schemeTableau10.concat(d3.schemePastel1));
+        .domain(d3.range(1, 13)) // 1 to 12 activities
+        .range(d3.schemeTableau10.concat(d3.schemePastel1.slice(0,2))); // Ensure enough colors
 
-    // Activity rectangles
+    // Activity rectangles for D3 chart
     svg.selectAll(".activity-rect")
-        .data(activities)
+        .data(chartDisplayActivities) // Use chartDisplayActivities
         .enter()
         .append("rect")
         .attr("class", d => `activity-rect activity-${d.start.getTime()}-${d.end.getTime()}`)
@@ -299,6 +313,7 @@ function renderChart(dataSlice, windowStart, windowEnd, yExtent, activities) {
         .attr("width", d => {
             const clippedStart = Math.max(d.start.getTime(), windowStart.getTime());
             const clippedEnd = Math.min(d.end.getTime(), windowEnd.getTime());
+            if (clippedEnd < clippedStart) return 0; // Avoid negative width
             return x(new Date(clippedEnd)) - x(new Date(clippedStart));
         })
         .attr("height", height - margin.top - margin.bottom)
@@ -318,184 +333,228 @@ function renderChart(dataSlice, windowStart, windowEnd, yExtent, activities) {
         });
 
     // Heart rate line
-    svg.append("path")
-        .datum(dataSlice)
-        .attr("fill", "none")
-        .attr("stroke", "#e60026")
-        .attr("stroke-width", 1.5)
-        .attr("d", line);
-
+    if (dataSlice && dataSlice.length > 0) {
+        svg.append("path")
+            .datum(dataSlice)
+            .attr("fill", "none")
+            .attr("stroke", "#e60026")
+            .attr("stroke-width", 1.5)
+            .attr("d", line);
+    }
     // Axes
     svg.append("g")
         .attr("transform", `translate(0,${height - margin.bottom})`)
-        .call(d3.axisBottom(x).ticks(6).tickFormat(d3.timeFormat("%-I:%M %p")));
+        .call(d3.axisBottom(x).ticks(Math.max(2, Math.round(width / 150))).tickFormat(d3.timeFormat("%-I:%M %p")));
 
     svg.append("g")
         .attr("transform", `translate(${margin.left},0)`)
         .call(d3.axisLeft(y));
-
+    
+    // Y-axis Label (ensure it's added only once or cleared if re-rendering)
+    svg.selectAll(".y-axis-label").remove(); // Remove previous label if any
     svg.append("text")
-        .attr("x", -height / 2)
-        .attr("y", -margin.left - 5)
+        .attr("class", "y-axis-label")
+        .attr("x", -(height / 2))
+        .attr("y", -margin.left + 15) // Adjust y position if needed
         .attr("transform", "rotate(-90)")
         .attr("text-anchor", "middle")
         .text("Beats Per Minute")
-        .style("font-size", "20px")
+        .style("font-size", "14px") // Adjusted font size
         .style("font-weight", "bold");
+
 
     // Hover elements
     const hoverLine = svg.append("line")
-        .attr("stroke", "gray")
-        .attr("stroke-width", 1)
-        .attr("stroke-dasharray", "4")
-        .style("display", "none");
-
+        .attr("stroke", "gray").attr("stroke-width", 1).attr("stroke-dasharray", "4").style("display", "none");
     const hoverDot = svg.append("circle")
-        .attr("r", 4)
-        .attr("fill", "#888888")
-        .attr("stroke", "#fff")
-        .attr("stroke-width", 1.5)
-        .style("display", "none");
+        .attr("r", 4).attr("fill", "#888888").attr("stroke", "#fff").attr("stroke-width", 1.5).style("display", "none");
 
-    // Hover interaction
+    // Hover interaction rectangle
     svg.append("rect")
         .attr("fill", "transparent")
         .attr("x", margin.left)
-        .attr("y", y.range()[1])
+        .attr("y", margin.top) // Use margin.top for y
         .attr("width", width - margin.left - margin.right)
-        .attr("height", y.range()[0] - y.range()[1])
+        .attr("height", height - margin.top - margin.bottom) // Use full chart height
         .on("mousemove", function(event) {
-            const [mouseX] = d3.pointer(event);
+            const [mouseX] = d3.pointer(event, this); // Pass `this` for correct coordinates
+            if (mouseX < margin.left || mouseX > width - margin.right) { // ignore if outside chart plotting area
+                 tooltip.style("display", "none");
+                 hoverLine.style("display", "none");
+                 hoverDot.style("display", "none");
+                return;
+            }
             const timeX = x.invert(mouseX);
 
+            // Find data point for HR
             const bisect = d3.bisector(d => d.minute).center;
-            const index = bisect(dataSlice, timeX);
-            const d = dataSlice[index];
-            if (!d) return;
-
+            const index = dataSlice && dataSlice.length > 0 ? bisect(dataSlice, timeX) : -1;
+            const d_hr = index !== -1 ? dataSlice[index] : null;
+            
             const formatTime = d3.timeFormat("%-I:%M %p");
-            const hoveredTime = d.minute;
+            const hoveredTime = timeX; // Use the inverted time for activity matching
 
-            const overlappingActivity = activities.find(a =>
-                hoveredTime >= a.start && hoveredTime <= a.end
+            // Find overlapping activity for tooltip and animation update
+             const overlappingActivity = activitiesForChart.find(a => // use activitiesForChart
+                hoveredTime >= a.start && hoveredTime <= (a.end || new Date(hoveredTime.getTime() + 1)) // handle null end
             );
 
-            d3.selectAll(".activity-rect").attr("opacity", 0.15);
+            d3.selectAll(".activity-rect").attr("opacity", 0.15); // Reset all opacities
 
+            let tooltipHtml = "";
             if (overlappingActivity) {
-                const className = `.activity-${overlappingActivity.start.getTime()}-${overlappingActivity.end.getTime()}`;
-                d3.select(className).attr("opacity", 0.35);
+                const className = `.activity-${overlappingActivity.start.getTime()}-${(overlappingActivity.end || '').getTime()}`;
+                try {
+                    svg.select(className).attr("opacity", 0.35); // Highlight current activity rect
+                } catch (e) { console.warn("Error selecting activity rect:", e); }
+                tooltipHtml += `<strong style="color:${activityColor(overlappingActivity.activity)}">${activityLabels[overlappingActivity.activity]}</strong><br/>`;
             }
 
-            const activityLine = overlappingActivity
-                ? `<strong style="color:${activityColor(overlappingActivity.activity)}">${activityLabels[overlappingActivity.activity]}</strong><br/>`
-                : "";
+            if (d_hr) {
+                tooltipHtml += `<strong>BPM:</strong> ${d_hr.avgHR.toFixed(1)}<br/>`;
+            }
+            tooltipHtml += `<strong>Time:</strong> ${formatTime(hoveredTime)}`;
 
             tooltip
                 .style("display", "block")
-                .html(`
-                    ${activityLine}
-                    <strong>BPM:</strong> ${d.avgHR.toFixed(1)}<br/>
-                    <strong>Time:</strong> ${formatTime(d.minute)}
-                `)
+                .html(tooltipHtml)
                 .style("left", (event.clientX + 10) + "px")
                 .style("top", (event.clientY + 15) + "px");
 
-            const xCoord = x(d.minute);
-            hoverLine
-                .attr("x1", xCoord)
-                .attr("x2", xCoord)
-                .attr("y1", margin.top)
-                .attr("y2", height - margin.bottom)
-                .style("display", "block");
-
-            hoverDot
-                .attr("cx", xCoord)
-                .attr("cy", y(d.avgHR))
-                .style("display", "block");
-
-            // Update activity display
-            updateActivityAnimationView(hoveredTime, activities);
+            if (d_hr) {
+                const xCoord = x(d_hr.minute);
+                hoverLine.attr("x1", xCoord).attr("x2", xCoord)
+                         .attr("y1", margin.top).attr("y2", height - margin.bottom)
+                         .style("display", "block");
+                hoverDot.attr("cx", xCoord).attr("cy", y(d_hr.avgHR)).style("display", "block");
+            } else {
+                hoverLine.style("display", "none");
+                hoverDot.style("display", "none");
+            }
+            // Update activity animation based on hovered time (pass the main activities array)
+            // Make sure `activities` here is the full list for the user, not just `activitiesForChart`
+            // This requires passing the global `userActivities` or `fullActivityData` to renderChart if it needs it.
+            // For now, assuming the main `activities` array (global or passed to DOMContentLoaded) is accessible.
+            // Let's assume `allUserActivities` is the variable holding the full list.
+            updateActivityAnimationView(hoveredTime, allUserActivities); // Ensure 'allUserActivities' is defined and passed
         })
         .on("mouseleave", () => {
             tooltip.style("display", "none");
             hoverLine.style("display", "none");
             hoverDot.style("display", "none");
+            d3.selectAll(".activity-rect").attr("opacity", 0.15); // Reset opacity
+             // When mouse leaves chart, reset animation to current scroll time
+            const scrollTop = window.scrollY;
+            const maxScroll = document.body.scrollHeight - window.innerHeight;
+            const scrollProgress = maxScroll > 0 ? scrollTop / maxScroll : 0;
+            
+            // Need timeExtent here. This suggests timeExtent should be more globally available or re-calculated.
+            // For now, this part might need to be linked to the scroll handler's time calculation.
+            // Or, simply call updateActivityAnimationView with a time derived from the current window if available.
+            // Let currentScrollTime be a globalish variable updated by scroll handler
+            if (typeof currentScrollTime !== 'undefined' && allUserActivities) {
+                 updateActivityAnimationView(currentScrollTime, allUserActivities);
+            }
+
         });
 
-    svg.selectAll(".tick text")
-        .style("font-size", "17px");
-
-    svg.selectAll(".domain, .tick line")
-        .style("stroke", "#333")
-        .style("stroke-width", 1.5);
+    svg.selectAll(".tick text").style("font-size", "12px"); // Adjusted tick font size
+    svg.selectAll(".domain, .tick line").style("stroke", "#333").style("stroke-width", 1); // Adjusted stroke
 }
-
 // --- Main Data Loading and Initialization ---
+let allUserActivities = []; // To store all activities for the selected user
+let currentScrollTime; // To store the time corresponding to the current scroll position
+
 document.addEventListener('DOMContentLoaded', async () => {
-    setupActivityDisplayElements();
+    setupActivityDisplayElements(); // Setup video elements first
+
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const loadingText = document.getElementById('loading-text');
 
     try {
-        const [hrData, activityData] = await Promise.all([
-            d3.csv("../assets/cleaned_data/all_actigraph.csv", d => {
-                const hr = +d.HR;
-                if (isNaN(hr)) return null;
-                const timestamp = new Date(`2024-01-${String(d.day).padStart(2, '0')}T${d.time}`);
-                timestamp.setSeconds(0);
-                timestamp.setMilliseconds(0);
-                return {
-                    user: d.user,
-                    minute: timestamp,
-                    heartRate: hr
-                };
-            }),
-            d3.csv("../assets/cleaned_data/all_activity.csv", d => ({
+        loadingText.textContent = 'Loading HR data...';
+        const hrDataFull = await d3.csv("../assets/cleaned_data/all_actigraph.csv", d => {
+            const hr = +d.HR;
+            if (isNaN(hr) || d.user !== selectedUser) return null; // Filter by user early
+            const timestamp = new Date(`2024-01-${String(d.day).padStart(2, '0')}T${d.time}`);
+            timestamp.setSeconds(0); timestamp.setMilliseconds(0);
+            return { user: d.user, minute: timestamp, heartRate: hr };
+        });
+        
+        loadingText.textContent = 'Loading activity data...';
+        const activityDataFull = await d3.csv("../assets/cleaned_data/all_activity.csv", d => {
+            if (d.user !== selectedUser) return null; // Filter by user early
+            return {
                 activity: +d.Activity,
                 start: parseTimeToDate(d.Start, +d.Day),
                 end: d.End ? parseTimeToDate(d.End, +d.Day) : null,
                 user: d.user,
-                startStr: d.Start,
+                startStr: d.Start, // Keep original strings for getActiveActivity
                 endStr: d.End,
                 day: +d.Day,
-                activityCode: +d.Activity
-            }))
-        ]);
+                activityCode: +d.Activity // Keep for mapping
+            };
+        });
 
-        const filteredHrData = hrData.filter(d => d !== null);
-        const userData = filteredHrData.filter(d => d.user === selectedUser);
-        const userActivities = activityData.filter(d => d.user === selectedUser);
+        loadingText.textContent = 'Processing data...';
+        const filteredHrData = hrDataFull.filter(d => d !== null);
+        allUserActivities = activityDataFull.filter(d => d !== null && d.start); // Store for global use
+
+        // Ensure start/end times are handled for activities spanning midnight before sorting
+        allUserActivities.forEach(act => {
+            if (act.start && act.end && act.end < act.start) {
+                act.end.setDate(act.end.getDate() + 1);
+            }
+        });
+        allUserActivities.sort((a, b) => a.start - b.start);
+
 
         const bpmPerMinute = d3.rollups(
-            userData,
+            filteredHrData,
             v => d3.mean(v, d => d.heartRate),
-            d => d.minute
-        ).map(([minute, avgHR]) => ({ minute, avgHR }));
+            d => d.minute.getTime() // Group by time value for robustness
+        ).map(([minuteMillis, avgHR]) => ({ minute: new Date(minuteMillis), avgHR }))
+         .sort((a, b) => a.minute - b.minute);
 
-        bpmPerMinute.sort((a, b) => a.minute - b.minute);
+        if (bpmPerMinute.length === 0) {
+            loadingText.textContent = `No heart rate data for user ${selectedUser}.`;
+            console.warn(`No heart rate data for user ${selectedUser}.`);
+            // Keep overlay or show a message
+            return; 
+        }
+        
         const timeExtent = d3.extent(bpmPerMinute, d => d.minute);
         if (!timeExtent[0] || !timeExtent[1]) {
+            loadingText.textContent = `No valid time extent for user ${selectedUser}.`;
             console.warn(`No valid time extent for user ${selectedUser}.`);
+            // Keep overlay
             return;
         }
 
-        const totalTimeRangeMs = timeExtent[1] - timeExtent[0] - 1 * 60 * 60 * 1000;
         const yExtent = d3.extent(bpmPerMinute, d => d.avgHR);
+        const totalTimeRangeMs = timeExtent[1] - timeExtent[0];
+        const viewWindowDurationMs = 1 * 60 * 60 * 1000; // 1 hour
+
+        loadingOverlay.style.display = 'none'; // Hide loading overlay
 
         window.addEventListener("scroll", () => {
             const scrollTop = window.scrollY;
-            const maxScroll = document.body.scrollHeight - window.innerHeight;
-            const scrollProgress = scrollTop / maxScroll;
-            const offsetMs = scrollProgress * totalTimeRangeMs;
+            const maxScroll = Math.max(0, document.body.scrollHeight - window.innerHeight); // Ensure non-negative
+            const scrollProgress = maxScroll > 0 ? scrollTop / maxScroll : 0;
+            
+            // Calculate offset ensuring it doesn't exceed totalTimeRangeMs minus window duration
+            const effectiveScrollableRangeMs = Math.max(0, totalTimeRangeMs - viewWindowDurationMs);
+            const offsetMs = scrollProgress * effectiveScrollableRangeMs;
 
             const windowStart = new Date(timeExtent[0].getTime() + offsetMs);
-            const windowEnd = new Date(windowStart.getTime() + 1 * 60 * 60 * 1000);
+            const windowEnd = new Date(windowStart.getTime() + viewWindowDurationMs);
+            
+            currentScrollTime = new Date(windowStart.getTime() + viewWindowDurationMs / 2); // Update global scroll time
 
-            // Update time display
             const timeDisplay = document.getElementById('time-display');
             if (timeDisplay) {
-                const currentTime = new Date(windowStart.getTime() + (windowEnd.getTime() - windowStart.getTime()) / 2);
-                const hours = currentTime.getHours();
-                const minutes = currentTime.getMinutes().toString().padStart(2, '0');
+                const hours = currentScrollTime.getHours();
+                const minutes = currentScrollTime.getMinutes().toString().padStart(2, '0');
                 const ampm = hours >= 12 ? 'PM' : 'AM';
                 const displayHours = hours % 12 || 12;
                 timeDisplay.textContent = `${displayHours}:${minutes} ${ampm}`;
@@ -504,45 +563,41 @@ document.addEventListener('DOMContentLoaded', async () => {
             const visibleData = bpmPerMinute.filter(d =>
                 d.minute >= windowStart && d.minute <= windowEnd
             );
-            const visibleActivities = userActivities.filter(d =>
-                d.end >= windowStart && d.start <= windowEnd
+            const visibleActivities = allUserActivities.filter(d =>
+                (d.end ? d.end >= windowStart : true) && d.start <= windowEnd // activity overlaps with window
             );
-
-            renderChart(visibleData, windowStart, windowEnd, yExtent, visibleActivities);
             
-            // Update activity animation based on the middle of the current time window
-            const currentTime = new Date(windowStart.getTime() + (windowEnd.getTime() - windowStart.getTime()) / 2);
-            updateActivityAnimationView(currentTime, userActivities);
+            renderChart(visibleData, windowStart, windowEnd, yExtent, visibleActivities); // Pass visibleActivities for chart
+            updateActivityAnimationView(currentScrollTime, allUserActivities); // Pass allUserActivities for animation
         });
 
+        // Initial render
         const initialStart = timeExtent[0];
-        const initialEnd = new Date(initialStart.getTime() + 1 * 60 * 60 * 1000);
+        const initialEnd = new Date(initialStart.getTime() + viewWindowDurationMs);
+        currentScrollTime = new Date(initialStart.getTime() + viewWindowDurationMs / 2); // Set initial scroll time
+
         const initialData = bpmPerMinute.filter(d =>
             d.minute >= initialStart && d.minute <= initialEnd
         );
-        const initialActivities = userActivities.filter(d =>
-            d.end >= initialStart && d.start <= initialEnd
+        const initialActivitiesForChart = allUserActivities.filter(d =>
+             (d.end ? d.end >= initialStart : true) && d.start <= initialEnd
         );
 
-        renderChart(initialData, initialStart, initialEnd, yExtent, initialActivities);
-        
-        // Set initial activity animation
-        const initialTime = new Date(initialStart.getTime() + (initialEnd.getTime() - initialStart.getTime()) / 2);
-        updateActivityAnimationView(initialTime, userActivities);
+        renderChart(initialData, initialStart, initialEnd, yExtent, initialActivitiesForChart);
+        updateActivityAnimationView(currentScrollTime, allUserActivities); // Initial animation update
 
-        // Add click handler for video playback
-        const animationContainer = document.querySelector('.video-wrapper');
-        const animationVideo = document.getElementById('activity-animation-video');
-        const noActivityMsg = document.getElementById('no-activity-msg');
-
-        if (animationContainer && animationVideo && noActivityMsg) {
-            animationContainer.addEventListener('click', () => {
-                if (animationVideo.style.display === 'none' && animationVideo.src) {
-                    animationVideo.play().then(() => {
-                        noActivityMsg.style.display = 'none';
-                        animationVideo.style.display = 'block';
+        // Click handler for video wrapper to attempt play if paused by browser
+        if (videoWrapperElement) {
+            videoWrapperElement.addEventListener('click', () => {
+                if (currentVideoElement && currentVideoElement.style.display !== 'none' && currentVideoElement.paused) {
+                    currentVideoElement.play().then(() => {
+                        if(noActivityMsgElement) noActivityMsgElement.style.display = 'none';
                     }).catch(error => {
-                        console.warn("Video play failed:", error);
+                        console.warn("Video play on click failed:", error);
+                         if(noActivityMsgElement) {
+                            noActivityMsgElement.textContent = "Playback error. Try again.";
+                            noActivityMsgElement.style.display = 'block';
+                         }
                     });
                 }
             });
@@ -550,5 +605,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (error) {
         console.error("Error loading or processing data:", error);
+        loadingText.textContent = 'Error loading data. Please refresh.';
+        // Keep overlay visible or provide a more user-friendly error message on the page
     }
-}); 
+});
