@@ -2,7 +2,7 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 const width = 900;
 const height = 400;
-const margin = { top: 40, right: 20, bottom: 50, left: 20 };
+const margin = { top: 40, right: 20, bottom: 60, left: 70 };
 const params = new URLSearchParams(window.location.search);
 const selectedUser = params.get("user");
 
@@ -197,23 +197,23 @@ function renderChart(dataSlice, windowStart, windowEnd, yExtent) {
 
   svg.append("g")
     .attr("transform", `translate(${margin.left},0)`)
-    .call(d3.axisLeft(y));
+    .call(d3.axisLeft(y).ticks(8));
 
   svg.append("text")
     .attr("x", width / 2)
-    .attr("y", height - 5)
-    .attr("text-anchor", "middle")
+    .attr("y", height - 7)
+    .attr("text-anchor", 'middle')
     .text("Time (1-Hour Window)")
-    .style("font-size", "20px")
-    .style("font-weight", "bold");;
+    .style("font-size", "25px")
+    .style("font-weight", "bold");
 
   svg.append("text")
     .attr("x", -height / 2)
-    .attr("y", -margin.left -5)
+    .attr("y", margin.left-50)
     .attr("transform", "rotate(-90)")
     .attr("text-anchor", "middle")
     .text("Movement Intensity")
-    .style("font-size", "20px")
+    .style("font-size", "25px")
     .style("font-weight", "bold");
 
   const hoverLine = svg.append("line")
@@ -273,11 +273,11 @@ function renderChart(dataSlice, windowStart, windowEnd, yExtent) {
     });
 
     svg.selectAll(".tick text")
-    .style("font-size", "17px");
+    .style("font-size", "20px");
     
     svg.selectAll(".domain, .tick line")
     .style("stroke", "#333")
-    .style("stroke-width", 1.5);
+    .style("stroke-width", 2);
 
     loadingOverlay.style("display", "none");
 }
