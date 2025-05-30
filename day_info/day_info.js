@@ -465,6 +465,88 @@ function renderChart(dataSlice, windowStart, windowEnd, yExtent, activitiesForCh
 let allUserActivities = []; // To store all activities for the selected user
 let currentScrollTime; // To store the time corresponding to the current scroll position
 
+// Add theme management
+function getTimeTheme(hour) {
+  if (hour >= 5 && hour < 8) {
+    return {
+      name: "dawn",
+      bg: "var(--dawn-bg)",
+      accent: "var(--accent-color)",
+      card: "var(--card-bg)"
+    };
+  } else if (hour >= 8 && hour < 17) {
+    return {
+      name: "day",
+      bg: "var(--day-bg)",
+      accent: "var(--accent-color)",
+      card: "var(--card-bg)"
+    };
+  } else if (hour >= 17 && hour < 20) {
+    return {
+      name: "sunset",
+      bg: "var(--sunset-bg)",
+      accent: "var(--accent-color)",
+      card: "var(--card-bg)"
+    };
+  } else {
+    return {
+      name: "night",
+      bg: "var(--night-bg)",
+      accent: "var(--accent-color)",
+      card: "var(--card-bg)"
+    };
+  }
+}
+
+function updateTheme(time) {
+  const hour = time.getHours();
+  const theme = getTimeTheme(hour);
+  
+  // Update background
+  const dynamicBg = document.querySelector('.dynamic-bg');
+  if (dynamicBg) {
+    dynamicBg.style.background = theme.bg;
+  }
+  
+  // Update body class for theme-specific styles
+  document.body.className = `theme-${theme.name}`;
+  
+  // Update accent colors
+  document.documentElement.style.setProperty('--accent-color', theme.accent);
+  document.documentElement.style.setProperty('--card-bg', theme.card);
+}
+
+// Update scroll progress
+function updateScrollProgress(progress) {
+  const progressFill = document.querySelector('.progress-fill');
+  const scrollFill = document.querySelector('.scroll-fill');
+  
+  if (progressFill) {
+    progressFill.style.width = `${progress * 100}%`;
+  }
+  if (scrollFill) {
+    scrollFill.style.height = `${progress * 100}%`;
+  }
+}
+
+// Update activity info card
+function updateActivityInfo(activity) {
+  const activityInfo = document.querySelector('.activity-info .card');
+  if (activityInfo && activity) {
+    const details = activityDetailsMap[activity.activityCode];
+    if (details) {
+      activityInfo.innerHTML = `
+        <div class="flex items-center gap-3">
+          <div>
+            <h4 class="font-semibold">${details.name}</h4>
+            <p class="text-sm opacity-70">Current activity</p>
+          </div>
+        </div>
+      `;
+    }
+  }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     setupActivityDisplayElements(); // Setup video elements first
 
@@ -537,21 +619,29 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         loadingOverlay.style.display = 'none'; // Hide loading overlay
 
+        // Set initial theme
+        updateTheme(timeExtent[0]);
+
         window.addEventListener("scroll", () => {
             const scrollTop = window.scrollY;
-            const maxScroll = Math.max(0, document.body.scrollHeight - window.innerHeight); // Ensure non-negative
+            const maxScroll = Math.max(0, document.body.scrollHeight - window.innerHeight);
             const scrollProgress = maxScroll > 0 ? scrollTop / maxScroll : 0;
             
-            // Calculate offset ensuring it doesn't exceed totalTimeRangeMs minus window duration
+            // Calculate time based on scroll progress
             const effectiveScrollableRangeMs = Math.max(0, totalTimeRangeMs - viewWindowDurationMs);
             const offsetMs = scrollProgress * effectiveScrollableRangeMs;
-
             const windowStart = new Date(timeExtent[0].getTime() + offsetMs);
             const windowEnd = new Date(windowStart.getTime() + viewWindowDurationMs);
-            
-            currentScrollTime = new Date(windowStart.getTime() + viewWindowDurationMs / 2); // Update global scroll time
+            currentScrollTime = new Date(windowStart.getTime() + viewWindowDurationMs / 2);
 
-            const timeDisplay = document.getElementById('time-display');
+            // Update theme based on current time
+            updateTheme(currentScrollTime);
+            
+            // Update scroll progress indicators
+            updateScrollProgress(scrollProgress);
+
+            // Update time display
+            const timeDisplay = document.querySelector('.time-display');
             if (timeDisplay) {
                 const hours = currentScrollTime.getHours();
                 const minutes = currentScrollTime.getMinutes().toString().padStart(2, '0');
@@ -560,15 +650,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 timeDisplay.textContent = `${displayHours}:${minutes} ${ampm}`;
             }
 
+            // Update charts and activity
             const visibleData = bpmPerMinute.filter(d =>
                 d.minute >= windowStart && d.minute <= windowEnd
             );
             const visibleActivities = allUserActivities.filter(d =>
-                (d.end ? d.end >= windowStart : true) && d.start <= windowEnd // activity overlaps with window
+                (d.end ? d.end >= windowStart : true) && d.start <= windowEnd
             );
             
-            renderChart(visibleData, windowStart, windowEnd, yExtent, visibleActivities); // Pass visibleActivities for chart
-            updateActivityAnimationView(currentScrollTime, allUserActivities); // Pass allUserActivities for animation
+            renderChart(visibleData, windowStart, windowEnd, yExtent, visibleActivities);
+            updateActivityAnimationView(currentScrollTime, allUserActivities);
+            
+            // Update activity info
+            const currentActivity = getActiveActivity(currentScrollTime, allUserActivities);
+            updateActivityInfo(currentActivity);
         });
 
         // Initial render
@@ -585,6 +680,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         renderChart(initialData, initialStart, initialEnd, yExtent, initialActivitiesForChart);
         updateActivityAnimationView(currentScrollTime, allUserActivities); // Initial animation update
+        
+        // Initial activity info
+        const initialActivity = getActiveActivity(currentScrollTime, allUserActivities);
+        updateActivityInfo(initialActivity);
 
         // Click handler for video wrapper to attempt play if paused by browser
         if (videoWrapperElement) {

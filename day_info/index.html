@@ -11,133 +11,183 @@
   <script type="module" src="../heartrate.js"></script>
   <script type="module" src="../activity.js"></script>
   <style>
+    :root {
+      --dawn-bg: linear-gradient(135deg, #ffedd5, #fecdd3, #e9d5ff);
+      --day-bg: linear-gradient(135deg, #dbeafe, #cffafe, #dcfce7);
+      --sunset-bg: linear-gradient(135deg, #fdba74, #fca5a5, #c4b5fd);
+      --night-bg: linear-gradient(135deg, #312e81, #1e3a8a, #3730a3);
+    }
+
     body {
       margin: 0;
-      font-family: sans-serif;
-      height: 1000vh; /* allows scroll */
+      font-family: system-ui, -apple-system, sans-serif;
+      height: 1000vh;
       background-color: #fafafa;
-      padding: 20px;
+      padding: 0;
+      color: #1f2937;
     }
 
-    #control-panel {
+    .fixed-layout {
       position: fixed;
-      top: 20px;
-      left: 20px;
-      background: white;
-      padding: 10px 15px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-      border-radius: 8px;
-      z-index: 10;
+      inset: 0;
+      overflow: hidden;
     }
 
-    #chart-container {
-      position: fixed;
-      top: 150px;
-      right: 20px;
-      z-index: 5;
+    .dynamic-bg {
+      position: absolute;
+      inset: 0;
+      transition: opacity 2s ease;
     }
 
-    #chart-container-acc {
-      position: fixed;
-      top: 410px; /* Adjusted from 410px, assuming heart rate chart is 250px + some margin */
-      right: 20px;
-      z-index: 5;
+    .header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      padding: 1.5rem;
     }
 
-    #chart, #chart-acc {
-      border: 1px solid #ccc;
-      background-color: white;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
-    }
-
-    #play-pause-btn {
-      margin-top: 5px;
-      padding: 6px 12px;
-      font-size: 14px;
-      border: none;
-      background-color: #007acc;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    #play-pause-btn:hover {
-      background-color: #005f99;
-    }
-
-    #loading-overlay {
-      position: fixed;
-      top: 150px;
-      right: 20px;
-      width: 650px; /* Width of chart */
-      height: 510px; /* Combined height of charts + spacing if applicable */
+    .header-content {
       display: flex;
       align-items: center;
-      justify-content: center;
-      background: rgba(255, 255, 255, 0.85);
-      font-size: 18px;
-      color: #333;
-      border: 1px solid #ccc;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
-      z-index: 100; /* Should be high */
+      justify-content: space-between;
     }
 
-    #loading-text {
+    .time-display {
+      background: rgba(255, 255, 255, 0.8);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      font-family: monospace;
+      font-size: 1.5rem;
       font-weight: bold;
     }
 
-    #time-display {
+    .progress-bar {
+      margin-top: 1rem;
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      transition: width 0.3s ease;
+    }
+
+    .main-content {
+      display: flex;
+      height: 100%;
+      padding-top: 8rem;
+    }
+
+    .data-section {
+      width: 50%;
+      padding: 1.5rem;
+      overflow-y: auto;
+    }
+
+    .animation-section {
+      width: 50%;
+      position: relative;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.8);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+    }
+
+    .chart-container {
+      height: 12rem;
+      margin-top: 1rem;
+    }
+
+    .activity-info {
       position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: white;
-      padding: 10px 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-      font-size: 24px;
-      font-weight: bold;
-      z-index: 100;
-      text-align: center;
+      bottom: 1.5rem;
+      left: 1.5rem;
+      right: 1.5rem;
+      z-index: 40;
+      max-width: 32rem;
+      margin: 0 auto;
     }
 
-    /* Activity Section Styles - Copied from your JS for completeness in HTML context */
+    .scroll-indicator {
+      position: fixed;
+      right: 1.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 40;
+    }
+
+    .scroll-bar {
+      width: 4px;
+      height: 8rem;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+
+    .scroll-fill {
+      width: 100%;
+      transition: height 0.3s ease;
+    }
+
+    /* Activity Section Styles */
     .activity-section {
       position: fixed;
       top: 80px;
       left: 20px;
       width: 220px;
-      z-index: 10; /* Ensure it's above other elements if needed, but below time/control panels if they overlap */
+      z-index: 10;
     }
 
     .activity-title {
-      background: white;
+      background: rgba(255, 255, 255, 0.8);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
       padding: 10px;
       margin: 0;
       border-radius: 8px 8px 0 0;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       text-align: center;
     }
 
     .activity-container {
-      background: white;
+      background: rgba(255, 255, 255, 0.8);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
       padding: 10px;
       border-radius: 0 0 8px 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .video-wrapper {
       width: 100%;
-      height: 180px; /* Or your desired height */
+      height: 180px;
       position: relative;
       overflow: hidden;
-      border: 1px solid #eee;
-      border-radius: 4px;
-      background: #f8f8f8;
-      cursor: pointer; /* Added from your JS */
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 0.5rem;
+      background: rgba(248, 248, 248, 0.8);
+      cursor: pointer;
     }
 
-    /* Style for both video players */
     .activity-animation-video {
       width: 100%;
       height: 100%;
@@ -159,46 +209,104 @@
       padding: 10px;
       border-radius: 4px;
       margin: 0;
-      pointer-events: none; /* So it doesn't interfere with clicks on the wrapper */
+      pointer-events: none;
     }
 
+    /* Theme-specific styles */
+    .theme-dawn {
+      --accent-color: #ea580c;
+      --card-bg: rgba(255, 237, 213, 0.8);
+    }
+
+    .theme-day {
+      --accent-color: #2563eb;
+      --card-bg: rgba(219, 234, 254, 0.8);
+    }
+
+    .theme-sunset {
+      --accent-color: #ea580c;
+      --card-bg: rgba(253, 186, 116, 0.8);
+    }
+
+    .theme-night {
+      --accent-color: #a78bfa;
+      --card-bg: rgba(49, 46, 129, 0.4);
+    }
   </style>
 </head>
 <body>
-  <div id="control-panel">
-    <h2>A Day In My Life</h2>
-    <button id="play-pause-btn">▶ Auto-Scroll</button>
-  </div>
+  <div class="fixed-layout">
+    <div class="dynamic-bg"></div>
+    
+    <header class="header">
+      <div class="header-content">
+        <div>
+          <h1 class="text-3xl font-bold">A Day In My Life</h1>
+          <p class="text-sm opacity-70 mt-1">Interactive Timeline</p>
+        </div>
+        <div class="time-display">00:00 AM</div>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill"></div>
+      </div>
+    </header>
 
-  <div id="time-display">00:00 AM</div>
+    <div class="main-content">
+      <div class="data-section">
+        <div class="card">
+          <h3 class="text-lg font-semibold mb-4">Heart Rate</h3>
+          <div id="chart-container" class="chart-container">
+            <svg id="chart" width="100%" height="100%"></svg>
+          </div>
+        </div>
 
-  <div id="chart-container">
-    <svg id="chart" width="650" height="250"></svg>
-  </div>
+        <div class="card">
+          <h3 class="text-lg font-semibold mb-4">Activity & Movement</h3>
+          <div id="chart-container-acc" class="chart-container">
+            <svg id="chart-acc" width="100%" height="100%"></svg>
+          </div>
+        </div>
 
-  <div id="chart-container-acc">
-    <svg id="chart-acc" width="650" height="250"></svg>
+        <div class="card">
+          <h3 class="text-lg font-semibold mb-4">Sleep Quality</h3>
+          <div id="sleep-metrics" class="metrics"></div>
+        </div>
+      </div>
+
+      <div class="animation-section">
+        <div class="activity-section">
+          <h4 class="activity-title">Current Activity</h4>
+          <div class="activity-container">
+            <div class="video-wrapper">
+              <video id="activity-animation-video-active" class="activity-animation-video" autoplay loop muted playsinline></video>
+              <video id="activity-animation-video-standby" class="activity-animation-video" autoplay loop muted playsinline></video>
+              <p id="no-activity-msg">Loading activity...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="activity-info">
+      <div class="card">
+        <div class="flex items-center gap-3">
+          <div>
+            <h4 class="font-semibold">Current Activity</h4>
+            <p class="text-sm opacity-70">Loading activity details...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scroll-indicator">
+      <div class="scroll-bar">
+        <div class="scroll-fill"></div>
+      </div>
+    </div>
   </div>
 
   <div id="loading-overlay">
     <div id="loading-text">Loading data...</div>
   </div>
-  <h2>Sleep Summary</h2>
-
-  <div id="sleep-metrics" class="metrics" style="padding: 40px;"></div>
-
-  <section id="heartrate" class="section">
-    <h2>Heart Rate Analysis</h2>
-    <div id="heartrate-metrics" class="metrics"></div>
-    <svg id="heartrate-chart" class="chart" width="650" height="300"></svg>
-    <div id="tooltip-heartrate"></div>
-  </section>
-    
-  <section id="activity" class="section">
-    <h3>Activity Visualization</h3>
-    <div id="activity-metrics" class="metrics"></div>
-    <svg id="activity-chart" class="chart" width="650" height="250"></svg>
-  </section>
-  
 </body>
 </html>
