@@ -232,81 +232,135 @@
       --accent-color: #a78bfa;
       --card-bg: rgba(49, 46, 129, 0.4);
     }
+
+    .bottom-section {
+  display: none;
+  padding: 60px 40px;
+}
+
+
   </style>
 </head>
 <body>
-  <div class="fixed-layout">
-    <div class="dynamic-bg"></div>
-    
-    <header class="header">
-      <div class="header-content">
-        <div>
-          <h1 class="text-3xl font-bold">A Day In My Life</h1>
-          <p class="text-sm opacity-70 mt-1">Interactive Timeline</p>
+  <div class="page-wrapper">
+    <div class="fixed-layout">
+      <div class="dynamic-bg"></div>
+      
+      <header class="header">
+        <div class="header-content">
+          <div>
+            <h1 class="text-3xl font-bold">A Day In My Life</h1>
+            <p class="text-sm opacity-70 mt-1">Interactive Timeline</p>
+          </div>
+          <div class="time-display">00:00 AM</div>
         </div>
-        <div class="time-display">00:00 AM</div>
-      </div>
-      <div class="progress-bar">
-        <div class="progress-fill"></div>
-      </div>
-    </header>
+        <div class="progress-bar">
+          <div class="progress-fill"></div>
+        </div>
+      </header>
 
-    <div class="main-content">
-      <div class="data-section">
-        <div class="card">
-          <h3 class="text-lg font-semibold mb-4">Heart Rate</h3>
-          <div id="chart-container" class="chart-container">
-            <svg id="chart" width="100%" height="100%"></svg>
+      <div class="main-content">
+        <div class="data-section">
+          <div class="card">
+            <h3 class="text-lg font-semibold mb-4">Heart Rate</h3>
+            <div id="chart-container" class="chart-container">
+              <svg id="chart" width="100%" height="100%"></svg>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="text-lg font-semibold mb-4">Activity & Movement</h3>
+            <div id="chart-container-acc" class="chart-container">
+              <svg id="chart-acc" width="100%" height="100%"></svg>
+            </div>
           </div>
         </div>
 
-        <div class="card">
-          <h3 class="text-lg font-semibold mb-4">Activity & Movement</h3>
-          <div id="chart-container-acc" class="chart-container">
-            <svg id="chart-acc" width="100%" height="100%"></svg>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3 class="text-lg font-semibold mb-4">Sleep Quality</h3>
-          <div id="sleep-metrics" class="metrics"></div>
-        </div>
-      </div>
-
-      <div class="animation-section">
-        <div class="activity-section">
-          <h4 class="activity-title">Current Activity</h4>
-          <div class="activity-container">
-            <div class="video-wrapper">
-              <video id="activity-animation-video-active" class="activity-animation-video" autoplay loop muted playsinline></video>
-              <video id="activity-animation-video-standby" class="activity-animation-video" autoplay loop muted playsinline></video>
-              <p id="no-activity-msg">Loading activity...</p>
+        <div class="animation-section">
+          <div class="activity-section">
+            <h4 class="activity-title">Current Activity</h4>
+            <div class="activity-container">
+              <div class="video-wrapper">
+                <video id="activity-animation-video-active" class="activity-animation-video" autoplay loop muted playsinline></video>
+                <video id="activity-animation-video-standby" class="activity-animation-video" autoplay loop muted playsinline></video>
+                <p id="no-activity-msg">Loading activity...</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="activity-info">
-      <div class="card">
-        <div class="flex items-center gap-3">
-          <div>
-            <h4 class="font-semibold">Current Activity</h4>
-            <p class="text-sm opacity-70">Loading activity details...</p>
+      <div class="activity-info">
+        <div class="card">
+          <div class="flex items-center gap-3">
+            <div>
+              <h4 class="font-semibold">Current Activity</h4>
+              <p class="text-sm opacity-70">Loading activity details...</p>
+            </div>
           </div>
+        </div>
+      </div>
+
+      <div class="scroll-indicator">
+        <div class="scroll-bar">
+          <div class="scroll-fill"></div>
         </div>
       </div>
     </div>
 
-    <div class="scroll-indicator">
-      <div class="scroll-bar">
-        <div class="scroll-fill"></div>
-      </div>
+    <div class="bottom-section">
+      <h2>Sleep Summary</h2>
+      <div id="sleep-metrics" class="metrics" style="padding: 40px;"></div>
+
+      <section id="heartrate" class="section card">
+        <h2>Heart Rate Summary</h2>
+        <div id="heartrate-metrics" class="metrics"></div>
+        <svg id="heartrate-chart" class="chart" width="650" height="300"></svg>
+        <div id="tooltip-heartrate"></div>
+      </section>
+
+      <section id="activity" class="section card">
+        <h3>Activity Summary</h3>
+        <div id="activity-metrics" class="metrics"></div>
+        <svg id="activity-chart" class="chart" width="650" height="250"></svg>
+      </section>
     </div>
+
+
+    <div id="loading-overlay">
+        <div id="loading-text">Loading data...</div>
+      </div>
   </div>
 
-  <div id="loading-overlay">
-    <div id="loading-text">Loading data...</div>
-  </div>
+<button id="view-summary-btn"
+  style="display: none; position: fixed; bottom: 20px; right: 20px; z-index: 10000; padding: 10px 20px; font-size: 1rem;">
+  View Summary Stats
+</button>
+
+
+<script>
+  const summaryButton = document.getElementById("view-summary-btn");
+const selectedUser = new URLSearchParams(window.location.search).get("user");
+
+// Check if user scrolled to bottom
+window.addEventListener("scroll", () => {
+  const scrollBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 10;
+
+  if (scrollBottom) {
+    summaryButton.style.display = "block";
+  }
+});
+
+summaryButton.addEventListener("click", () => {
+  if (selectedUser) {
+    window.location.href = `summary.html?user=${selectedUser}`;
+  } else {
+    alert("User not specified.");
+  }
+});
+</script>
+
+
+
 </body>
 </html>

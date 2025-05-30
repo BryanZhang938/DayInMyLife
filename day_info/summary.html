@@ -1,0 +1,50 @@
+<!-- summary.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Summary Stats</title>
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: #fafafa;
+      padding: 2rem;
+      color: #1f2937;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(8px);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <h1>Summary Statistics</h1>
+
+  <div class="card">
+    <h2>Sleep Summary</h2>
+    <div id="sleep-metrics" class="metrics"></div>
+  </div>
+
+  <div class="card">
+    <h2>Heart Rate Summary</h2>
+    <div id="heartrate-metrics" class="metrics"></div>
+    <svg id="heartrate-chart" class="chart" width="650" height="300"></svg>
+  </div>
+
+  <div class="card">
+    <h2>Activity Summary</h2>
+    <div id="activity-metrics" class="metrics"></div>
+    <svg id="activity-chart" class="chart" width="650" height="250"></svg>
+  </div>
+
+  <script type="module" src="../sleep.js"></script>
+  <script type="module" src="../heartrate.js"></script>
+  <script type="module" src="../activity.js"></script>
+</body>
+</html>
