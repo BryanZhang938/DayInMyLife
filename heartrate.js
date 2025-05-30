@@ -3,33 +3,27 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 const params = new URLSearchParams(window.location.search);
 const selectedUser = params.get("user");
 
-
-// Function to parse heart rate data
 function parseHeartRate(d) {
   return {
     user: d.user,
-    datetime: d3.timeParse("%H:%M:%S")(d.time),
+    datetime: new Date(`2024-01-${String(d.day).padStart(2, '0')}T${d.time}`),
     heartRate: +d["HR"]
   };
 }
 
-// Function to process heart rate data and find peak hour
 function processHeartRateData(data) {
-  // Validate data
   if (!data || data.length === 0) {
     console.error("No heart rate data available");
     return { hourlyData: [], peakHour: null };
   }
 
-  // Filter out invalid data points
-  const validData = data.filter(d => !isNaN(d.heartRate) && d.datetime !== null);
+  const validData = data.filter(d => !isNaN(d.heartRate) && d.datetime instanceof Date);
 
   if (validData.length === 0) {
     console.error("No valid heart rate data points found");
     return { hourlyData: [], peakHour: null };
   }
 
-  // Group data by hour and calculate average heart rate
   const hourlyData = Array.from(
     d3.rollup(
       validData,
@@ -39,7 +33,6 @@ function processHeartRateData(data) {
     ([hour, avgRate]) => ({ hour, avgRate })
   ).sort((a, b) => a.hour - b.hour);
 
-  // Find the hour with highest average heart rate
   const peakHour = hourlyData.length > 0 
     ? hourlyData.reduce((a, b) => b.avgRate > a.avgRate ? b : a, hourlyData[0])
     : null;
@@ -47,11 +40,9 @@ function processHeartRateData(data) {
   return { hourlyData, peakHour };
 }
 
-// Function to draw heart rate visualization
 function drawHeartRate(data) {
   const { hourlyData, peakHour } = processHeartRateData(data);
 
-  // Create metrics display
   d3.select("#heartrate-metrics").html(`
     <div class="metric">
       <strong>${peakHour ? peakHour.avgRate.toFixed(1) : 'N/A'}</strong><br>Peak Hourly Heart Rate
@@ -61,12 +52,8 @@ function drawHeartRate(data) {
     </div>
   `);
 
-  if (hourlyData.length === 0) {
-    console.error("No hourly heart rate data available for visualization");
-    return;
-  }
+  if (hourlyData.length === 0) return;
 
-  // Create chart
   const svg = d3.select("#heartrate-chart");
   const { width, height } = svg.node().getBoundingClientRect();
   const margin = { top: 40, right: 20, bottom: 50, left: 50 };
@@ -74,13 +61,9 @@ function drawHeartRate(data) {
   svg.selectAll("*").remove();
 
   const hourExtent = d3.extent(hourlyData, d => d.hour);
-  const paddedDomain = [
-    d3.timeHour.offset(hourExtent[0], -1),  
-    d3.timeHour.offset(hourExtent[1], 1)   
-  ];
-
+  const barPaddingMs = 30 * 60 * 1000; // half an hour on each side
   const x = d3.scaleTime()
-    .domain(paddedDomain)
+    .domain([new Date(hourExtent[0].getTime() - barPaddingMs), new Date(hourExtent[1].getTime() + barPaddingMs)])
     .range([margin.left, width - margin.right]);
 
   const y = d3.scaleLinear()
@@ -88,14 +71,13 @@ function drawHeartRate(data) {
     .range([height - margin.bottom, margin.top]);
 
   const tooltip = d3.select("#tooltip-heartrate");
-
-  // Add bars
   const barW = ((width - margin.left - margin.right) / hourlyData.length) * 0.8;
+
   svg.append("g")
     .selectAll("rect")
     .data(hourlyData)
     .join("rect")
-    .attr("x", d => x(d.hour) - barW/2)
+    .attr("x", d => x(d.hour) - barW / 2)
     .attr("y", d => y(d.avgRate))
     .attr("width", barW)
     .attr("height", d => y(0) - y(d.avgRate))
@@ -120,11 +102,10 @@ function drawHeartRate(data) {
       d3.select(this).attr("opacity", 0.6);
     });
 
-  // Add axes
   svg.append("g")
     .attr("transform", `translate(0,${height - margin.bottom})`)
     .call(d3.axisBottom(x)
-      .ticks(d3.timeHour.every(2))
+      .ticks(d3.timeHour.every(1))
       .tickFormat(d3.timeFormat("%-I %p")))
     .selectAll("text")
     .style("text-anchor", "middle")
@@ -134,9 +115,8 @@ function drawHeartRate(data) {
     .attr("transform", `translate(${margin.left},0)`)
     .call(d3.axisLeft(y))
     .selectAll("text")
-    .style("font-size", "12px");;
+    .style("font-size", "12px");
 
-  // Add labels
   svg.append("text")
     .attr("class", "axis-label")
     .attr("transform", `translate(${width/2}, ${height - 5})`)
@@ -155,7 +135,6 @@ function drawHeartRate(data) {
     .style("font-weight", "bold")
     .text("Average Heart Rate (bpm)");
 
-  // Add title
   svg.append("text")
     .attr("class", "chart-title")
     .attr("x", width/2)
@@ -166,12 +145,9 @@ function drawHeartRate(data) {
     .text("Average Heart Rate Per Hour");
 }
 
-// Export functions for use in other modules
-export { parseHeartRate, drawHeartRate }; 
+export { parseHeartRate, drawHeartRate };
 
-// Auto-load heart rate data if on a user-specific page
 const userParam = new URLSearchParams(window.location.search).get("user");
-
 if (userParam) {
   d3.csv("../assets/cleaned_data/all_actigraph.csv", parseHeartRate).then(hrData => {
     const filtered = hrData.filter(d => d.user === userParam);

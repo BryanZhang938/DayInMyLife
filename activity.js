@@ -3,32 +3,27 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 const params = new URLSearchParams(window.location.search);
 const selectedUser = params.get("user");
 
-// Function to parse activity data
 function parseActivity(d) {
   return {
     user: d.user,
-    datetime: d3.timeParse("%H:%M:%S")(d.time),
+    datetime: new Date(`2024-01-${String(d.day).padStart(2, '0')}T${d.time}`),
     activity: +d["Vector Magnitude"]
   };
 }
 
-// Function to draw activity chart
 function drawActivity(data) {
-  // Validate data
   if (!data || data.length === 0) {
     console.error("No activity data available");
     return;
   }
 
-  // Filter out invalid data points
-  const validData = data.filter(d => !isNaN(d.activity) && d.datetime !== null);
+  const validData = data.filter(d => !isNaN(d.activity) && d.datetime instanceof Date);
 
   if (validData.length === 0) {
     console.error("No valid activity data points found");
     return;
   }
 
-  // Group data by hour and calculate average activity
   const hourlyData = Array.from(
     d3.rollup(
       validData,
@@ -42,7 +37,6 @@ function drawActivity(data) {
     ? hourlyData.reduce((a, b) => b.avgActivity > a.avgActivity ? b : a, hourlyData[0])
     : null;
 
-  // Update metrics display
   d3.select("#activity-metrics").html(`
     <div class="metric">
       <strong>${peakHour ? peakHour.avgActivity.toFixed(1) : 'N/A'}</strong><br>Peak Hourly Activity Level
@@ -52,12 +46,8 @@ function drawActivity(data) {
     </div>
   `);
 
-  if (hourlyData.length === 0) {
-    console.error("No hourly activity data available for visualization");
-    return;
-  }
+  if (hourlyData.length === 0) return;
 
-  // Create chart
   const svg = d3.select("#activity-chart");
   const { width, height } = svg.node().getBoundingClientRect();
   const margin = { top: 40, right: 20, bottom: 50, left: 50 };
@@ -65,20 +55,15 @@ function drawActivity(data) {
   svg.selectAll("*").remove();
 
   const hourExtent = d3.extent(hourlyData, d => d.hour);
-  const paddedDomain = [
-    d3.timeHour.offset(hourExtent[0], -1),  
-    d3.timeHour.offset(hourExtent[1], 1)   
-  ];
-
+  const barPaddingMs = 30 * 60 * 1000; // half an hour padding on each side
   const x = d3.scaleTime()
-    .domain(paddedDomain)
+    .domain([new Date(hourExtent[0].getTime() - barPaddingMs), new Date(hourExtent[1].getTime() + barPaddingMs)])
     .range([margin.left, width - margin.right]);
 
   const y = d3.scaleLinear()
     .domain([0, d3.max(hourlyData, d => d.avgActivity)]).nice()
     .range([height - margin.bottom, margin.top]);
 
-  // Add tooltip container if not present
   if (d3.select("body").select("#tooltip-activity").empty()) {
     d3.select("body")
       .append("div")
@@ -127,7 +112,7 @@ function drawActivity(data) {
   svg.append("g")
     .attr("transform", `translate(0,${height - margin.bottom})`)
     .call(d3.axisBottom(x)
-      .ticks(d3.timeHour.every(2))
+      .ticks(d3.timeHour.every(1))
       .tickFormat(d3.timeFormat("%-I %p")))
     .selectAll("text")
     .style("text-anchor", "middle")
@@ -167,10 +152,8 @@ function drawActivity(data) {
     .text("Average Activity Level Per Hour");
 }
 
-// Export functions
 export { parseActivity, drawActivity };
 
-// Auto-load activity data if on a user-specific page
 if (selectedUser) {
   d3.csv("../assets/cleaned_data/all_actigraph.csv", parseActivity).then(activityData => {
     const filtered = activityData.filter(d => d.user === selectedUser);
