@@ -235,7 +235,7 @@ body {
 
 .page-header {
   text-align: center;
-  padding: 50px 20px 40px; /* Increased top padding */
+  padding: 60px 20px 30px; /* Increased top padding */
   /* background-color: rgba(255, 255, 255, 0.7); Slightly transparent white background if desired */
   /* border-bottom: 1px solid #e0e0e0; Optional separator */
 }
@@ -479,4 +479,28 @@ body {
 
 .grid path { /* */
   display: none; /* */
+}
+
+#home-button {
+  position: fixed;
+  top: 10px;
+  left: 20px;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: background-color 0.2s ease;
+  z-index: 9999; /* stays on top */
+}
+
+#home-button:hover {
+  background-color: #2563eb;
+}
+.time-display {
+  margin-top: -70px !important; /* higher up */
 }

@@ -246,6 +246,7 @@
   </style>
 </head>
 <body>
+  <button id="home-button">🏠 Home</button>
   <div class="page-wrapper">
     <div class="fixed-layout">
       <div class="dynamic-bg"></div>
@@ -360,6 +361,11 @@
       } else {
         alert("User not specified.");
       }
+    });
+  </script>
+  <script>
+    document.getElementById("home-button").addEventListener("click", () => {
+      window.location.href = "../index.html";
     });
   </script>
 
