@@ -62,6 +62,18 @@ d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
     .attr("y", -margin.left + 20)
     .text("BMI");
 
+  // Gridlines
+  svg.append("g")
+    .attr("class", "grid")
+    .style("pointer-events", "none")  // Make grid non-interactive
+    .call(d3.axisLeft(y).tickSize(-width).tickFormat(""));
+
+  svg.append("g")
+    .attr("class", "grid")
+    .style("pointer-events", "none")  // Make grid non-interactive
+    .attr("transform", `translate(0,${height})`)
+    .call(d3.axisBottom(x).tickSize(-height).tickFormat(""));
+
   svg.selectAll("circle")
     .data(data)
     .join("circle")
@@ -75,6 +87,7 @@ d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
       .on("click", function(event, d) {
         const encodedUser = encodeURIComponent(d.original_user);
         console.log("Clicked participant (original ID):", d.original_user, "Reassigned ID for display:", d.user);
+        window.location.href = `day_info/index.html?user=${encodedUser}`;
       })
       .on("mouseover", function (event, d) {
         tooltip.style("visibility", "visible")
@@ -122,14 +135,4 @@ d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
             placeholderContent.style("display", "block");
         }
       });
-
-  // Gridlines
-  svg.append("g")
-    .attr("class", "grid")
-    .call(d3.axisLeft(y).tickSize(-width).tickFormat(""));
-
-  svg.append("g")
-    .attr("class", "grid")
-    .attr("transform", `translate(0,${height})`)
-    .call(d3.axisBottom(x).tickSize(-height).tickFormat(""));
 });
