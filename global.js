@@ -8,17 +8,32 @@ const height = 400 - margin.top - margin.bottom;
 
 const tooltip = d3.select("#tooltip");
 
+// Ensure the container has a fixed height to prevent shifting
+d3ChartContainer.style.height = `${height + margin.top + margin.bottom}px`;
+
 const svg = d3.select("#d3-chart-container")
-  .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform", `translate(${margin.left},${margin.top})`);
+  .select("svg") // Try to select existing SVG first
+  .empty() ? // If it doesn't exist, append it
+    d3.select("#d3-chart-container").append("svg") 
+    : d3.select("#d3-chart-container").select("svg"); // Otherwise, use the existing one
+
+// Set fixed dimensions for the SVG
+svg.attr("width", width + margin.left + margin.right)
+   .attr("height", height + margin.top + margin.bottom)
+   .style("display", "block"); // Ensure block display to prevent inline spacing issues
+
+const chartGroup = svg.select("g")
+    .empty() ?
+    svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`)
+    : svg.select("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
 // Select hover preview elements
 const hoverPreviewHelper = d3.select(".hover-preview-helper");
 const placeholderContent = hoverPreviewHelper.select(".placeholder-content");
 const participantDetailsContent = hoverPreviewHelper.select(".participant-details-content");
+
+let selectedCircle = null; // Keep track of the currently selected circle
+let currentlySelectedData = null; // Keep track of data for the selected circle
 
 d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
   data = data.filter(d => d.user !== "user_11" && d.user !== "user_8");
@@ -42,20 +57,27 @@ d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
     .domain(d3.extent(data, d => d.avg_HR))
     .range([8, 24]);
 
-  svg.append("g")
+  // Clear previous axes before drawing new ones if re-running
+  chartGroup.selectAll(".axis").remove();
+  chartGroup.selectAll(".axis-label").remove();
+  chartGroup.selectAll(".grid").remove();
+
+  chartGroup.append("g")
+    .attr("class", "axis x-axis")
     .attr("transform", `translate(0,${height})`)
     .call(d3.axisBottom(x));
 
-  svg.append("g")
+  chartGroup.append("g")
+    .attr("class", "axis y-axis")
     .call(d3.axisLeft(y));
 
-  svg.append("text")
+  chartGroup.append("text")
     .attr("class", "axis-label")
     .attr("x", width / 2)
     .attr("y", height + 40)
     .text("Age");
 
-  svg.append("text")
+  chartGroup.append("text")
     .attr("class", "axis-label")
     .attr("transform", "rotate(-90)")
     .attr("x", -height / 2)
@@ -63,18 +85,18 @@ d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
     .text("BMI");
 
   // Gridlines
-  svg.append("g")
-    .attr("class", "grid")
-    .style("pointer-events", "none")  // Make grid non-interactive
+  chartGroup.append("g")
+    .attr("class", "grid x-grid")
+    .attr("transform", `translate(0,${height})`)
+    .style("pointer-events", "none")
+    .call(d3.axisBottom(x).tickSize(-height).tickFormat(""));
+  
+  chartGroup.append("g")
+    .attr("class", "grid y-grid")
+    .style("pointer-events", "none")
     .call(d3.axisLeft(y).tickSize(-width).tickFormat(""));
 
-  svg.append("g")
-    .attr("class", "grid")
-    .style("pointer-events", "none")  // Make grid non-interactive
-    .attr("transform", `translate(0,${height})`)
-    .call(d3.axisBottom(x).tickSize(-height).tickFormat(""));
-
-  svg.selectAll("circle")
+  const circles = chartGroup.selectAll("circle")
     .data(data)
     .join("circle")
       .attr("cx", d => x(d.Age))
@@ -84,11 +106,7 @@ d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
       .attr("opacity", 0.7)
       .attr("stroke", "#ffffff")
       .attr("stroke-width", 1)
-      .on("click", function(event, d) {
-        const encodedUser = encodeURIComponent(d.original_user);
-        console.log("Clicked participant (original ID):", d.original_user, "Reassigned ID for display:", d.user);
-        window.location.href = `day_info/index.html?user=${encodedUser}`;
-      })
+      .style("cursor", "pointer") // Add pointer cursor
       .on("mouseover", function (event, d) {
         tooltip.style("visibility", "visible")
           .html(`<strong>Participant ${d.user}</strong><br>` +
@@ -98,25 +116,28 @@ d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
                 `BMI: ${d.BMI}<br>` +
                 `Avg HR: ${d.avg_HR} bpm`);
         
-        d3.select(this)
-          .attr("stroke-width", 2)
-          .attr("opacity", 0.9);
+        // Highlight on hover only if not the currently selected circle
+        if (!d3.select(this).classed("selected")) {
+            d3.select(this)
+              .attr("stroke-width", 2)
+              .attr("opacity", 0.9);
+        }
 
-        if (!hoverPreviewHelper.empty()) {
-            placeholderContent.style("display", "none");
-            
-            const detailsHtml = `
-                <span class="avatar-placeholder">${d.user.replace('user_', 'P')}</span>
-                <h4>Participant ${d.user}</h4>
-                <ul>
-                    <li><span class="label">Age:</span> <span class="value">${d.Age}</span></li>
-                    <li><span class="label">Height:</span> <span class="value">${d.Height} cm</span></li>
-                    <li><span class="label">Weight:</span> <span class="value">${d.Weight} kg</span></li>
-                    <li><span class="label">BMI:</span> <span class="value">${d.BMI}</span></li>
-                    <li><span class="label">Avg. Heart Rate:</span> <span class="value">${d.avg_HR} bpm</span></li>
-                </ul>
-            `;
-            participantDetailsContent.html(detailsHtml).style("display", "block");
+        // If no circle is selected, update hover preview
+        if (!selectedCircle) {
+            if (!hoverPreviewHelper.empty()) {
+                placeholderContent.style("display", "none");
+                const detailsHtml = `
+                    <span class="avatar-placeholder">${d.user.replace('user_', 'P')}</span>
+                    <h4>${d.user}</h4> <ul>
+                        <li><span class="label">Age:</span> <span class="value">${d.Age}</span></li>
+                        <li><span class="label">Height:</span> <span class="value">${d.Height} cm</span></li>
+                        <li><span class="label">Weight:</span> <span class="value">${d.Weight} kg</span></li>
+                        <li><span class="label">BMI:</span> <span class="value">${d.BMI}</span></li>
+                        <li><span class="label">Avg. Heart Rate:</span> <span class="value">${d.avg_HR} bpm</span></li>
+                    </ul>`;
+                participantDetailsContent.html(detailsHtml).style("display", "block");
+            }
         }
       })
       .on("mousemove", function (event) {
@@ -126,13 +147,111 @@ d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
       })
       .on("mouseout", function () {
         tooltip.style("visibility", "hidden");
-        d3.select(this)
-          .attr("stroke-width", 1)
-          .attr("opacity", 0.7);
+        // Revert hover highlight only if not the currently selected circle
+        if (!d3.select(this).classed("selected")) {
+            d3.select(this)
+              .attr("stroke-width", 1)
+              .attr("opacity", 0.7);
+        }
+
+        // If no circle is selected, revert hover preview to placeholder
+        if (!selectedCircle) {
+            if (!hoverPreviewHelper.empty()) {
+                participantDetailsContent.style("display", "none").html('');
+                placeholderContent.style("display", "block");
+            }
+        }
+      })
+      .on("click", function(event, d) {
+        event.stopPropagation(); // Prevent click from bubbling to other elements like the main svg
+        const clickedNode = this;
+
+        // If there was a previously selected circle, reset its appearance
+        if (selectedCircle && selectedCircle.node() !== clickedNode) {
+          selectedCircle
+            .classed("selected", false)
+            .attr("stroke", "#ffffff")
+            .attr("stroke-width", 1)
+            .attr("opacity", 0.7);
+        }
+
+        // Toggle selection on the clicked circle
+        if (selectedCircle && selectedCircle.node() === clickedNode) {
+          // Deselecting the current circle
+          d3.select(clickedNode)
+            .classed("selected", false)
+            .attr("stroke", "#ffffff")
+            .attr("stroke-width", 1)
+            .attr("opacity", 0.7); // Revert to default opacity
+          selectedCircle = null;
+          currentlySelectedData = null;
+          console.log(`Participant ${d.user} deselected.`);
+          
+          // Revert to placeholder
+          if (!hoverPreviewHelper.empty()) {
+            participantDetailsContent.style("display", "none").html('');
+            placeholderContent.select(".placeholder-title").text("Hover to Preview"); // Reset title
+            placeholderContent.style("display", "block");
+          }
+
+        } else {
+          // Selecting a new circle (or the first one)
+          d3.select(clickedNode)
+            .classed("selected", true)
+            .attr("stroke", "#fbbf24") // Prominent stroke color for selection (amber)
+            .attr("stroke-width", 3)
+            .attr("opacity", 1); // Full opacity when selected
+          selectedCircle = d3.select(clickedNode);
+          currentlySelectedData = d;
+          console.log(`Participant ${d.user} (Original ID: ${d.original_user}) selected.`);
+
+          // Update hover-preview-helper with selected participant's details
+          if (!hoverPreviewHelper.empty()) {
+            placeholderContent.style("display", "none");
+            const detailsHtml = `
+                <span class="avatar-placeholder">${d.user.replace('user_', 'P')}</span>
+                <h4>Selected: ${d.user}</h4>
+                <ul>
+                    <li><span class="label">Age:</span> <span class="value">${d.Age}</span></li>
+                    <li><span class="label">Height:</span> <span class="value">${d.Height} cm</span></li>
+                    <li><span class="label">Weight:</span> <span class="value">${d.Weight} kg</span></li>
+                    <li><span class="label">BMI:</span> <span class="value">${d.BMI}</span></li>
+                    <li><span class="label">Avg. Heart Rate:</span> <span class="value">${d.avg_HR} bpm</span></li>
+                </ul>
+                <button id="start-story-button" class="control-button" style="margin-top: 20px; width: 100%; justify-content: center;">Explore Their Day</button>
+            `;
+            participantDetailsContent.html(detailsHtml).style("display", "block");
+
+            // Add event listener for the "Explore Their Day" button
+            const startStoryButton = participantDetailsContent.select("#start-story-button");
+            if (!startStoryButton.empty()) {
+                startStoryButton.on("click", () => {
+                    console.log(`Navigating to day_info for ${currentlySelectedData.user}`);
+                    const encodedUser = encodeURIComponent(currentlySelectedData.original_user);
+                    window.location.href = `day_info/index.html?user=${encodedUser}`;
+                });
+            }
+          }
+        }
+      });
+});
+
+// Add a click listener to the SVG background to deselect any circle
+svg.on("click", function() {
+    if (selectedCircle) {
+        selectedCircle
+            .classed("selected", false)
+            .attr("stroke", "#ffffff")
+            .attr("stroke-width", 1)
+            .attr("opacity", 0.7);
+        selectedCircle = null;
+        currentlySelectedData = null;
+        console.log("Selection cleared by clicking background.");
 
         if (!hoverPreviewHelper.empty()) {
             participantDetailsContent.style("display", "none").html('');
+            placeholderContent.select(".placeholder-title").text("Hover to Preview");
             placeholderContent.style("display", "block");
         }
-      });
+    }
 });

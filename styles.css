@@ -431,13 +431,19 @@ body {
 
 #d3-chart-container {
   flex-grow: 1; /* Chart takes available space */
-  /* Ensure your D3 chart is sized appropriately within this container.
-     You might need to adjust the D3 script's width/height settings or
-     make the SVG responsive if it's not already. */
-  /* background-color: #fff; /* If chart needs a distinct background */
-  /* border: 1px solid #e5e7eb; */
-  /* border-radius: 8px; */
-  /* min-height: 450px; /* Ensure it has enough height */
+  position: relative; /* Ensure proper positioning context */
+  min-height: 450px; /* Ensure minimum height */
+  height: 450px; /* Fixed height to prevent shifting */
+  overflow: visible; /* Allow tooltips to be visible outside container */
+}
+
+/* Ensure SVG maintains its dimensions */
+#d3-chart-container svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .hover-preview-helper {
@@ -922,4 +928,37 @@ svg text.axis-label {
 
 #tutorial-next-button {
     padding: 10px 20px;
+}
+
+/* Circle selection styles */
+svg circle {
+  transition: stroke 0.2s ease, stroke-width 0.2s ease, opacity 0.2s ease; /* Smooth transitions */
+}
+
+/* Style for the selected circle */
+svg circle.selected {
+  /* Additional styles can be added here if needed */
+}
+
+/* Style for the "Explore Their Day" button */
+#start-story-button {
+  background-color: #3b82f6; /* Blue background */
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+#start-story-button:hover {
+  background-color: #2563eb; /* Darker blue on hover */
 }
