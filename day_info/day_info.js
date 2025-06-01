@@ -1,5 +1,10 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
+window.history.scrollRestoration = 'manual';
+window.addEventListener('load', function () {
+    window.scrollTo(0, 0);
+});
+
 // --- Constants and Configuration ---
 const width = 1000;
 const height = 400;
@@ -686,7 +691,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Initial render
         const initialStart = timeExtent[0];
         const initialEnd = new Date(initialStart.getTime() + viewWindowDurationMs);
-        currentScrollTime = new Date(initialStart.getTime() + viewWindowDurationMs / 2); // Set initial scroll time
+        currentScrollTime = new Date(initialStart.getTime()); // Set initial scroll time
 
         const initialData = bpmPerMinute.filter(d =>
             d.minute >= initialStart && d.minute <= initialEnd
