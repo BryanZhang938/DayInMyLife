@@ -297,13 +297,11 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 20px; /* Slightly reduced padding */
-  background-color: rgba(255, 255, 255, 0.9); /* White with slight transparency */
-  border-bottom: 1px solid #e5e7eb; /* Lighter border */
-  max-width: 1200px;
-  margin: 0 auto 20px auto; /* Reduced bottom margin */
+  padding: 12px 20px;
+  background-color: transparent;
+  max-width: 1262px;
+  margin: 0 auto 5px auto;
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* Softer shadow */
 }
 
 .controls-left, .controls-right {
@@ -313,26 +311,34 @@ body {
 }
 
 .control-button { /* General style for buttons like 'Filters' and 'Show Tutorial' */
-  background-color: #fff;
-  border: 1px solid #d1d5db; /* gray-300 */
-  padding: 8px 16px;
+  background-color: white;
+  border: 1px solid rgba(209, 213, 219, 0.5);
+  padding: 10px 20px;
   border-radius: 6px;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.9em;
-  color: #374151; /* gray-700 */
-  transition: background-color 0.2s, border-color 0.2s;
+  font-size: 1em;
+  color: #374151;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .control-button:hover {
-  border-color: #9ca3af; /* gray-400 */
-  background-color: #f9fafb; /* gray-50 */
+  border-color: #9ca3af;
+  background-color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .control-button .icon {
-  font-size: 1.1em; /* Adjust icon size if needed */
+  font-size: 1.1em;
+  color: #6b7280;
+}
+
+.control-button:hover .icon {
+  color: #3b82f6;
 }
 
 .filter-icon { /* Specific icon color if needed */
