@@ -644,7 +644,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const offsetMs = scrollProgress * effectiveScrollableRangeMs;
             const windowStart = new Date(timeExtent[0].getTime() + offsetMs);
             const windowEnd = new Date(windowStart.getTime() + viewWindowDurationMs);
-            currentScrollTime = new Date(windowStart.getTime() + viewWindowDurationMs / 2);
+            currentScrollTime = new Date(windowStart.getTime());
 
             // Update theme based on current time
             updateTheme(currentScrollTime);
