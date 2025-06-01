@@ -128,7 +128,6 @@ function setupActivityDisplayElements() {
 
     const title = document.createElement('h4');
     title.className = 'activity-title';
-    title.textContent = 'Current Activity';
     // Styles are now in HTML/CSS
 
     const container = document.createElement('div');
@@ -412,6 +411,9 @@ function renderChart(dataSlice, windowStart, windowEnd, yExtent, activitiesForCh
                     svg.select(className).attr("opacity", 0.35); // Highlight current activity rect
                 } catch (e) { console.warn("Error selecting activity rect:", e); }
                 tooltipHtml += `<strong style="color:${activityColor(overlappingActivity.activity)}">${activityLabels[overlappingActivity.activity]}</strong><br/>`;
+                updateActivityInfo(overlappingActivity);
+            } else {
+                updateActivityInfo();
             }
 
             if (d_hr) {
@@ -441,6 +443,8 @@ function renderChart(dataSlice, windowStart, windowEnd, yExtent, activitiesForCh
             // For now, assuming the main `activities` array (global or passed to DOMContentLoaded) is accessible.
             // Let's assume `allUserActivities` is the variable holding the full list.
             updateActivityAnimationView(hoveredTime, allUserActivities); // Ensure 'allUserActivities' is defined and passed
+            const currentActivity = getActiveActivity(hoveredTime, allUserActivities);
+            updateActivityInfo(currentActivity);
         })
         .on("mouseleave", () => {
             tooltip.style("display", "none");
@@ -458,8 +462,9 @@ function renderChart(dataSlice, windowStart, windowEnd, yExtent, activitiesForCh
             // Let currentScrollTime be a globalish variable updated by scroll handler
             if (typeof currentScrollTime !== 'undefined' && allUserActivities) {
                  updateActivityAnimationView(currentScrollTime, allUserActivities);
+                 const currentActivity = getActiveActivity(currentScrollTime, allUserActivities);
+                 updateActivityInfo(currentActivity);
             }
-
         });
 
     svg.selectAll(".tick text").style("font-size", "20px"); // Adjusted tick font size
@@ -535,20 +540,23 @@ function updateScrollProgress(progress) {
 
 // Update activity info card
 function updateActivityInfo(activity) {
-  const activityInfo = document.querySelector('.activity-info .card');
+  const activityInfo = document.querySelector('.activity-title');
   if (activityInfo && activity) {
     const details = activityDetailsMap[activity.activityCode];
     if (details) {
-      activityInfo.innerHTML = `
-        <div class="flex items-center gap-3">
-          <div>
-            <h4 class="font-semibold">${details.name}</h4>
-            <p class="text-sm opacity-70">Current activity</p>
-          </div>
-        </div>
-      `;
+        activityInfo.innerHTML = `
+                <p>Current Activity:</p>
+                <h4>${details.name}</h4>
+                `;
     }
-  }
+  } 
+  else if (activityInfo) {
+    console.log('hi');
+    activityInfo.innerHTML = `
+                <p>Current Activity:</p>
+                <h4>N/A</h4>
+                `;
+    }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -626,7 +634,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Set initial theme
         updateTheme(timeExtent[0]);
 
-        window.addEventListener("scroll", () => {
+        function updateTimeDisplay() {
             const scrollTop = window.scrollY;
             const maxScroll = Math.max(0, document.body.scrollHeight - window.innerHeight);
             const scrollProgress = maxScroll > 0 ? scrollTop / maxScroll : 0;
@@ -668,6 +676,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Update activity info
             const currentActivity = getActiveActivity(currentScrollTime, allUserActivities);
             updateActivityInfo(currentActivity);
+        }
+        updateTimeDisplay();
+
+        window.addEventListener("scroll", () => {
+            updateTimeDisplay();
         });
 
         // Initial render

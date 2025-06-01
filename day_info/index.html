@@ -159,17 +159,26 @@
       width: 600px;
       height: 500px;
       z-index: 10;
+      border-radius: 1rem;
+      overflow: hidden;
     }
 
     .activity-title {
       background: rgba(255, 255, 255, 0.8);
       -webkit-backdrop-filter: blur(8px);
       backdrop-filter: blur(8px);
-      padding: 10px;
       margin: 0;
-      border-radius: 8px 8px 0 0;
       border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 1rem 1rem 0 0;
       text-align: center;
+    }
+
+    .activity-title p, .activity-title h4 {
+      margin: 0;
+    }
+
+    .activity-title p {
+      margin-top: 1em;
     }
 
     .activity-container {
@@ -177,7 +186,7 @@
       -webkit-backdrop-filter: blur(8px);
       backdrop-filter: blur(8px);
       padding: 10px;
-      border-radius: 0 0 8px 8px;
+      border-radius: 0 0 1rem 1rem;
       border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
@@ -310,7 +319,7 @@
 
         <div class="animation-section">
           <div class="activity-section">
-            <h4 class="activity-title">Current Activity</h4>
+            <h4 class="activity-title"></h4>
             <div class="activity-container">
               <div class="video-wrapper">
                 <video id="activity-animation-video-active" class="activity-animation-video" autoplay loop muted playsinline></video>
@@ -322,6 +331,7 @@
         </div>
       </div>
 
+      <!--
       <div class="activity-info">
         <div class="card">
           <div class="flex items-center gap-3">
@@ -332,6 +342,7 @@
           </div>
         </div>
       </div>
+      -->
 
       <div class="scroll-indicator">
         <div class="scroll-bar">
