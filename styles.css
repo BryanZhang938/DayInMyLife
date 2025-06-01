@@ -732,3 +732,118 @@ svg text.axis-label {
   margin-right: 8px;
   color: #374151;
 }
+
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Modal Content Box */
+.modal-content {
+    background-color: white;
+    padding: 25px 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.visible .modal-content {
+    transform: scale(1);
+}
+
+.modal-close-button {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.8em;
+    color: #888;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+}
+
+.modal-close-button:hover {
+    color: #333;
+}
+
+.tutorial-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    gap: 10px;
+}
+
+.tutorial-header .step-indicator-container {
+    background-color: #e0e7ff;
+    color: #3b82f6;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.tutorial-header h3 {
+    margin: 0;
+    font-size: 1.4em;
+    color: #1f2937;
+    font-weight: 600;
+}
+
+.tutorial-text {
+    font-size: 0.95em;
+    color: #4b5563;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    min-height: 60px;
+}
+
+.tutorial-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.step-dots {
+    display: flex;
+    gap: 6px;
+}
+
+.step-dots .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #d1d5db;
+    transition: background-color 0.3s;
+}
+
+.step-dots .dot.active {
+    background-color: #3b82f6;
+}
+
+#tutorial-next-button {
+    padding: 10px 20px;
+}

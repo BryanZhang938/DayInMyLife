@@ -133,4 +133,118 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!d3.select("#d3-chart-container svg").selectAll("circle").empty()) {
     applyChartFilters();
   }
+
+  // Tutorial Modal Functionality
+  const showTutorialButton = document.querySelector('.controls-bar .tutorial-button');
+  const tutorialModal = document.getElementById('tutorial-modal');
+  const modalCloseButton = document.getElementById('modal-close-button');
+  const tutorialTitleElement = document.getElementById('tutorial-title');
+  const tutorialTextElement = document.getElementById('tutorial-text');
+  const tutorialNextButton = document.getElementById('tutorial-next-button');
+  const stepDotsContainer = document.getElementById('tutorial-step-dots');
+  const stepIndicatorContainer = document.querySelector('.tutorial-header .step-indicator-container');
+
+  console.log('Tutorial Button:', showTutorialButton);
+  console.log('Tutorial Modal:', tutorialModal);
+
+  const tutorialSteps = [
+      {
+          title: "Welcome to A Day in My Life!",
+          content: "Each circle on the chart represents a real participant who shared their biometric data for 24 hours."
+      },
+      {
+          title: "Explore the Data",
+          content: "Hover over any circle to see that participant's summary details. The size of the circle corresponds to their BMI (or Average Heart Rate, depending on current data)."
+      },
+      {
+          title: "Begin the Journey",
+          content: "Click on any participant's circle to dive into a more detailed view of their personal data story (functionality to be added later!)."
+      }
+  ];
+
+  let currentTutorialStep = 0;
+
+  function updateTutorialStepDots() {
+      stepDotsContainer.innerHTML = ''; // Clear existing dots
+      for (let i = 0; i < tutorialSteps.length; i++) {
+          const dot = document.createElement('div');
+          dot.classList.add('dot');
+          if (i === currentTutorialStep) {
+              dot.classList.add('active');
+          }
+          stepDotsContainer.appendChild(dot);
+      }
+  }
+
+  function displayTutorialStep(stepIndex) {
+      if (stepIndex < 0 || stepIndex >= tutorialSteps.length) return;
+
+      const step = tutorialSteps[stepIndex];
+      tutorialTitleElement.textContent = step.title;
+      tutorialTextElement.textContent = step.content;
+
+      if (stepIndicatorContainer) {
+          stepIndicatorContainer.textContent = `${stepIndex + 1}/${tutorialSteps.length}`;
+      }
+      updateTutorialStepDots();
+
+      if (stepIndex === tutorialSteps.length - 1) {
+          tutorialNextButton.textContent = "Start Exploring";
+      } else {
+          tutorialNextButton.textContent = "Next";
+      }
+      currentTutorialStep = stepIndex;
+  }
+
+  function showModal() {
+      console.log('Showing modal');
+      currentTutorialStep = 0;
+      displayTutorialStep(currentTutorialStep);
+      tutorialModal.style.display = 'flex';
+      tutorialModal.classList.add('visible');
+  }
+
+  function hideModal() {
+      console.log('Hiding modal');
+      tutorialModal.classList.remove('visible');
+      setTimeout(() => {
+          tutorialModal.style.display = 'none';
+      }, 300); // Match the transition duration
+  }
+
+  if (showTutorialButton && tutorialModal) {
+      showTutorialButton.addEventListener('click', () => {
+          console.log('Tutorial button clicked');
+          showModal();
+      });
+  }
+
+  if (modalCloseButton) {
+      modalCloseButton.addEventListener('click', hideModal);
+  }
+
+  if (tutorialModal) {
+      tutorialModal.addEventListener('click', (event) => {
+          if (event.target === tutorialModal) {
+              hideModal();
+          }
+      });
+  }
+
+  if (tutorialNextButton) {
+      tutorialNextButton.addEventListener('click', () => {
+          if (currentTutorialStep < tutorialSteps.length - 1) {
+              currentTutorialStep++;
+              displayTutorialStep(currentTutorialStep);
+          } else {
+              hideModal();
+          }
+      });
+  }
+
+  // Optional: Show tutorial once on first visit
+  if (!localStorage.getItem('tutorialShown')) {
+      showModal();
+      localStorage.setItem('tutorialShown', 'true');
+  }
 });
