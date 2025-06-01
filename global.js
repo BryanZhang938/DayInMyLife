@@ -75,6 +75,7 @@ d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
       .on("click", function(event, d) {
         const encodedUser = encodeURIComponent(d.original_user);
         console.log("Clicked participant (original ID):", d.original_user, "Reassigned ID for display:", d.user);
+        window.location.href = `day_info/index.html?user=${encodedUser}`;
       })
       .on("mouseover", function (event, d) {
         tooltip.style("visibility", "visible")
