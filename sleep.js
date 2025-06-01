@@ -40,7 +40,9 @@ const metricDescriptions = {
   avgAwakeningLength: "Average duration of each awakening, in minutes.",
   waso: "Total number of minutes the participant spent awake after initially falling asleep.",
   movementIndex: "Percentage of time spent immobile (no arm movement) during the movement phase of sleep.",
-  fragmentationIndex: "Percentage of time spent moving during what should have been immobile sleep phases."
+  fragmentationIndex: "Percentage of time spent moving during what should have been immobile sleep phases.",
+  cortisol: "Cortisol concentration measured in μg of cortisol per 100 μg of protein. Typically higher after waking, it reflects physiological stress and alertness.",
+  melatonin: "Melatonin concentration measured in μg of melatonin per μg of protein. Typically higher before sleep, it reflects readiness for sleep and circadian rhythm."
 };
 
 // load CSV once at startup
@@ -366,3 +368,87 @@ function drawSleep(sleepData) {
     .text('Sleep Efficiency Over Time');
 }
   
+d3.csv("../assets/cleaned_data/all_saliva.csv", parseSaliva).then(salivaData => {
+  if (!selectedUser) return;
+
+  const userSaliva = salivaData.filter(d => d.user === selectedUser);
+  if (userSaliva.length !== 2) return;
+
+  // Insert subheading row outside of #sleep-metrics
+  const container = d3.select("#sleep-container");
+
+// Add Hormone Summary title
+  container.append("h3")
+    .text("Hormone Summary")
+    .style("margin-top", "2rem")
+    .style("font-size", "1.25rem")
+    .style("font-weight", "600");
+
+  const subheadingRow = container.append("div")
+    .style("display", "flex")
+    .style("width", "100%")
+    .style("margin-top", "2rem");
+
+  subheadingRow.append("div")
+    .style("flex", "1")
+    .style("text-align", "center")
+    .style("font-weight", "600")
+    .style("font-size", "1rem")
+    .text("Before Sleep");
+
+  subheadingRow.append("div")
+    .style("flex", "1")
+    .style("text-align", "center")
+    .style("font-weight", "600")
+    .style("font-size", "1rem")
+    .text("Wake Up");
+
+  const hormoneSection = container.append("div")
+  .attr("id", "hormone-metrics")
+  .attr("class", "metrics") // this ensures it matches original styling
+  .style("margin-top", "0.5rem");
+
+  // Sort again just to be safe
+  const sorted = userSaliva.sort((a, b) =>
+    a.sample === "before sleep" ? -1 : 1
+  );
+
+  // Add Cortisol and Melatonin boxes for each sample
+  sorted.forEach(entry => {
+    appendHormoneMetric(hormoneSection, entry.cortisol, "Cortisol Norm");
+    appendHormoneMetric(hormoneSection, entry.melatonin, "Melatonin Norm");
+  });
+});
+
+function appendHormoneMetric(container, value, label) {
+  const box = container.append('div').attr('class', 'metric');
+
+  box.append('strong')
+    .text(value.toExponential(2)); // or value.toFixed(3) if you prefer decimals
+
+  const labelDiv = box.append('div').attr('class', 'label');
+  labelDiv.text(label);
+
+  // Match the key to our metricDescriptions object
+  const infoKey = label.toLowerCase().includes('cortisol') ? 'cortisol' : 'melatonin';
+
+  labelDiv.append('span')
+    .attr('class', 'info-icon')
+    .text(' ⓘ')
+    .on('mouseover', (event) => {
+      showInfoTooltip(event.pageX, event.pageY, metricDescriptions[infoKey]);
+    })
+    .on('mouseout', hideInfoTooltip);
+}
+
+
+// Saliva parser
+function parseSaliva(d) {
+  return {
+    user: d.user.trim(),
+    sample: d.SAMPLES.toLowerCase(),
+    cortisol: +d["Cortisol NORM"],
+    melatonin: +d["Melatonin NORM"]
+  };
+}
+
