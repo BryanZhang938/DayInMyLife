@@ -435,40 +435,99 @@ body {
 }
 
 .hover-preview-helper {
-  width: 280px; /* Wider sidebar as in target */
+  width: 280px;
   flex-shrink: 0;
-  background-color: #f9fafb; /* Light gray background (gray-50) */
-  padding: 25px; /* Increased padding */
+  background-color: #f8f9fa;
+  padding: 25px;
   border-radius: 8px;
-  text-align: left; /* Align text to left for details */
-  color: #4b5563; /* gray-600 */
-  border: 1px solid #e5e7eb; /* Consistent border */
-  /* min-height: 450px; /* Match chart container height if desired */
+  border: 1px solid #e5e7eb;
+  color: #4b5563;
+  text-align: left;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
-.hover-preview-helper .icon { /* Icon for "Hover to Preview" state */
-  font-size: 2.8em; /* Adjust if using actual image/svg icons */
+/* Placeholder Content Styles */
+.hover-preview-helper .placeholder-content {
+  text-align: center;
+}
+
+.hover-preview-helper .placeholder-icon {
+  font-size: 2.8em;
   display: block;
   margin-bottom: 15px;
-  color: #fbbf24; /* amber-400, similar to target's hand icon color */
-  text-align: center; /* Center the icon if it's for the placeholder text */
+  color: #fbbf24;
 }
 
-.hover-preview-helper h3 { /* For "Hover to Preview" or Participant Name */
+.hover-preview-helper .placeholder-title {
   font-size: 1.2em;
-  color: #1f2937; /* Darker gray */
+  color: #1f2937;
   margin-top: 0;
   margin-bottom: 10px;
   font-weight: 600;
-  text-align: center; /* Center placeholder title */
-}
-.hover-preview-helper p { /* For placeholder text or participant details */
-  font-size: 0.9em;
-  line-height: 1.6;
-  color: #4b5563; /* gray-600 */
-  margin-bottom: 8px; /* Spacing between detail lines */
 }
 
+.hover-preview-helper .placeholder-text {
+  font-size: 0.9em;
+  line-height: 1.6;
+  color: #4b5563;
+  margin-bottom: 0;
+}
+
+/* Participant Details Content Styles */
+.hover-preview-helper .participant-details-content {
+  text-align: left;
+  width: 100%;
+}
+
+.participant-details-content .avatar-placeholder {
+  font-size: 2.5em;
+  display: block;
+  text-align: center;
+  margin-bottom: 12px;
+  color: #3b82f6;
+}
+
+.participant-details-content h4 {
+  font-size: 1.2em;
+  color: #111827;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.participant-details-content ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.participant-details-content ul li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 0.9em;
+  color: #374151;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.participant-details-content ul li:last-child {
+  border-bottom: none;
+}
+
+.participant-details-content ul li .label {
+  color: #6b7280;
+  margin-right: 8px;
+}
+
+.participant-details-content ul li .value {
+  font-weight: 500;
+  text-align: right;
+}
 
 /* Adjust existing tooltip style if necessary. The current one looks fine. */
 #tooltip { /* */

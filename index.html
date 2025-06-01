@@ -67,13 +67,15 @@
             <div id="d3-chart-container">
                 </div>
             <div class="hover-preview-helper">
-                <span class="icon hand-icon">&#128075;</span> <h3>Hover to Preview</h3>
-                <p>Move your cursor over any circle to see participant details and begin exploring their data story.</p>
+                <div class="placeholder-content">
+                    <span class="placeholder-icon">&#128075;</span> <h3 class="placeholder-title">Hover to Preview</h3>
+                    <p class="placeholder-text">Move your cursor over any circle to see participant details.</p>
+                </div>
+                <div class="participant-details-content" style="display: none;">
+                </div>
             </div>
         </div>
     </main>
-
-    <div id="tooltip"></div>
 
     <div class="legend-container container">
         <div class="legend-card">

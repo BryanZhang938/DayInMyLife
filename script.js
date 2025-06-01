@@ -184,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
       tutorialTextElement.textContent = step.content;
 
       if (stepIndicatorContainer) {
-          stepIndicatorContainer.textContent = `${stepIndex + 1}/${tutorialSteps.length}`;
+          stepIndicatorContainer.textContent = `${stepIndex + 1}`;
       }
       updateTutorialStepDots();
 
