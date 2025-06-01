@@ -41,15 +41,17 @@ d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
     .call(d3.axisLeft(y));
 
   svg.append("text")
+    .attr("class", "axis-label")
     .attr("x", width / 2)
     .attr("y", height + 40)
     .attr("text-anchor", "middle")
     .text("Age");
 
   svg.append("text")
+    .attr("class", "axis-label")
     .attr("transform", "rotate(-90)")
     .attr("x", -height / 2)
-    .attr("y", -40)
+    .attr("y", -margin.left + 15)
     .attr("text-anchor", "middle")
     .text("BMI");
 
@@ -59,10 +61,10 @@ d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
       .attr("cx", d => x(d.Age))
       .attr("cy", d => y(d.BMI))
       .attr("r", d => r(d.avg_HR))
-      .attr("fill", "steelblue")
-      .attr("opacity", 0.8)
-      .attr("stroke", "#333")
-      .attr("stroke-width", 0.5)
+      .attr("fill", "#3b82f6")
+      .attr("opacity", 0.7)
+      .attr("stroke", "#ffffff")
+      .attr("stroke-width", 1)
       .on("click", function(event, d) {
         const encodedUser = encodeURIComponent(d.original_user);
         window.location.href = `day_info/index.html?user=${encodedUser}`;
@@ -75,7 +77,7 @@ d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
                 `Weight: ${d.Weight} kg<br>` +
                 `BMI: ${d.BMI}<br>` +
                 `Avg HR: ${d.avg_HR.toFixed(1)} bpm`);
-        d3.select(this).attr("stroke-width", 1.5);
+        d3.select(this).attr("stroke-width", 2);
       })
       .on("mousemove", function (event) {
         tooltip
@@ -84,7 +86,7 @@ d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
       })
       .on("mouseout", function () {
         tooltip.style("visibility", "hidden");
-        d3.select(this).attr("stroke-width", 0.5);
+        d3.select(this).attr("stroke-width", 1);
       });
 
   // Gridlines

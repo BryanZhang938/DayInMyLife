@@ -628,3 +628,107 @@ body {
 .time-display {
   margin-top: -70px !important; /* higher up */
 }
+
+/* D3 Axis Styling */
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #d1d5db; /* Lighter gray for axis lines and ticks (similar to gray-300) */
+  stroke-width: 1px;
+  shape-rendering: crispEdges;
+}
+
+.axis text {
+  font-family: 'Roboto', sans-serif;
+  font-size: 11px; /* Slightly smaller and cleaner */
+  fill: #6b7280; /* Medium gray for text (similar to gray-500 / muted-foreground) */
+}
+
+/* Axis Labels (e.g., "Age", "BMI") */
+svg text.axis-label {
+  font-size: 12px;
+  fill: #4b5563; /* Darker gray for labels (similar to gray-600) */
+  text-anchor: middle;
+}
+
+/* Grid styling */
+.grid line {
+  stroke: #e5e7eb;     /* Very light gray (similar to gray-200) */
+  stroke-opacity: 0.7; /* Make them somewhat transparent */
+  shape-rendering: crispEdges;
+}
+
+.grid path {
+  display: none; /* Hide it if you only want the tick lines */
+}
+
+/* Legend Styling */
+.legend-container {
+  margin-top: 20px;
+  margin-bottom: 40px;
+}
+
+.legend-card {
+  background-color: #ffffff;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border: 1px solid #e5e7eb;
+}
+
+.legend-card h4 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 1.1em;
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 0.9em;
+  color: #4b5563;
+}
+
+.legend-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  border-radius: 3px;
+  vertical-align: middle;
+}
+
+.legend-swatch.size-swatch {
+  background-color: transparent;
+  border: 1px solid #6b7280;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+}
+
+.legend-swatch .inner-size-swatch {
+  display: block;
+  width: 8px;
+  height: 8px;
+  background-color: #6b7280;
+  border-radius: 50%;
+}
+
+.legend-swatch.color-swatch {
+  border-radius: 50%;
+}
+
+.legend-marker {
+  display: inline-block;
+  width: 14px;
+  text-align: center;
+  font-weight: bold;
+  margin-right: 8px;
+  color: #374151;
+}

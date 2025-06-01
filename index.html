@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Day in My Data</title> <link rel="stylesheet" href="styles.css">
+    <title>A Day in My Life</title> <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet"> <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://unpkg.com/scrollama@3.2.0/build/scrollama.min.js"></script>
     <script type="module" src="global.js"></script>
@@ -12,7 +12,7 @@
 </head>
 <body>
     <header class="page-header">
-        <h1>A Day in My Data</h1>
+        <h1>A Day in My Life</h1>
         <p class="subtitle">Explore the rhythms of real people through the lens of their biometric data. Click a circle to begin the journey.</p>
         <a href="#participant-overview-section" class="start-exploring">
             Start Exploring <span class="chevron-down">&#9660;</span>
@@ -59,7 +59,7 @@
     <main id="participant-overview-section" class="participant-overview-container">
         <div class="overview-header">
             <h2>Participant Overview</h2>
-            <p class="overview-subtitle">10 participants - Hover to preview - Click to explore</p>
+            <p class="overview-subtitle">21 participants - Hover to preview - Click to explore</p>
         </div>
         <div class="chart-area-wrapper">
             <div id="d3-chart-container">
@@ -73,5 +73,22 @@
 
     <div id="tooltip"></div>
 
+    <div class="legend-container container">
+        <div class="legend-card">
+            <h4>Legend</h4>
+            <div class="legend-item">
+                <span class="legend-swatch size-swatch"><span class="inner-size-swatch"></span></span> Circle size = Avg HR 
+            </div>
+            <div class="legend-item">
+                <span class="legend-swatch color-swatch" style="background-color: #3b82f6;"></span> Data Point
+            </div>
+            <div class="legend-item">
+                <span class="legend-marker">X</span> X-axis = Age
+            </div>
+            <div class="legend-item">
+                <span class="legend-marker">Y</span> Y-axis = BMI
+            </div>
+        </div>
+    </div>
 </body>
 </html>
