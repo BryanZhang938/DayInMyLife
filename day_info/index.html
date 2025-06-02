@@ -252,6 +252,29 @@
       pointer-events: none;
     }
 
+    #autoscroller {
+      position: fixed;
+      bottom: 20px; 
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000; 
+    }
+
+    #play-pause-btn {
+      margin-top: 10px;
+      padding: 6px 12px;
+      font-size: 14px;
+      border: none;
+      background-color: #007acc;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #play-pause-btn:hover {
+      background-color: #005f99;
+    }
+
     #loading-overlay-hr, #loading-overlay-acc {
       position: fixed;
       left: 21px;
@@ -475,6 +498,10 @@ h3{
 
         <div class="animation-section"></div>
         
+      </div>
+
+      <div id="autoscroller">
+        <button id="play-pause-btn">▶ Auto-Scroll</button>
       </div>
 
     </div>
