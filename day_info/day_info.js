@@ -810,6 +810,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         renderChart(initialData, initialStart, initialEnd, yExtent, initialActivitiesForChart);
         updateActivityAnimationView(currentScrollTime, allUserActivities); // Initial animation update
+        const introScreen = document.getElementById("intro-loading-screen");
+if (introScreen) {
+  introScreen.style.opacity = "0";
+  setTimeout(() => {
+    introScreen.style.display = "none";
+  }, 800);
+}
         
         // Initial activity info
         const initialActivity = getActiveActivity(currentScrollTime, allUserActivities);
