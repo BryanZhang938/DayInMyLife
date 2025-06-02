@@ -187,11 +187,11 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       {
           title: "Explore the Data",
-          content: "Hover over any circle to see that participant's summary details. The size of the circle corresponds to their BMI (or Average Heart Rate, depending on current data)."
+          content: "Hover over any circle to see that participant's summary details. The size of the circle corresponds to their Average Heart Rate."
       },
       {
           title: "Begin the Journey",
-          content: "Click on any participant's circle to dive into a more detailed view of their personal data story (functionality to be added later!)."
+          content: "Click on any participant's circle to dive into a more detailed view of their personal data story."
       }
   ];
 
