@@ -656,7 +656,7 @@ body.loaded .legend-container {
 }
 
 .filter-group {
-  padding: 10px;
+  padding: 5px;
   /* border: 1px solid #f3f4f6; /* Optional border for each group */
   /* border-radius: 6px; */
 }
@@ -921,11 +921,11 @@ svg text.axis-label {
 /* Modal Content Box */
 .modal-content {
     background-color: white;
-    padding: 25px 30px;
+    padding: 20px 25px;
     border-radius: 10px;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
     width: 90%;
-    max-width: 500px;
+    max-width: 400px;
     position: relative;
     transform: scale(0.9);
     transition: transform 0.3s ease;
@@ -955,8 +955,8 @@ svg text.axis-label {
 .tutorial-header {
     display: flex;
     align-items: center;
-    margin-bottom: 15px;
-    gap: 10px;
+    margin-bottom: 12px;
+    gap: 8px;
 }
 
 .tutorial-header .step-indicator-container {
@@ -979,15 +979,15 @@ svg text.axis-label {
     font-size: 0.95em;
     color: #4b5563;
     line-height: 1.6;
-    margin-bottom: 25px;
-    min-height: 60px;
+    margin-bottom: 20px;
+    min-height: 50px;
 }
 
 .tutorial-navigation {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 20px;
+    margin-top: 15px;
 }
 
 .step-dots {

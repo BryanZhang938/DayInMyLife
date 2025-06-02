@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       {
           title: "Explore the Data",
-          content: "Hover over any circle to see that participant's summary details. The size of the circle corresponds to their Average Heart Rate."
+          content: "Hover over any circle to see that participant's summary details."
       },
       {
           title: "Begin the Journey",

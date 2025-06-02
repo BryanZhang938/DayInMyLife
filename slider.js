@@ -163,25 +163,6 @@ class CustomRangeSlider {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Initializing custom range sliders...');
     
-    // Age Range Slider
-    const ageSlider = new CustomRangeSlider({
-        sliderId: 'age-range-slider-custom',
-        handleMinId: 'age-handle-min',
-        handleMaxId: 'age-handle-max',
-        selectedRangeId: 'age-selected-range',
-        valueDisplayId: 'age-value-display',
-        minValue: 20,
-        maxValue: 40,
-        initialMin: 20,
-        initialMax: 40,
-        onChange: (min, max) => {
-            console.log('Age slider changed:', { min, max });
-            if (typeof applyChartFilters === 'function') {
-                applyChartFilters();
-            }
-        }
-    });
-
     // Heart Rate Range Slider
     const hrSlider = new CustomRangeSlider({
         sliderId: 'hr-range-slider-custom',
@@ -201,12 +182,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Make sliders available globally for the chart filtering
-    window.ageSlider = ageSlider;
+    // Make slider available globally for the chart filtering
     window.hrSlider = hrSlider;
     
-    console.log('Custom range sliders initialized:', {
-        ageSlider: window.ageSlider,
+    console.log('Custom range slider initialized:', {
         hrSlider: window.hrSlider
     });
 }); 

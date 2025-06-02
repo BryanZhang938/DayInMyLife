@@ -1,14 +1,14 @@
 /* Custom Range Slider Styles */
 .custom-range-slider-wrapper {
-    margin-top: 10px;
-    padding: 10px 0;
+    margin-top: 5px;
+    padding: 5px 0;
 }
 
 .custom-range-slider {
     position: relative;
     width: 100%;
     height: 8px;
-    margin: 15px 0;
+    margin: 8px 0;
 }
 
 .custom-range-track {
