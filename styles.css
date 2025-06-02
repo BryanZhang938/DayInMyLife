@@ -747,13 +747,13 @@ body.loaded .legend-container {
 }
 #home-button {
   position: fixed;
-  top: 10px;
-  left: 20px;
+  top: 20px;
+  right: 175px;
   background-color: #3b82f6;
   color: white;
   border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 0.75rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.5rem;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -839,6 +839,18 @@ svg text.axis-label {
   height: 28px;
   margin-right: 12px;
   color: #3b82f6;
+  background-color: rgba(59, 130, 246, 0.1);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.legend-swatch2 {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  color: white;
   background-color: rgba(59, 130, 246, 0.1);
   border-radius: 8px;
   transition: all 0.2s ease;

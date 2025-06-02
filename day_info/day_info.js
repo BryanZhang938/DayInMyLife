@@ -593,18 +593,16 @@ function updateTheme(time) {
   document.documentElement.style.setProperty('--card-bg', theme.card);
 }
 
-// Update scroll progress
-function updateScrollProgress(progress) {
-  const progressFill = document.querySelector('.progress-fill');
-  const scrollFill = document.querySelector('.scroll-fill');
+function updateScrollProgress() {
+    const progressFill = document.querySelector('.progress-fill');
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const scrollProgress = scrollTop / scrollHeight;
   
-  if (progressFill) {
-    progressFill.style.width = `${progress * 100}%`;
+    if (progressFill) {
+      progressFill.style.width = `${scrollProgress * 100}%`;
+    }
   }
-  if (scrollFill) {
-    scrollFill.style.height = `${progress * 100}%`;
-  }
-}
 
 // Update activity info card
 function updateActivityInfo(activity) {
@@ -737,43 +735,42 @@ document.addEventListener('DOMContentLoaded', async () => {
                 timeDisplay.textContent = `${displayHours}:${minutes} ${ampm}`;
             }
             const lastDataPoint = bpmPerMinute
-    .filter(d => d.minute <= currentScrollTime)
-    .at(-1);
+            .filter(d => d.minute <= currentScrollTime)
+            .at(-1);
 
-const stepsUpToNow = lastDataPoint ? lastDataPoint.cumulativeSteps : 0;
+            const stepsUpToNow = lastDataPoint ? lastDataPoint.cumulativeSteps : 0;
 
-// Update step counter display
-const stepCounter = document.getElementById("step-counter");
-if (stepCounter) {
-    stepCounter.innerHTML = `Number of Steps: ${Math.round(stepsUpToNow)} <span class="step-box inline-box"></span> = 300 Steps`;}
+            // Update step counter display
+            const stepCounter = document.getElementById("step-counter");
+            if (stepCounter) {
+                stepCounter.innerHTML = `Number of Steps: ${Math.round(stepsUpToNow)} <span class="step-box inline-box"></span> = 300 Steps`;}
 
-// Box rendering stays as before
+            // Box rendering stays as before
 
-// Calculate number of full and partial boxes
-const STEP_UNIT = 300;  // ← Define the new box scale here
+            // Calculate number of full and partial boxes
+            const STEP_UNIT = 300;  // ← Define the new box scale here
 
-const fullBoxes = Math.floor(stepsUpToNow / STEP_UNIT);
-const partialFraction = (stepsUpToNow % STEP_UNIT) / STEP_UNIT;
+            const fullBoxes = Math.floor(stepsUpToNow / STEP_UNIT);
+            const partialFraction = (stepsUpToNow % STEP_UNIT) / STEP_UNIT;
 
-// Render boxes
-const stepBoxContainer = document.getElementById("step-boxes-container");
-if (stepBoxContainer) {
-stepBoxContainer.innerHTML = ""; // Clear previous boxes
+            // Render boxes
+            const stepBoxContainer = document.getElementById("step-boxes-container");
+            if (stepBoxContainer) {
+                stepBoxContainer.innerHTML = ""; // Clear previous boxes
 
-for (let i = 0; i < fullBoxes; i++) {
-const box = document.createElement("div");
-box.className = "step-box";
-stepBoxContainer.appendChild(box);
-}
+                for (let i = 0; i < fullBoxes; i++) {
+                    const box = document.createElement("div");
+                    box.className = "step-box";
+                    stepBoxContainer.appendChild(box);
+                }
 
-if (partialFraction > 0) {
-const partialBox = document.createElement("div");
-partialBox.className = "step-box partial";
-partialBox.style.background = `linear-gradient(to right, green ${partialFraction * 100}%, transparent ${partialFraction * 100}%)`;
-stepBoxContainer.appendChild(partialBox);
-}
-}
-
+                if (partialFraction > 0) {
+                    const partialBox = document.createElement("div");
+                    partialBox.className = "step-box partial";
+                    partialBox.style.background = `linear-gradient(to right, green ${partialFraction * 100}%, transparent ${partialFraction * 100}%)`;
+                    stepBoxContainer.appendChild(partialBox);
+                }
+            }
 
             // Update charts and activity
             const visibleData = bpmPerMinute.filter(d =>
@@ -794,7 +791,10 @@ stepBoxContainer.appendChild(partialBox);
 
         window.addEventListener("scroll", () => {
             updateTimeDisplay();
+            updateScrollProgress();
         });
+
+        window.addEventListener('resize', updateScrollProgress); 
 
         // Initial render
         const initialStart = timeExtent[0];
