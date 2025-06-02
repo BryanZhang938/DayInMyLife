@@ -38,6 +38,11 @@ const activityDetailsMap = {
     11: { name: "smoking", file: "../assets/animations/smoking.mp4" },
     12: { name: "alcohol consumption", file: "../assets/animations/alcohol_assumption.mp4" } // Assuming typo "assumption" -> "consumption"
 };
+// Add this entry for default fallback animation
+const defaultNoActivity = {
+    name: "doing nothing",
+    file: "../assets/animations/doing_nothing.mp4"
+  };
 
 // --- DOM Elements (will be assigned in DOMContentLoaded) ---
 let currentVideoElement;
@@ -274,12 +279,69 @@ function updateActivityAnimationView(nowDateTime, activities) {
             noActivityMsgElement.style.display = 'block';
             videoWrapperElement.title = `User ${selectedUser}: Unmapped Activity ${activeActivity.activityCode}`;
         }
-    } else { // No specific activity tracked at this time
-        currentVideoElement.style.display = 'none'; currentVideoElement.pause();
-        preloadVideoElement.style.display = 'none'; preloadVideoElement.pause();
-        noActivityMsgElement.textContent = `No specific activity tracked for ${selectedUser} at this time.`;
-        noActivityMsgElement.style.display = 'block';
-        videoWrapperElement.title = `User ${selectedUser}: No activity`;
+    } else {
+        const targetSrc = new URL(defaultNoActivity.file, window.location.href).href;
+    
+        // If already showing the idle animation, resume if paused
+        if (currentVideoElement.style.display !== 'none' && currentVideoElement.currentSrc === targetSrc) {
+            if (currentVideoElement.paused) {
+                currentVideoElement.play().catch(e => console.warn("Failed to play idle video:", e));
+            }
+            noActivityMsgElement.style.display = 'none';
+            videoWrapperElement.title = `User ${selectedUser}: ${defaultNoActivity.name}`;
+            return;
+        }
+    
+        // Load into preload and swap
+        if (preloadVideoElement.currentSrc !== targetSrc || preloadVideoElement.readyState < 2) {
+            if (!currentVideoElement.currentSrc || currentVideoElement.style.display === 'none') {
+                noActivityMsgElement.textContent = "Loading activity...";
+                noActivityMsgElement.style.display = 'block';
+            }
+    
+            preloadVideoElement.onloadeddata = () => {
+                currentVideoElement.style.display = 'none';
+                currentVideoElement.pause();
+    
+                preloadVideoElement.style.display = 'block';
+                preloadVideoElement.play().catch(() => {
+                    noActivityMsgElement.textContent = "Click to play activity";
+                    noActivityMsgElement.style.display = 'block';
+                });
+    
+                noActivityMsgElement.style.display = 'none';
+                videoWrapperElement.title = `User ${selectedUser}: ${defaultNoActivity.name}`;
+    
+                let temp = currentVideoElement;
+                currentVideoElement = preloadVideoElement;
+                preloadVideoElement = temp;
+            };
+    
+            preloadVideoElement.onerror = () => {
+                noActivityMsgElement.textContent = "Failed to load idle animation.";
+                preloadVideoElement.style.display = 'none';
+            };
+    
+            preloadVideoElement.src = targetSrc;
+            preloadVideoElement.load();
+        } else {
+            // If preload is already ready, show it
+            currentVideoElement.style.display = 'none';
+            currentVideoElement.pause();
+    
+            preloadVideoElement.style.display = 'block';
+            preloadVideoElement.play().catch(() => {
+                noActivityMsgElement.textContent = "Click to play activity";
+                noActivityMsgElement.style.display = 'block';
+            });
+    
+            noActivityMsgElement.style.display = 'none';
+            videoWrapperElement.title = `User ${selectedUser}: ${defaultNoActivity.name}`;
+    
+            let temp = currentVideoElement;
+            currentVideoElement = preloadVideoElement;
+            preloadVideoElement = temp;
+        }
     }
 }
 
@@ -559,7 +621,7 @@ function updateActivityInfo(activity) {
     console.log('hi');
     activityInfo.innerHTML = `
                 <p>Current Activity:</p>
-                <h4>N/A</h4>
+                <h4>No Recorded Activity</h4>
                 `;
     }
 }
