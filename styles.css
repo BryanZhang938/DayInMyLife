@@ -1134,3 +1134,11 @@ svg circle.selected {
   from { transform: translateX(-150px); }
   to   { transform: translateX(100vw); }
 }
+
+#conclusion-button {
+  margin-left: auto;
+  margin-right: 0;
+  display: block;
+  margin-top: 0rem;
+  margin-bottom: 1rem;
+}
