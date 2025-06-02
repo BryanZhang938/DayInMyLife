@@ -547,33 +547,33 @@ let currentScrollTime; // To store the time corresponding to the current scroll 
 
 // Add theme management
 function getTimeTheme(hour) {
-  if (hour >= 5 && hour < 8) {
-    return {
-      name: "dawn",
-      bg: "var(--dawn-bg)",
-      accent: "var(--accent-color)",
-      card: "var(--card-bg)"
+  if (hour >= 5 && hour < 8) { // Dawn
+    return { 
+      name: "dawn", 
+      bg: "var(--dawn-bg)", 
+      accent: "#EA580C", 
+      card: "rgba(255, 237, 213, 0.8)" 
     };
-  } else if (hour >= 8 && hour < 17) {
-    return {
-      name: "day",
-      bg: "var(--day-bg)",
-      accent: "var(--accent-color)",
-      card: "var(--card-bg)"
+  } else if (hour >= 8 && hour < 17) { // Day
+    return { 
+      name: "day", 
+      bg: "var(--day-bg)", 
+      accent: "#2563EB", 
+      card: "rgba(219, 234, 254, 0.8)" 
     };
-  } else if (hour >= 17 && hour < 20) {
-    return {
-      name: "sunset",
-      bg: "var(--sunset-bg)",
-      accent: "var(--accent-color)",
-      card: "var(--card-bg)"
+  } else if (hour >= 17 && hour < 20) { // Sunset
+    return { 
+      name: "sunset", 
+      bg: "var(--sunset-bg)", 
+      accent: "#C2410C", 
+      card: "rgba(253, 186, 116, 0.8)" 
     };
-  } else {
-    return {
-      name: "night",
-      bg: "var(--night-bg)",
-      accent: "var(--accent-color)",
-      card: "var(--card-bg)"
+  } else { // Night
+    return { 
+      name: "night", 
+      bg: "var(--night-bg)", 
+      accent: "#A855F7", 
+      card: "rgba(59, 10, 102, 0.6)" 
     };
   }
 }
@@ -581,19 +581,70 @@ function getTimeTheme(hour) {
 function updateTheme(time) {
   const hour = time.getHours();
   const theme = getTimeTheme(hour);
-  
-  // Update background
+  const root = document.documentElement;
   const dynamicBg = document.querySelector('.dynamic-bg');
+  
   if (dynamicBg) {
     dynamicBg.style.background = theme.bg;
   }
   
-  // Update body class for theme-specific styles
-  document.body.className = `theme-${theme.name}`;
+  root.style.setProperty('--accent-color', theme.accent);
+  root.style.setProperty('--card-bg', theme.card);
+
+  // Update text colors for elements that use --accent-color
+  document.querySelector('.title-card h1')?.style.setProperty('color', theme.accent);
+  document.querySelector('.time-display')?.style.setProperty('color', theme.accent);
+  document.querySelector('.progress-fill')?.style.setProperty('background-color', theme.accent);
+
+  // Update chart colors
+  svg.selectAll(".tick text").style("fill", theme.accent);
+  svg.selectAll(".domain, .tick line").style("stroke", theme.accent);
+  svg.selectAll("text.axis-label").style("fill", theme.accent);
+  svg.select("text[text-anchor='middle']").style("fill", theme.accent);
   
-  // Update accent colors
-  document.documentElement.style.setProperty('--accent-color', theme.accent);
-  document.documentElement.style.setProperty('--card-bg', theme.card);
+  // Update card and activity section colors
+  document.querySelectorAll('.card h3').forEach(h3 => h3.style.color = theme.accent);
+  document.querySelector('.activity-title')?.style.setProperty('background', theme.card);
+  document.querySelector('.activity-title p')?.style.setProperty('color', theme.accent);
+  document.querySelector('.activity-title h4')?.style.setProperty('color', theme.accent);
+  document.querySelector('.activity-container')?.style.setProperty('background', theme.card);
+
+  // Update button colors
+  const homeButton = document.getElementById('home-button');
+  if (homeButton) {
+    homeButton.style.color = theme.accent;
+  }
+  const summaryButton = document.getElementById('view-summary-btn');
+  if (summaryButton) {
+    summaryButton.style.backgroundColor = theme.accent;
+  }
+}
+
+function createFloatingDots() {
+  const dynamicBg = document.querySelector('.dynamic-bg');
+  if (!dynamicBg) return;
+
+  // Clear existing dots
+  dynamicBg.querySelectorAll('.floating-dot').forEach(dot => dot.remove());
+
+  const numberOfDots = 30; // Increased from 8 to 508
+  for (let i = 0; i < numberOfDots; i++) {
+    const dot = document.createElement('div');
+    dot.classList.add('floating-dot');
+
+    // Randomize starting positions
+    dot.style.left = `${10 + Math.random() * 80}%`;
+    dot.style.top = `${10 + Math.random() * 80}%`;
+    
+    // Randomize animation parameters
+    const duration = 3 + Math.random() * 4; // 3s to 7s
+    const delay = Math.random() * 2; // 0s to 2s delay
+
+    dot.style.animationDuration = `${duration}s`;
+    dot.style.animationDelay = `${delay}s`;
+
+    dynamicBg.appendChild(dot);
+  }
 }
 
 function updateScrollProgress() {
@@ -628,7 +679,8 @@ function updateActivityInfo(activity) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    setupActivityDisplayElements(); // Setup video elements first
+    setupActivityDisplayElements();
+    createFloatingDots(); // Create dots once layout is ready
 
     const loadingOverlay = document.getElementById('loading-overlay-hr');
     const loadingText = document.getElementById('loading-text-hr');
