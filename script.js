@@ -280,4 +280,10 @@ document.addEventListener('DOMContentLoaded', () => {
       showModal();
       localStorage.setItem('tutorialShown', 'true');
   }
+
+  // Trigger page load animations
+  // Using a small timeout to ensure initial styles are rendered before 'loaded' class is added
+  setTimeout(() => {
+      document.body.classList.add('loaded');
+  }, 100); // 100ms delay, adjust if needed
 });

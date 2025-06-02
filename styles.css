@@ -233,6 +233,49 @@ body {
   line-height: 1.6;
 }
 
+/* General Page Load Animations */
+/* Initial states for elements before animation */
+.page-header h1,
+.page-header .subtitle,
+.page-header .start-exploring,
+.controls-bar,
+.participant-overview-container,
+.legend-container {
+    opacity: 0;
+    transform: translateY(30px); /* Start elements slightly lower */
+    /* Define the transition: property, duration, timing-function, delay */
+    transition: opacity 0.6s ease-out, transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Controls bar specific initial state if you want it to slide from top */
+.controls-bar {
+    transform: translateY(-30px); /* Start controls bar slightly higher */
+}
+
+/* Staggered delays for a nicer effect - applied when 'loaded' class is on body */
+/* These delays will make elements appear one after another */
+body.loaded .page-header h1 { transition-delay: 0.1s; }
+body.loaded .page-header .subtitle { transition-delay: 0.2s; }
+body.loaded .page-header .start-exploring { transition-delay: 0.3s; }
+
+body.loaded .controls-bar { transition-delay: 0.25s; } /* Controls bar animates after header text */
+
+/* Filter panel animation is already handled by its .open class */
+
+body.loaded .participant-overview-container { transition-delay: 0.4s; }
+body.loaded .legend-container { transition-delay: 0.5s; }
+
+/* Final states for elements when 'body.loaded' is present */
+body.loaded .page-header h1,
+body.loaded .page-header .subtitle,
+body.loaded .page-header .start-exploring,
+body.loaded .controls-bar,
+body.loaded .participant-overview-container,
+body.loaded .legend-container {
+    opacity: 1;
+    transform: translateY(0); /* Move to final position */
+}
+
 .page-header {
   text-align: center;
   padding: 50px 20px 40px; /* Increased top padding */
