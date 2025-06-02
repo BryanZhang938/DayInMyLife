@@ -280,4 +280,24 @@ document.addEventListener('DOMContentLoaded', () => {
       showModal();
       localStorage.setItem('tutorialShown', 'true');
   }
+
+  document.getElementById("explore-button")?.addEventListener("click", () => {
+  const intro = document.getElementById("intro-screen");
+  const runner = document.getElementById("runner");
+
+  if (runner) {
+    runner.style.transition = "opacity 1s ease";
+    runner.style.opacity = 0;
+  }
+
+  if (intro) {
+    intro.style.transition = "opacity 1s ease";
+    intro.style.opacity = 0;
+    setTimeout(() => {
+      intro.style.display = "none";
+      if (runner) runner.style.display = "none";
+      document.body.style.overflow = "auto";
+    }, 1000);
+  }
+});
 });

@@ -988,3 +988,95 @@ svg circle.selected {
 #start-story-button:hover {
   background-color: #2563eb; /* Darker blue on hover */
 }
+
+#intro-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom right, #eff6ff, #eef2ff, #f5f3ff);;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+#intro-text {
+  font-size: 2.5rem;
+  color: #1f2937;
+  font-weight: 700;
+  text-align: center;
+  margin: 0 1rem;
+  opacity: 0;
+  animation: fadeIn 2s ease-in-out forwards;
+}
+
+#subtitle-text {
+  font-size: 1.25rem;
+  color: #4b5563;
+  text-align: center;
+  margin: 1rem 2rem 0;
+  max-width: 600px;
+  opacity: 0;
+  animation: fadeIn 2s ease-in-out forwards;
+  animation-delay: 2.5s;
+  line-height: 1.6;
+}
+
+#explore-button {
+  margin-top: 2rem;
+  padding: 0.75rem 2rem;
+  font-size: 1.1rem;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: background-color 0.2s ease;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeInUp 1s ease forwards;
+  animation-delay: 4.5s;
+}
+
+#explore-button:hover {
+  background-color: #2563eb;
+}
+
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#runner {
+  position: fixed;
+  top: 60px;
+  left: 0; /* anchor to left */
+  height: 120px;
+  z-index: 99999;
+  pointer-events: none;
+  transform: translateX(-150px); /* initial offset */
+  animation: runAcross 5s linear infinite;
+  will-change: transform;
+}
+
+@keyframes runAcross {
+  from { transform: translateX(-150px); }
+  to   { transform: translateX(100vw); }
+}
