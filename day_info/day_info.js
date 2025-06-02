@@ -25,18 +25,18 @@ const activityLabels = {
 };
 
 const activityDetailsMap = {
-    1: { name: "sleeping", file: "../assets/animations/sleeping.mp4" },
-    2: { name: "laying down", file: "../assets/animations/laying_down.mp4" },
-    3: { name: "sitting (e.g. studying, eating, driving)", file: "../assets/animations/sitting.mp4" },
-    4: { name: "light movement (e.g. slow/medium walk, chores, work)", file: "../assets/animations/light_movement.mp4" },
-    5: { name: "medium movement (e.g. fast walk, bike)", file: "../assets/animations/medium_movement.mp4" },
-    6: { name: "heavy movement (e.g. gym, running)", file: "../assets/animations/heavy_movement.mp4" },
-    7: { name: "eating", file: "../assets/animations/eating.mp4" },
-    8: { name: "small screen usage (e.g. smartphone, computer)", file: "../assets/animations/small_screen_usage.mp4" },
-    9: { name: "large screen usage (e.g. TV, cinema)", file: "../assets/animations/large_screen_usage.mp4" },
-    10: { name: "caffeinated drink consumption", file: "../assets/animations/caffeinated_drink_consumption.mp4" },
-    11: { name: "smoking", file: "../assets/animations/smoking.mp4" },
-    12: { name: "alcohol consumption", file: "../assets/animations/alcohol_assumption.mp4" } // Assuming typo "assumption" -> "consumption"
+    1: { name: "Sleeping", file: "../assets/animations/sleeping.mp4" },
+    2: { name: "Laying Down", file: "../assets/animations/laying_down.mp4" },
+    3: { name: "Sitting (e.g. studying, eating, driving)", file: "../assets/animations/sitting.mp4" },
+    4: { name: "Light Movement (e.g. slow/medium walk, chores, work)", file: "../assets/animations/light_movement.mp4" },
+    5: { name: "Medium Movement (e.g. fast walk, bike)", file: "../assets/animations/medium_movement.mp4" },
+    6: { name: "Heavy Movement (e.g. gym, running)", file: "../assets/animations/heavy_movement.mp4" },
+    7: { name: "Eating", file: "../assets/animations/eating.mp4" },
+    8: { name: "Small Screen Usage (e.g. smartphone, computer)", file: "../assets/animations/small_screen_usage.mp4" },
+    9: { name: "Large Screen Usage (e.g. TV, cinema)", file: "../assets/animations/large_screen_usage.mp4" },
+    10: { name: "Caffeinated Drink Consumption", file: "../assets/animations/caffeinated_drink_consumption.mp4" },
+    11: { name: "Smoking", file: "../assets/animations/smoking.mp4" },
+    12: { name: "Alcohol Consumption", file: "../assets/animations/alcohol_assumption.mp4" } // Assuming typo "assumption" -> "consumption"
 };
 // Add this entry for default fallback animation
 const defaultNoActivity = {
