@@ -1122,11 +1122,11 @@ svg circle.selected {
   position: fixed;
   top: 60px;
   left: 0; /* anchor to left */
-  height: 120px;
+  height: 190px;
   z-index: 99999;
   pointer-events: none;
   transform: translateX(-150px); /* initial offset */
-  animation: runAcross 5s linear infinite;
+  animation: runAcross 4s linear infinite;
   will-change: transform;
 }
 
