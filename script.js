@@ -20,6 +20,25 @@ Promise.all([
 });
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Smooth scroll for "Start Exploring" link
+  const startExploringLink = document.querySelector('a.start-exploring');
+
+  if (startExploringLink) {
+    startExploringLink.addEventListener('click', function(event) {
+      event.preventDefault(); // Prevent the default anchor jump
+
+      const targetId = this.getAttribute('href'); // Gets "#participant-overview-section"
+      const targetElement = document.querySelector(targetId);
+
+      if (targetElement) {
+        targetElement.scrollIntoView({
+          behavior: 'smooth', // This enables smooth scrolling
+          block: 'start'      // Aligns the top of the target element to the top of the viewport
+        });
+      }
+    });
+  }
+
   const filterButton = document.querySelector('.controls-bar .filter-button');
   const filterPanel = document.getElementById('filter-panel');
 
