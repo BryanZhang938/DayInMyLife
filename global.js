@@ -106,7 +106,16 @@ d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
       .attr("opacity", 0.7)
       .attr("stroke", "#ffffff")
       .attr("stroke-width", 1)
-      .style("cursor", "pointer") // Add pointer cursor
+      .style("cursor", "pointer"); // Add pointer cursor
+
+  // Set initial participant count right after drawing circles
+  const countElement = document.getElementById('participant-count');
+  if (countElement) {
+    countElement.textContent = circles.size();
+  }
+
+  // Add event handlers
+  circles
       .on("mouseover", function (event, d) {
         tooltip.style("visibility", "visible")
           .html(`<strong>Participant ${d.user}</strong><br>` +
