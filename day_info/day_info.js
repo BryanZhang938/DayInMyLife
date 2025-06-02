@@ -678,6 +678,46 @@ function updateActivityInfo(activity) {
     }
 }
 
+function interpolateHeartRateData(data) {
+    if (!data || data.length < 2) return data;
+    
+    const interpolatedData = [];
+    const MAX_GAP_MINUTES = 2;
+    
+    for (let i = 0; i < data.length - 1; i++) {
+        const current = data[i];
+        const next = data[i + 1];
+        
+        // Add current point
+        interpolatedData.push(current);
+        
+        // Calculate time difference in minutes
+        const timeDiff = (next.minute - current.minute) / (1000 * 60);
+        
+        // If gap is larger than MAX_GAP_MINUTES, interpolate
+        if (timeDiff > MAX_GAP_MINUTES) {
+            const numPoints = Math.floor(timeDiff / MAX_GAP_MINUTES);
+            const stepSize = timeDiff / (numPoints + 1);
+            
+            for (let j = 1; j <= numPoints; j++) {
+                const interpolatedTime = new Date(current.minute.getTime() + (stepSize * j * 60 * 1000));
+                const interpolatedHR = current.avgHR + (next.avgHR - current.avgHR) * (j / (numPoints + 1));
+                
+                interpolatedData.push({
+                    minute: interpolatedTime,
+                    avgHR: interpolatedHR,
+                    cumulativeSteps: current.cumulativeSteps + (next.cumulativeSteps - current.cumulativeSteps) * (j / (numPoints + 1))
+                });
+            }
+        }
+    }
+    
+    // Add the last point
+    interpolatedData.push(data[data.length - 1]);
+    
+    return interpolatedData;
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     setupActivityDisplayElements();
     createFloatingDots(); // Create dots once layout is ready
@@ -712,15 +752,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         loadingText.textContent = 'Processing data...';
         const filteredHrData = hrDataFull.filter(d => d !== null);
-        allUserActivities = activityDataFull.filter(d => d !== null && d.start); // Store for global use
+        const rawUserActivities = activityDataFull.filter(d => d !== null && d.start); // Store for global use
 
         // Ensure start/end times are handled for activities spanning midnight before sorting
-        allUserActivities.forEach(act => {
+        rawUserActivities.forEach(act => {
             if (act.start && act.end && act.end < act.start) {
                 act.end.setDate(act.end.getDate() + 1);
             }
         });
-        allUserActivities.sort((a, b) => a.start - b.start);
+
+        // Apply interpolation to activities
+        // allUserActivities = interpolateActivityData(rawUserActivities);
+
+        // Update activityLabels to include "No Activity"
+        activityLabels[0] = "No Activity";
+        activityDetailsMap[0] = {
+            name: "No Activity",
+            file: "../assets/animations/doing_nothing.mp4"
+        };
+
         let cumulativeSteps = 0;
 
         const bpmPerMinute = d3.rollups(
@@ -738,14 +788,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             cumulativeSteps: val.cumulativeSteps
         })).sort((a, b) => a.minute - b.minute);
 
-        if (bpmPerMinute.length === 0) {
+        // Add interpolation step here
+        const interpolatedBpmPerMinute = interpolateHeartRateData(bpmPerMinute);
+
+        if (interpolatedBpmPerMinute.length === 0) {
             loadingText.textContent = `No heart rate data for user ${selectedUser}.`;
             console.warn(`No heart rate data for user ${selectedUser}.`);
             // Keep overlay or show a message
             return; 
         }
         
-        const timeExtent = d3.extent(bpmPerMinute, d => d.minute);
+        const timeExtent = d3.extent(interpolatedBpmPerMinute, d => d.minute);
         if (!timeExtent[0] || !timeExtent[1]) {
             loadingText.textContent = `No valid time extent for user ${selectedUser}.`;
             console.warn(`No valid time extent for user ${selectedUser}.`);
@@ -753,7 +806,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        const yExtent = d3.extent(bpmPerMinute, d => d.avgHR);
+        const yExtent = d3.extent(interpolatedBpmPerMinute, d => d.avgHR);
         const totalTimeRangeMs = timeExtent[1] - timeExtent[0];
         const viewWindowDurationMs = 1 * 60 * 60 * 1000; // 1 hour
 
@@ -789,7 +842,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const displayHours = hours % 12 || 12;
                 timeDisplay.textContent = `${displayHours}:${minutes} ${ampm}`;
             }
-            const lastDataPoint = bpmPerMinute
+            const lastDataPoint = interpolatedBpmPerMinute
             .filter(d => d.minute <= currentScrollTime)
             .at(-1);
 
@@ -828,7 +881,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             // Update charts and activity
-            const visibleData = bpmPerMinute.filter(d =>
+            const visibleData = interpolatedBpmPerMinute.filter(d =>
                 d.minute >= windowStart && d.minute <= windowEnd
             );
             const visibleActivities = allUserActivities.filter(d =>
@@ -856,7 +909,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const initialEnd = new Date(initialStart.getTime() + viewWindowDurationMs);
         currentScrollTime = new Date(initialStart.getTime()); // Set initial scroll time
 
-        const initialData = bpmPerMinute.filter(d =>
+        const initialData = interpolatedBpmPerMinute.filter(d =>
             d.minute >= initialStart && d.minute <= initialEnd
         );
         const initialActivitiesForChart = allUserActivities.filter(d =>

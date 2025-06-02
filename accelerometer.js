@@ -131,8 +131,10 @@ window.addEventListener("scroll", () => {
 }, { passive: true });
 
   function updateChart(user) {
-    const userData = accData.filter(d => d.user === user);
+    let userData = accData.filter(d => d.user === user);
     userData.sort((a, b) => a.time - b.time);
+
+    userData = interpolateAccelerometerData(userData);
 
     const timeExtent = d3.extent(userData, d => d.time);
     if (!timeExtent[0] || !timeExtent[1]) {
@@ -280,4 +282,47 @@ function renderChart(dataSlice, windowStart, windowEnd, yExtent) {
     .style("stroke-width", 2);
 
     loadingOverlay.style("display", "none");
+}
+
+function interpolateAccelerometerData(data) {
+  if (!data || data.length < 2) return data;
+  
+  const interpolatedData = [];
+  const MAX_GAP_MINUTES = 3;
+  
+  // Sort data by time
+  const sortedData = [...data].sort((a, b) => a.time - b.time);
+  
+  for (let i = 0; i < sortedData.length - 1; i++) {
+      const current = sortedData[i];
+      const next = sortedData[i + 1];
+      
+      // Add current point
+      interpolatedData.push(current);
+      
+      // Calculate time difference in minutes
+      const timeDiff = (next.time - current.time) / (1000 * 60);
+      
+      // If gap is larger than MAX_GAP_MINUTES, interpolate
+      if (timeDiff > MAX_GAP_MINUTES) {
+          const numPoints = Math.floor(timeDiff / MAX_GAP_MINUTES);
+          const stepSize = timeDiff / (numPoints + 1);
+          
+          for (let j = 1; j <= numPoints; j++) {
+              const interpolatedTime = new Date(current.time.getTime() + (stepSize * j * 60 * 1000));
+              const interpolatedMagnitude = current.magnitude + (next.magnitude - current.magnitude) * (j / (numPoints + 1));
+              
+              interpolatedData.push({
+                  user: current.user,
+                  time: interpolatedTime,
+                  magnitude: interpolatedMagnitude
+              });
+          }
+      }
+  }
+  
+  // Add the last point
+  interpolatedData.push(sortedData[sortedData.length - 1]);
+  
+  return interpolatedData;
 }
