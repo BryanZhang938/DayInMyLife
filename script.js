@@ -191,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
 const intro = document.getElementById("intro-screen");
 const runner = document.getElementById("runner");
 
-if (!localStorage.getItem("introShown")) {
+if (!sessionStorage.getItem("introShown")) {
   // Show the intro screen
   if (intro) intro.style.display = "flex";
   if (runner) runner.style.display = "block";
@@ -210,7 +210,7 @@ if (!localStorage.getItem("introShown")) {
         intro.style.display = "none";
         if (runner) runner.style.display = "none";
         document.body.style.overflow = "auto";
-        localStorage.setItem("introShown", "true");
+        sessionStorage.setItem("introShown", "true");
       }, 1000);
     }
   });
