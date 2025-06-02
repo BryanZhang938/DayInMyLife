@@ -752,25 +752,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         loadingText.textContent = 'Processing data...';
         const filteredHrData = hrDataFull.filter(d => d !== null);
-        const rawUserActivities = activityDataFull.filter(d => d !== null && d.start); // Store for global use
+        allUserActivities = activityDataFull.filter(d => d !== null && d.start); // Store for global use
 
         // Ensure start/end times are handled for activities spanning midnight before sorting
-        rawUserActivities.forEach(act => {
+        allUserActivities.forEach(act => {
             if (act.start && act.end && act.end < act.start) {
                 act.end.setDate(act.end.getDate() + 1);
             }
         });
-
-        // Apply interpolation to activities
-        // allUserActivities = interpolateActivityData(rawUserActivities);
-
-        // Update activityLabels to include "No Activity"
-        activityLabels[0] = "No Activity";
-        activityDetailsMap[0] = {
-            name: "No Activity",
-            file: "../assets/animations/doing_nothing.mp4"
-        };
-
+        allUserActivities.sort((a, b) => a.start - b.start);
         let cumulativeSteps = 0;
 
         const bpmPerMinute = d3.rollups(

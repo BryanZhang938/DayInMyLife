@@ -749,7 +749,7 @@ body.loaded .legend-container {
 #home-button {
   position: fixed;
   top: 25px;
-  right: 185px;
+  left: 40px;
   background-color: #3b82f6;
   color: white;
   border: none;
