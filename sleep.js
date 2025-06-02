@@ -393,14 +393,14 @@ d3.csv("../assets/cleaned_data/all_saliva.csv", parseSaliva).then(salivaData => 
     .style("flex", "1")
     .style("text-align", "center")
     .style("font-weight", "600")
-    .style("font-size", "1rem")
+    .style("font-size", "1.2rem")
     .text("Before Sleep");
 
   subheadingRow.append("div")
     .style("flex", "1")
     .style("text-align", "center")
     .style("font-weight", "600")
-    .style("font-size", "1rem")
+    .style("font-size", "1.2rem")
     .text("Wake Up");
 
   const hormoneSection = container.append("div")
