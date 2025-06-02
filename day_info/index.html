@@ -12,10 +12,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
     :root {
-      --dawn-bg: linear-gradient(135deg, #ffedd5, #fecdd3, #e9d5ff);
-      --day-bg: linear-gradient(135deg, #dbeafe, #cffafe, #dcfce7);
+      /* Updated Gradients based on day-in-my-data */
+      --dawn-bg: linear-gradient(135deg, #fed7aa, #fbcfe8, #d8b4fe);
+      --day-bg: linear-gradient(135deg, #bfdbfe, #a5f3fc, #bbf7d0);
       --sunset-bg: linear-gradient(135deg, #fdba74, #fca5a5, #c4b5fd);
-      --night-bg: linear-gradient(135deg, #312e81, #1e3a8a, #3730a3);
+      --night-bg: linear-gradient(135deg, #4c1d95, #1e3a8a, #312e81);
     }
 
     body {
@@ -25,6 +26,7 @@
       background-color: #fafafa;
       padding: 0;
       color: #1f2937;
+      overflow-x: hidden;
     }
 
     .fixed-layout {
@@ -36,7 +38,29 @@
     .dynamic-bg {
       position: absolute;
       inset: 0;
-      transition: opacity 2s ease;
+      transition: background 2s ease;
+      overflow: hidden;
+    }
+
+    .floating-dot {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--accent-color);
+      opacity: 0;
+      animation-name: floatDot;
+      animation-timing-function: ease-in-out;
+      animation-iteration-count: infinite;
+      pointer-events: none;
+    }
+
+    @keyframes floatDot {
+      0%   { transform: translate(0px, 0px); opacity: 0.3; }
+      25%  { transform: translate(40px, -20px); opacity: 0.4; }
+      50%  { transform: translate(80px, -40px); opacity: 0.6; }
+      75%  { transform: translate(40px, -20px); opacity: 0.4; }
+      100% { transform: translate(0px, 0px); opacity: 0.3; }
     }
 
     .header {
@@ -55,6 +79,10 @@
       margin-top: -30px;
     }
 
+    .title-card {
+      flex: 1;
+    }
+
     .time-display {
       background: rgba(255, 255, 255, 0.8);
       -webkit-backdrop-filter: blur(8px);
@@ -66,6 +94,7 @@
       font-size: 1.5rem;
       font-weight: bold;
       margin-top: 0.5rem;
+      margin-right: 1rem;
     }
 
     .progress-bar {
@@ -378,9 +407,6 @@ h3{
   </style>
 </head>
 <body>
-  <button id="home-button">
-    <span class="legend-swatch2"><i class="fas fa-home"></i></span>
-  </button>
   <div class="page-wrapper">
     <div class="fixed-layout">
       <div class="dynamic-bg"></div>
@@ -388,12 +414,33 @@ h3{
       <header class="header">
         <div class="header-content">
           <div class="title-card">
-            <h1 class="text-3xl font-bold">A Day In My Life</h1>
+            <h1 class="text-3xl font-bold" style="color: var(--accent-color); transition: color 0.5s ease;">A Day In My Life</h1>
           </div>
-          <div class="time-display">00:00 AM</div>
+          <div class="time-display" style="color: var(--accent-color); transition: color 0.5s ease;">00:00 AM</div>
+          <button id="home-button" title="Return to Home" style="
+            background-color: rgba(255,255,255,0.5);
+            color: var(--accent-color);
+            border: 1px solid rgba(255,255,255,0.2);
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+            padding: 0.5rem;
+            border-radius: 9999px;
+            font-size: 1rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: background-color 0.2s ease, color 0.2s ease;
+            z-index: 60;
+          ">
+            <i class="fas fa-home"></i>
+          </button>
         </div>
         <div class="progress-bar">
-          <div class="progress-fill"></div>
+          <div class="progress-fill" style="background-color: var(--accent-color); transition: background-color 0.5s ease, width 0.3s ease;"></div>
         </div>
       </header>
 
