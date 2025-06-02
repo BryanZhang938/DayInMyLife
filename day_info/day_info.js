@@ -760,7 +760,7 @@ function updateScrollProgress() {
           // After last activity
           else if (currentScrollTime > allUserActivities.at(-1).end) {
             idleStart = allUserActivities.at(-1).end;
-            idleEnd = new Date(currentScrollTime);
+            idleEnd = new Date(timeExtent[1]); // Clamp to end of available data
           }
         }
   
