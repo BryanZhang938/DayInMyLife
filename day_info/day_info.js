@@ -175,7 +175,8 @@ function setupActivityDisplayElements() {
     activitySection.appendChild(container);
     
     // Prepend to body or append to a specific placeholder if you have one
-    document.body.insertBefore(activitySection, document.body.firstChild);
+    const animationDiv = document.querySelector('.animation-section');
+    animationDiv.appendChild(activitySection);
 }
 
 function updateActivityAnimationView(nowDateTime, activities) {
@@ -618,7 +619,6 @@ function updateActivityInfo(activity) {
     }
   } 
   else if (activityInfo) {
-    console.log('hi');
     activityInfo.innerHTML = `
                 <p>Current Activity:</p>
                 <h4>No Recorded Activity</h4>

@@ -56,117 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   }
 
-  // --- Filter Sliders Functionality ---
-  const ageMinSlider = document.getElementById('age-range-min');
-  const ageMaxSlider = document.getElementById('age-range-max');
-  const ageValueDisplay = document.getElementById('age-value-display');
-
-  const hrMinSlider = document.getElementById('hr-range-min');
-  const hrMaxSlider = document.getElementById('hr-range-max');
-  const hrValueDisplay = document.getElementById('hr-value-display');
-
-  function updateAgeDisplay() {
-    if (ageMinSlider && ageMaxSlider && ageValueDisplay) {
-      ageValueDisplay.textContent = `${ageMinSlider.value} - ${ageMaxSlider.value}`;
-    }
-  }
-
-  function updateHrDisplay() {
-    if (hrMinSlider && hrMaxSlider && hrValueDisplay) {
-      hrValueDisplay.textContent = `${hrMinSlider.value} - ${hrMaxSlider.value} bpm`;
-    }
-  }
-
-  function applyChartFilters() {
-    if (!ageMinSlider || !ageMaxSlider || !hrMinSlider || !hrMaxSlider) return;
-
-    const ageMin = parseInt(ageMinSlider.value);
-    const ageMax = parseInt(ageMaxSlider.value);
-    const hrMin = parseInt(hrMinSlider.value);
-    const hrMax = parseInt(hrMaxSlider.value);
-
-    // Select all circles rendered by D3 from global.js
-    const circles = d3.select("#d3-chart-container svg").selectAll("circle");
-
-    if (circles.empty()) {
-      // Update count to 0 if no circles
-      const countElement = document.getElementById('participant-count');
-      if (countElement) {
-        countElement.textContent = '0';
-      }
-      return;
-    }
-
-    let visibleCircleCount = 0; // Initialize count of visible circles
-
-    circles.style("display", function(d) {
-      if (!d || typeof d.Age === 'undefined' || typeof d.avg_HR === 'undefined') {
-        return "none";
-      }
-
-      const meetsAgeCriteria = d.Age >= ageMin && d.Age <= ageMax;
-      const meetsHrCriteria = d.avg_HR >= hrMin && d.avg_HR <= hrMax;
-
-      if (meetsAgeCriteria && meetsHrCriteria) {
-        visibleCircleCount++; // Increment count if circle is visible
-        return null; // null removes the inline 'display' style, making it visible
-      } else {
-        return "none"; // Hide if it doesn't meet criteria
-      }
-    });
-
-    // Update the participant count display
-    const countElement = document.getElementById('participant-count');
-    if (countElement) {
-      countElement.textContent = visibleCircleCount;
-    }
-  }
-
-  // Event Listeners for Age Sliders
-  if (ageMinSlider && ageMaxSlider) {
-    ageMinSlider.addEventListener('input', () => {
-      if (parseInt(ageMinSlider.value) > parseInt(ageMaxSlider.value)) {
-        ageMaxSlider.value = ageMinSlider.value;
-      }
-      updateAgeDisplay();
-      applyChartFilters();
-    });
-
-    ageMaxSlider.addEventListener('input', () => {
-      if (parseInt(ageMaxSlider.value) < parseInt(ageMinSlider.value)) {
-        ageMinSlider.value = ageMaxSlider.value;
-      }
-      updateAgeDisplay();
-      applyChartFilters();
-    });
-    updateAgeDisplay();
-  }
-
-  // Event Listeners for HR Sliders
-  if (hrMinSlider && hrMaxSlider) {
-    hrMinSlider.addEventListener('input', () => {
-      if (parseInt(hrMinSlider.value) > parseInt(hrMaxSlider.value)) {
-        hrMaxSlider.value = hrMinSlider.value;
-      }
-      updateHrDisplay();
-      applyChartFilters();
-    });
-
-    hrMaxSlider.addEventListener('input', () => {
-      if (parseInt(hrMaxSlider.value) < parseInt(hrMinSlider.value)) {
-        hrMinSlider.value = hrMaxSlider.value;
-      }
-      updateHrDisplay();
-      applyChartFilters();
-    });
-    updateHrDisplay();
-  }
-
-  // Apply initial filters if chart is ready
-  if (!d3.select("#d3-chart-container svg").selectAll("circle").empty()) {
-    applyChartFilters();
-  }
-
   // Tutorial Modal Functionality
   const showTutorialButton = document.querySelector('.controls-bar .tutorial-button');
   const tutorialModal = document.getElementById('tutorial-modal');
@@ -187,11 +76,11 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       {
           title: "Explore the Data",
-          content: "Hover over any circle to see that participant's summary details. The size of the circle corresponds to their BMI (or Average Heart Rate, depending on current data)."
+          content: "Hover over any circle to see that participant's summary details. The size of the circle corresponds to their Average Heart Rate."
       },
       {
           title: "Begin the Journey",
-          content: "Click on any participant's circle to dive into a more detailed view of their personal data story (functionality to be added later!)."
+          content: "Click on any participant's circle to dive into a more detailed view of their personal data story."
       }
   ];
 
@@ -280,4 +169,10 @@ document.addEventListener('DOMContentLoaded', () => {
       showModal();
       localStorage.setItem('tutorialShown', 'true');
   }
+
+  // Trigger page load animations
+  // Using a small timeout to ensure initial styles are rendered before 'loaded' class is added
+  setTimeout(() => {
+      document.body.classList.add('loaded');
+  }, 100); // 100ms delay, adjust if needed
 });
