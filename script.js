@@ -70,8 +70,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const circles = d3.select("#d3-chart-container svg").selectAll("circle");
 
     if (circles.empty()) {
+      // Update count to 0 if no circles
+      const countElement = document.getElementById('participant-count');
+      if (countElement) {
+        countElement.textContent = '0';
+      }
       return;
     }
+
+    let visibleCircleCount = 0; // Initialize count of visible circles
 
     circles.style("display", function(d) {
       if (!d || typeof d.Age === 'undefined' || typeof d.avg_HR === 'undefined') {
@@ -81,8 +88,19 @@ document.addEventListener('DOMContentLoaded', () => {
       const meetsAgeCriteria = d.Age >= ageMin && d.Age <= ageMax;
       const meetsHrCriteria = d.avg_HR >= hrMin && d.avg_HR <= hrMax;
 
-      return (meetsAgeCriteria && meetsHrCriteria) ? null : "none";
+      if (meetsAgeCriteria && meetsHrCriteria) {
+        visibleCircleCount++; // Increment count if circle is visible
+        return null; // null removes the inline 'display' style, making it visible
+      } else {
+        return "none"; // Hide if it doesn't meet criteria
+      }
     });
+
+    // Update the participant count display
+    const countElement = document.getElementById('participant-count');
+    if (countElement) {
+      countElement.textContent = visibleCircleCount;
+    }
   }
 
   // Event Listeners for Age Sliders
