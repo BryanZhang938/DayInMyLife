@@ -683,12 +683,12 @@ const stepsUpToNow = lastDataPoint ? lastDataPoint.cumulativeSteps : 0;
 // Update step counter display
 const stepCounter = document.getElementById("step-counter");
 if (stepCounter) {
-    stepCounter.innerHTML = `Number of Steps: ${Math.round(stepsUpToNow)} <span class="step-box inline-box"></span> = 200 Steps`;}
+    stepCounter.innerHTML = `Number of Steps: ${Math.round(stepsUpToNow)} <span class="step-box inline-box"></span> = 300 Steps`;}
 
 // Box rendering stays as before
 
 // Calculate number of full and partial boxes
-const STEP_UNIT = 200;  // ← Define the new box scale here
+const STEP_UNIT = 300;  // ← Define the new box scale here
 
 const fullBoxes = Math.floor(stepsUpToNow / STEP_UNIT);
 const partialFraction = (stepsUpToNow % STEP_UNIT) / STEP_UNIT;
