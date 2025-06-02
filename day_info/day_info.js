@@ -59,6 +59,20 @@ const activityDetailsMap = {
     11: { name: "Smoking", file: "../assets/animations/smoking.mp4" },
     12: { name: "Alcohol Consumption", file: "../assets/animations/alcohol_assumption.mp4" } // Assuming typo "assumption" -> "consumption"
 };
+const activityPhrases = {
+    1: "sleeping",
+    2: "laying down",
+    3: "sitting",
+    4: "doing light movement",
+    5: "doing medium activity",
+    6: "doing heavy activity",
+    7: "eating",
+    8: "using a small screen",
+    9: "watching a large screen",
+    10: "drinking caffeine",
+    11: "smoking",
+    12: "drinking alcohol"
+  };
 // Add this entry for default fallback animation
 const defaultNoActivity = {
     name: "doing nothing",
@@ -686,9 +700,8 @@ function updateScrollProgress() {
       progressFill.style.width = `${scrollProgress * 100}%`;
     }
   }
-
-// Update activity info card
-function updateActivityInfo(activity) {
+  let timeExtent = null;
+  function updateActivityInfo(activity) {
     const activityInfo = document.querySelector('.activity-title');
     const captionBox = document.getElementById('activity-caption');
   
@@ -700,7 +713,6 @@ function updateActivityInfo(activity) {
           <h4>${details.name}</h4>
         `;
   
-        // Create caption like "Bryan engages in medium movement for 1 hour"
         const durationMin = activity.end && activity.start
           ? Math.round((activity.end - activity.start) / 60000)
           : null;
@@ -712,9 +724,10 @@ function updateActivityInfo(activity) {
             : `${durationMin} min`
           : "an unknown duration";
   
-        const userName = `Participant ${participantNumber}`;  
+        const userName = `Participant ${participantNumber}`;
         if (captionBox) {
-          captionBox.textContent = `${userName} engages in ${details.name.toLowerCase()} for ${readableDuration}.`;
+            const phrase = activityPhrases[activity.activityCode] || "doing an activity";
+            captionBox.textContent = `${userName} was ${phrase} for ${readableDuration}.`;
         }
       }
     } else {
@@ -724,8 +737,50 @@ function updateActivityInfo(activity) {
           <h4>No Recorded Activity</h4>
         `;
       }
-      if (captionBox) {
-        captionBox.textContent = "No activity data available.";
+  
+      if (captionBox && currentScrollTime && allUserActivities.length > 0) {
+        let idleStart = null;
+        let idleEnd = null;
+  
+        for (let i = 0; i < allUserActivities.length; i++) {
+          const act = allUserActivities[i];
+          if (act.start > currentScrollTime) {
+            idleEnd = act.start;
+            idleStart = (i > 0 && allUserActivities[i - 1].end) ? allUserActivities[i - 1].end : null;
+            break;
+          }
+        }
+  
+        if (!idleStart) {
+          // Before first activity
+          if (currentScrollTime < allUserActivities[0].start) {
+            idleStart = new Date(timeExtent[0]);
+            idleEnd = allUserActivities[0].start;
+          }
+          // After last activity
+          else if (currentScrollTime > allUserActivities.at(-1).end) {
+            idleStart = allUserActivities.at(-1).end;
+            idleEnd = new Date(currentScrollTime);
+          }
+        }
+  
+        if (idleStart && idleEnd && idleEnd > idleStart) {
+          const idleMinutes = Math.round((idleEnd - idleStart) / 60000);
+          const hours = Math.floor(idleMinutes / 60);
+          const minutes = idleMinutes % 60;
+          const userName = `Participant ${participantNumber}`;
+  
+          let durationStr = '';
+          if (hours > 0) durationStr += `${hours} hour${hours > 1 ? 's' : ''}`;
+          if (hours > 0 && minutes > 0) durationStr += ' and ';
+          if (minutes > 0) durationStr += `${minutes} minute${minutes > 1 ? 's' : ''}`;
+  
+          if (captionBox) {
+            captionBox.textContent = `${userName} has no recorded activity for ${durationStr}.`;
+          }
+        } else {
+          captionBox.textContent = "No activity data available.";
+        }
       }
     }
   }
@@ -840,7 +895,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return; 
         }
         
-        const timeExtent = d3.extent(interpolatedBpmPerMinute, d => d.minute);
+        timeExtent = d3.extent(interpolatedBpmPerMinute, d => d.minute);
         if (!timeExtent[0] || !timeExtent[1]) {
             loadingText.textContent = `No valid time extent for user ${selectedUser}.`;
             console.warn(`No valid time extent for user ${selectedUser}.`);
