@@ -87,7 +87,7 @@
     .main-content {
       display: flex;
       height: 100%;
-      padding-top: 6.7rem;
+      padding-top: 5rem;
     }
 
     .data-section {
@@ -128,17 +128,6 @@
       margin-right: 0;
     }
 
-    /*
-    .activity-info {
-      position: fixed;
-      bottom: 3rem;
-      right: 20px;
-      z-index: 40;
-      max-width: 32rem;
-      margin: 0 auto;
-    }
-    */
-
     .scroll-indicator {
       position: fixed;
       right: 1.5rem;
@@ -163,8 +152,8 @@
     /* Activity Section Styles */
     .activity-section {
       position: fixed;
-      top: 130px;
-      right: 20px;
+      top: 100px;
+      right: 130px;
       width: 600px;
       height: 500px;
       z-index: 10;
@@ -425,40 +414,9 @@ h3{
           </div>
         </div>
 
-        <div class="animation-section">
-          <!--
-          <div class="activity-section">
-            <h4 class="activity-title"></h4>
-            <div class="activity-container">
-              <div class="video-wrapper">
-                <video id="activity-animation-video-active" class="activity-animation-video" autoplay loop muted playsinline></video>
-                <video id="activity-animation-video-standby" class="activity-animation-video" autoplay loop muted playsinline></video>
-                <p id="no-activity-msg">Loading activity...</p>
-              </div>
-            </div>
-          </div>
-          -->
-        </div>
+        <div class="animation-section"></div>
       </div>
 
-      <!--
-      <div class="activity-info">
-        <div class="card">
-          <div class="flex items-center gap-3">
-            <div>
-              <h4 class="font-semibold">Current Activity</h4>
-              <p class="text-sm opacity-70">Loading activity details...</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      -->
-
-      <div class="scroll-indicator">
-        <div class="scroll-bar">
-          <div class="scroll-fill"></div>
-        </div>
-      </div>
     </div>
     <div class="step-strip">
       <div id="step-counter" class="step-counter">
@@ -466,25 +424,6 @@ h3{
       </div>
       <div id="step-boxes-container" class="step-boxes"></div>
     </div>
-
-    <div class="bottom-section">
-      <h2>Sleep Summary</h2>
-      <div id="sleep-metrics" class="metrics" style="padding: 40px;"></div>
-
-      <section id="heartrate" class="section card">
-        <h2>Heart Rate Summary</h2>
-        <div id="heartrate-metrics" class="metrics"></div>
-        <svg id="heartrate-chart" class="chart" width="650" height="300"></svg>
-        <div id="tooltip-heartrate"></div>
-      </section>
-
-      <section id="activity" class="section card">
-        <h3>Activity Summary</h3>
-        <div id="activity-metrics" class="metrics"></div>
-        <svg id="activity-chart" class="chart" width="650" height="250"></svg>
-      </section>
-    </div>
-
 
     <div id="loading-overlay">
         <div id="loading-text"></div>
@@ -526,7 +465,7 @@ h3{
     });
   </script>
   <script>
-    document.getElementById("home-button").addEventListener("click", () => {
+    document.getElementById("button").addEventListener("click", () => {
       window.location.href = "../index.html";
     });
   </script>

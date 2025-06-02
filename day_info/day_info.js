@@ -198,7 +198,7 @@ function updateActivityAnimationView(nowDateTime, activities) {
                     currentVideoElement.play().catch(e => console.warn("Failed to play current video:", e));
                 }
                 noActivityMsgElement.style.display = 'none';
-                videoWrapperElement.title = `User ${selectedUser}: ${details.name}`;
+                // videoWrapperElement.title = `User ${selectedUser}: ${details.name}`;
                 return;
             }
 
@@ -217,7 +217,7 @@ function updateActivityAnimationView(nowDateTime, activities) {
                 let temp = currentVideoElement;
                 currentVideoElement = preloadVideoElement;
                 preloadVideoElement = temp;
-                videoWrapperElement.title = `User ${selectedUser}: ${details.name}`;
+                // videoWrapperElement.title = `User ${selectedUser}: ${details.name}`;
                 return;
             }
 
@@ -272,13 +272,13 @@ function updateActivityAnimationView(nowDateTime, activities) {
                 preloadVideoElement.src = targetSrc;
                 preloadVideoElement.load();
             }
-            videoWrapperElement.title = `User ${selectedUser}: ${details.name}`;
+            // videoWrapperElement.title = `User ${selectedUser}: ${details.name}`;
         } else { // No animation detail for this activity code
             currentVideoElement.style.display = 'none'; currentVideoElement.pause();
             preloadVideoElement.style.display = 'none'; preloadVideoElement.pause();
             noActivityMsgElement.textContent = `Activity (Code: ${activeActivity.activityCode}) - No animation available.`;
             noActivityMsgElement.style.display = 'block';
-            videoWrapperElement.title = `User ${selectedUser}: Unmapped Activity ${activeActivity.activityCode}`;
+            // videoWrapperElement.title = `User ${selectedUser}: Unmapped Activity ${activeActivity.activityCode}`;
         }
     } else {
         const targetSrc = new URL(defaultNoActivity.file, window.location.href).href;
@@ -289,7 +289,7 @@ function updateActivityAnimationView(nowDateTime, activities) {
                 currentVideoElement.play().catch(e => console.warn("Failed to play idle video:", e));
             }
             noActivityMsgElement.style.display = 'none';
-            videoWrapperElement.title = `User ${selectedUser}: ${defaultNoActivity.name}`;
+            // videoWrapperElement.title = `User ${selectedUser}: ${defaultNoActivity.name}`;
             return;
         }
     
@@ -311,7 +311,7 @@ function updateActivityAnimationView(nowDateTime, activities) {
                 });
     
                 noActivityMsgElement.style.display = 'none';
-                videoWrapperElement.title = `User ${selectedUser}: ${defaultNoActivity.name}`;
+                // videoWrapperElement.title = `User ${selectedUser}: ${defaultNoActivity.name}`;
     
                 let temp = currentVideoElement;
                 currentVideoElement = preloadVideoElement;
@@ -337,7 +337,7 @@ function updateActivityAnimationView(nowDateTime, activities) {
             });
     
             noActivityMsgElement.style.display = 'none';
-            videoWrapperElement.title = `User ${selectedUser}: ${defaultNoActivity.name}`;
+            // videoWrapperElement.title = `User ${selectedUser}: ${defaultNoActivity.name}`;
     
             let temp = currentVideoElement;
             currentVideoElement = preloadVideoElement;

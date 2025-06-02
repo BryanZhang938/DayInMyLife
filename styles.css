@@ -748,8 +748,8 @@ body.loaded .legend-container {
 }
 #home-button {
   position: fixed;
-  top: 20px;
-  right: 175px;
+  top: 25px;
+  right: 185px;
   background-color: #3b82f6;
   color: white;
   border: none;
