@@ -574,11 +574,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadingText.textContent = 'Loading HR data...';
         const hrDataFull = await d3.csv("../assets/cleaned_data/all_actigraph.csv", d => {
             const hr = +d.HR;
-            if (isNaN(hr) || d.user !== selectedUser) return null; // Filter by user early
+            const steps = +d.Steps;
+            if (isNaN(hr) || isNaN(steps) || d.user !== selectedUser) return null;
             const timestamp = new Date(`2024-01-${String(d.day).padStart(2, '0')}T${d.time}`);
             timestamp.setSeconds(0); timestamp.setMilliseconds(0);
-            return { user: d.user, minute: timestamp, heartRate: hr };
-        });
+            return { user: d.user, minute: timestamp, heartRate: hr, steps: steps };        });
         
         // loadingText.textContent = 'Loading activity data...';
         const activityDataFull = await d3.csv("../assets/cleaned_data/all_activity.csv", d => {
@@ -606,14 +606,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
         allUserActivities.sort((a, b) => a.start - b.start);
-
+        let cumulativeSteps = 0;
 
         const bpmPerMinute = d3.rollups(
-            filteredHrData,
-            v => d3.mean(v, d => d.heartRate),
-            d => d.minute.getTime() // Group by time value for robustness
-        ).map(([minuteMillis, avgHR]) => ({ minute: new Date(minuteMillis), avgHR }))
-         .sort((a, b) => a.minute - b.minute);
+            hrDataFull.filter(d => d !== null),
+            v => {
+                const avgHR = d3.mean(v, d => d.heartRate);
+                const totalSteps = d3.sum(v, d => d.steps);
+                cumulativeSteps += totalSteps;
+                return { avgHR, cumulativeSteps };
+            },
+            d => d.minute.getTime()
+        ).map(([minuteMillis, val]) => ({
+            minute: new Date(minuteMillis),
+            avgHR: val.avgHR,
+            cumulativeSteps: val.cumulativeSteps
+        })).sort((a, b) => a.minute - b.minute);
 
         if (bpmPerMinute.length === 0) {
             loadingText.textContent = `No heart rate data for user ${selectedUser}.`;
@@ -666,6 +674,42 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const displayHours = hours % 12 || 12;
                 timeDisplay.textContent = `${displayHours}:${minutes} ${ampm}`;
             }
+            const lastDataPoint = bpmPerMinute
+    .filter(d => d.minute <= currentScrollTime)
+    .at(-1);
+
+const stepsUpToNow = lastDataPoint ? lastDataPoint.cumulativeSteps : 0;
+
+// Update step counter display
+const stepCounter = document.getElementById("step-counter");
+if (stepCounter) {
+    stepCounter.innerHTML = `Number of Steps: ${Math.round(stepsUpToNow)} <span class="step-box inline-box"></span> = 100 Steps`;}
+
+// Box rendering stays as before
+
+// Calculate number of full and partial boxes
+const fullBoxes = Math.floor(stepsUpToNow / 100);
+const partialFraction = (stepsUpToNow % 100) / 100;
+
+// Render boxes
+const stepBoxContainer = document.getElementById("step-boxes-container");
+if (stepBoxContainer) {
+stepBoxContainer.innerHTML = ""; // Clear previous boxes
+
+for (let i = 0; i < fullBoxes; i++) {
+const box = document.createElement("div");
+box.className = "step-box";
+stepBoxContainer.appendChild(box);
+}
+
+if (partialFraction > 0) {
+const partialBox = document.createElement("div");
+partialBox.className = "step-box partial";
+partialBox.style.background = `linear-gradient(to right, green ${partialFraction * 100}%, transparent ${partialFraction * 100}%)`;
+stepBoxContainer.appendChild(partialBox);
+}
+}
+
 
             // Update charts and activity
             const visibleData = bpmPerMinute.filter(d =>

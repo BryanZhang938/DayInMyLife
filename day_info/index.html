@@ -82,7 +82,7 @@
     .main-content {
       display: flex;
       height: 100%;
-      padding-top: 8rem;
+      padding-top: 6.7rem;
     }
 
     .data-section {
@@ -278,6 +278,54 @@
   display: none;
   padding: 60px 40px;
 }
+.step-strip {
+  position: fixed;
+  left: 21px;
+  bottom: 20px;
+  width: 40%; /* Match .data-section */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  z-index: 20;
+}
+
+.step-counter {
+  font-size: 0.95rem;
+  font-weight: bold;
+  color: #1f2937;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-family: monospace;
+}
+
+.step-boxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 100%;
+}
+
+.step-box {
+  width: 12px;
+  height: 12px;
+  background-color: green;
+  border: 1px solid #000;
+  opacity: 0.8;
+  border-radius: 3px;
+}
+
+.step-box.partial {
+  background: linear-gradient(to right, green 50%, transparent 50%);
+}
+.step-box.inline-box {
+  display: inline-block;
+  margin: 0 2px 0 12px;
+  transform: translateY(1px);
+}
+
 
 
   </style>
@@ -349,6 +397,12 @@
           <div class="scroll-fill"></div>
         </div>
       </div>
+    </div>
+    <div class="step-strip">
+      <div id="step-counter" class="step-counter">
+        Number of Steps: 0 <span class="step-box inline-box"></span> = 100 Steps
+      </div>
+      <div id="step-boxes-container" class="step-boxes"></div>
     </div>
 
     <div class="bottom-section">
