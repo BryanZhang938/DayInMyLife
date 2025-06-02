@@ -9,11 +9,15 @@ export function initializeConclusionModal() {
   const conclusionContent = {
     title: "Conclusion",
     text: `
-      This summary dashboard gives you a concise look at a participant’s full day of physiological and behavioral data.
-      You’ve seen breakdowns of sleep quality, resting heart rate, and activity levels — each represented through intuitive metrics and charts.
+      Looking at the several healthy participants within the study, it is clear that being a “healthy” person can mean many different things. 
+      There is no single structure or lifestyle that is the sole example of what a healthy life consists of. Some individuals live a 
+      healthy lifestyle through high activity levels and consistent movement, while others showed similar outcomes despite more sedentary 
+      routines but excellent sleep patterns or stable heart rates. This diversity highlights that health is multifaceted and personal. It 
+      is shaped by a combination of habits, genetics, and context rather than a one-size-fits-all model. 
       <br><br>
-      Use this summary to reflect on the day’s health patterns or compare across participants.
-      For deeper insight, revisit the interactive Day View for moment-by-moment analysis.
+      Taking the information presented by the participants gives inspiration as to how to live a healthy life. This means being active, 
+      taking the time to rest and recover, sleeping, and even relaxing by enjoying entertainment. 
+      <br><br>
       <strong>Thanks for exploring!</strong>
     `,
     step: "1"
