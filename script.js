@@ -31,9 +31,20 @@ document.addEventListener('DOMContentLoaded', () => {
       const targetElement = document.querySelector(targetId);
 
       if (targetElement) {
-        targetElement.scrollIntoView({
-          behavior: 'smooth', // This enables smooth scrolling
-          block: 'start'      // Aligns the top of the target element to the top of the viewport
+        // Calculate the scroll distance based on viewport height
+        const viewportHeight = window.innerHeight;
+        const scrollDistance = viewportHeight * 0.8; // Scroll 80% of the viewport height
+        
+        // Get the current scroll position
+        const currentScroll = window.pageYOffset;
+        
+        // Calculate the target scroll position
+        const targetScroll = currentScroll + scrollDistance;
+        
+        // Smooth scroll to the target position
+        window.scrollTo({
+          top: targetScroll,
+          behavior: 'smooth'
         });
       }
     });
