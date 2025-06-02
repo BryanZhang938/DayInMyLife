@@ -387,6 +387,9 @@ function renderChart(dataSlice, windowStart, windowEnd, yExtent, activitiesForCh
         .attr("fill", d => activityColor(d.activity))
         .attr("opacity", 0.15)
         .on("mousemove", function(event, d) {
+            // Bring this rect to the front
+            this.parentNode.appendChild(this);
+    
             d3.select(this).attr("opacity", 0.35);
             tooltip
                 .style("display", "block")
