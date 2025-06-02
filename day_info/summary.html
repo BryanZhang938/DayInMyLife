@@ -62,6 +62,19 @@
     <button onclick="window.location.href='../index.html'">
       🏠 Home
     </button>
+     <button id="conclusion-button" class="control-button tutorial-button">
+      Conclusion
+    </button>
+  </div>
+
+  <div id="conclusion-modal" class="modal-overlay">
+    <div class="modal-content large-modal">
+      <button id="conclusion-close-button" class="modal-close-button">&times;</button>
+      <div class="tutorial-header">
+        <h3 id="conclusion-title"></h3>
+      </div>
+      <p id="conclusion-text" class="tutorial-text"></p>
+    </div>
   </div>
   <h1>Summary Statistics</h1>
   
@@ -89,5 +102,9 @@
   <script type="module" src="../sleep.js"></script>
   <script type="module" src="../heartrate.js"></script>
   <script type="module" src="../activity.js"></script>
+  <script type="module">
+    import { initializeConclusionModal } from './takeaway.js';
+    initializeConclusionModal();
+  </script>
 </body>
 </html>
