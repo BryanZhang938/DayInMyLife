@@ -25,18 +25,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (filterButton && filterPanel) {
       filterButton.addEventListener('click', () => {
-          // Check the current display state
-          const isPanelHidden = filterPanel.style.display === 'none' || filterPanel.style.display === '';
-
-          if (isPanelHidden) {
-              // Show the panel
-              filterPanel.style.display = 'block'; // Or 'grid' if .filter-panel itself should be a grid
-                                                  // 'block' is fine since .filter-content inside it is 'grid'
-              filterButton.classList.add('active-filter'); // Add a class to indicate the button is active
+          // Toggle the .open class on the filter panel
+          filterPanel.classList.toggle('open');
+          
+          // Toggle the .active-filter class on the button based on the panel's state
+          if (filterPanel.classList.contains('open')) {
+              filterButton.classList.add('active-filter');
           } else {
-              // Hide the panel
-              filterPanel.style.display = 'none';
-              filterButton.classList.remove('active-filter'); // Remove the active class
+              filterButton.classList.remove('active-filter');
           }
       });
   }

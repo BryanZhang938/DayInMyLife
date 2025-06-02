@@ -567,17 +567,43 @@ body {
   display: none; /* */
 }
 
-/* Filter Panel Styling */
+/* Filter Panel Styling - Enhanced for smooth toggle */
 .filter-panel {
   max-width: 1200px;
-  margin: 0 auto 20px auto; /* Sits below controls-bar */
-  background-color: rgba(255, 255, 255, 0.9); /* Match controls-bar background */
-  border: 1px solid #e5e7eb; /* Lighter border */
+  margin: 0 auto 20px auto;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-  padding: 20px;
-  overflow: hidden; /* For potential animation later */
-  /* display: none; /* Will be controlled by JavaScript */
+  
+  /* Crucial for max-height animation to work */
+  overflow: hidden; 
+
+  /* Initial collapsed state */
+  max-height: 0; /* Start with no height */
+  opacity: 0;    /* Start fully transparent */
+  padding: 0 30px; /* Keep horizontal padding consistent, collapse vertical padding */
+  margin-top: 0;
+  margin-bottom: 0;
+  border-width: 0;
+
+  /* Define the transition for the properties we want to animate */
+  transition: max-height 0.4s ease-in-out, 
+              opacity 0.3s ease-in-out,
+              padding 0.4s ease-in-out,
+              margin-top 0.4s ease-in-out,
+              margin-bottom 0.4s ease-in-out,
+              border-width 0.4s ease-in-out;
+}
+
+.filter-panel.open {
+  /* State when the panel is open */
+  max-height: 500px; /* Adjust this value to be comfortably larger than the panel's actual content height */
+  opacity: 1;
+  padding: 20px 30px; /* Increased horizontal padding from 20px to 40px */
+  margin-top: 0;
+  margin-bottom: 20px;
+  border-width: 1px;
 }
 
 .filter-content {
