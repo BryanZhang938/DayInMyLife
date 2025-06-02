@@ -242,6 +242,36 @@ d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
           }
         }
       });
+
+  // --- FILTER FUNCTION ---
+  window.applyChartFilters = function() {
+    // Get slider values from window.ageSlider and window.hrSlider
+    let ageMin = 20, ageMax = 40, hrMin = 60, hrMax = 95;
+    if (window.ageSlider && typeof window.ageSlider.getValues === 'function') {
+      const ageVals = window.ageSlider.getValues();
+      ageMin = ageVals.min;
+      ageMax = ageVals.max;
+    }
+    if (window.hrSlider && typeof window.hrSlider.getValues === 'function') {
+      const hrVals = window.hrSlider.getValues();
+      hrMin = hrVals.min;
+      hrMax = hrVals.max;
+    }
+    let visibleCount = 0;
+    circles.each(function(d) {
+      const show = d.Age >= ageMin && d.Age <= ageMax && d.avg_HR >= hrMin && d.avg_HR <= hrMax;
+      d3.select(this).style("display", show ? null : "none");
+      if (show) visibleCount++;
+    });
+    // Update participant count
+    const countElement = document.getElementById('participant-count');
+    if (countElement) {
+      countElement.textContent = visibleCount;
+    }
+  };
+
+  // Call filter once to set initial state
+  window.applyChartFilters();
 });
 
 // Add a click listener to the SVG background to deselect any circle
