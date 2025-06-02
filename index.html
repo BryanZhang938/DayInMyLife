@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Day in My Life</title> <link rel="stylesheet" href="styles.css">
+    <title>A Day in My Life</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="slider.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -11,6 +13,7 @@
     <script type="module" src="global.js"></script>
     <script type="module" src="sleep.js"></script>
     <script type="module" src="script.js"></script>
+    <script type="module" src="slider.js"></script>
 </head>
 <body>
     <header class="page-header">
@@ -37,17 +40,25 @@
     <div id="filter-panel" class="filter-panel">
         <div class="filter-content">
             <div class="filter-group">
-                <label for="age-range-min">Age Range: <span id="age-value-display">20 - 40</span></label>
-                <div class="slider-container">
-                    Min: <input type="range" id="age-range-min" name="age-range-min" min="20" max="40" value="20">
-                    Max: <input type="range" id="age-range-max" name="age-range-max" min="20" max="40" value="40">
+                <label>Age Range: <span id="age-value-display">20 - 40</span></label>
+                <div class="custom-range-slider-wrapper">
+                    <div class="custom-range-slider" id="age-range-slider-custom">
+                        <div class="custom-range-track"></div>
+                        <div class="custom-range-selected-range" id="age-selected-range"></div>
+                        <div class="custom-range-handle" id="age-handle-min"></div>
+                        <div class="custom-range-handle" id="age-handle-max"></div>
+                    </div>
                 </div>
             </div>
             <div class="filter-group">
-                <label for="hr-range-min">Resting HR Range: <span id="hr-value-display">60 - 95</span></label>
-                <div class="slider-container">
-                    Min: <input type="range" id="hr-range-min" name="hr-range-min" min="60" max="95" value="60">
-                    Max: <input type="range" id="hr-range-max" name="hr-range-max" min="60" max="95" value="95">
+                <label>Resting HR Range: <span id="hr-value-display">60 - 95</span></label>
+                <div class="custom-range-slider-wrapper">
+                    <div class="custom-range-slider" id="hr-range-slider-custom">
+                        <div class="custom-range-track"></div>
+                        <div class="custom-range-selected-range" id="hr-selected-range"></div>
+                        <div class="custom-range-handle" id="hr-handle-min"></div>
+                        <div class="custom-range-handle" id="hr-handle-max"></div>
+                    </div>
                 </div>
             </div>
         </div>
