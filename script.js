@@ -187,3 +187,36 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.classList.add('loaded');
   }, 100); // 100ms delay, adjust if needed
 });
+
+const intro = document.getElementById("intro-screen");
+const runner = document.getElementById("runner");
+
+if (!localStorage.getItem("introShown")) {
+  // Show the intro screen
+  if (intro) intro.style.display = "flex";
+  if (runner) runner.style.display = "block";
+  document.body.style.overflow = "hidden";
+
+  document.getElementById("explore-button")?.addEventListener("click", () => {
+    if (runner) {
+      runner.style.transition = "opacity 1s ease";
+      runner.style.opacity = 0;
+    }
+
+    if (intro) {
+      intro.style.transition = "opacity 1s ease";
+      intro.style.opacity = 0;
+      setTimeout(() => {
+        intro.style.display = "none";
+        if (runner) runner.style.display = "none";
+        document.body.style.overflow = "auto";
+        localStorage.setItem("introShown", "true");
+      }, 1000);
+    }
+  });
+} else {
+  // User has already seen the intro
+  if (intro) intro.style.display = "none";
+  if (runner) runner.style.display = "none";
+  document.body.style.overflow = "auto";
+}
