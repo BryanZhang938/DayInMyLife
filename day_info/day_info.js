@@ -4,13 +4,34 @@ window.history.scrollRestoration = 'manual';
 window.addEventListener('load', function () {
     window.scrollTo(0, 0);
 });
-
 // --- Constants and Configuration ---
 const width = 1000;
 const height = 400;
 const margin = { top: 5, right: 0, bottom: 60, left: 20 };
 const params = new URLSearchParams(window.location.search);
 const selectedUser = params.get("user");
+const userDisplayMap = {
+    "user_1": 1,
+    "user_2": 2,
+    "user_3": 3,
+    "user_4": 4,
+    "user_5": 5,
+    "user_6": 6,
+    "user_7": 7,
+    "user_9": 8,
+    "user_10": 9,
+    "user_12": 10,
+    "user_13": 11,
+    "user_14": 12,
+    "user_15": 13,
+    "user_16": 14,
+    "user_17": 15,
+    "user_19": 16,
+    "user_20": 17,
+    "user_21": 18,
+    "user_22": 19
+  };
+const participantNumber = userDisplayMap[selectedUser] ?? "X";
 
 if (!selectedUser) {
   console.error("No user specified in URL.");
@@ -172,7 +193,15 @@ function setupActivityDisplayElements() {
     videoWrapperElement.appendChild(noActivityMsgElement);
     container.appendChild(videoWrapperElement);
     activitySection.appendChild(title);
-    activitySection.appendChild(container);
+activitySection.appendChild(container);
+
+// NEW: Create caption box and append
+const caption = document.createElement("div");
+caption.id = "activity-caption";
+caption.className = "activity-caption-box";
+caption.textContent = "No activity data available.";
+
+activitySection.appendChild(caption);  // ← added inside the same fixed box
     
     // Prepend to body or append to a specific placeholder if you have one
     const animationDiv = document.querySelector('.animation-section');
@@ -660,23 +689,46 @@ function updateScrollProgress() {
 
 // Update activity info card
 function updateActivityInfo(activity) {
-  const activityInfo = document.querySelector('.activity-title');
-  if (activityInfo && activity) {
-    const details = activityDetailsMap[activity.activityCode];
-    if (details) {
+    const activityInfo = document.querySelector('.activity-title');
+    const captionBox = document.getElementById('activity-caption');
+  
+    if (activityInfo && activity) {
+      const details = activityDetailsMap[activity.activityCode];
+      if (details) {
         activityInfo.innerHTML = `
-                <p>Current Activity:</p>
-                <h4>${details.name}</h4>
-                `;
+          <p>Current Activity:</p>
+          <h4>${details.name}</h4>
+        `;
+  
+        // Create caption like "Bryan engages in medium movement for 1 hour"
+        const durationMin = activity.end && activity.start
+          ? Math.round((activity.end - activity.start) / 60000)
+          : null;
+  
+        const readableDuration = durationMin
+          ? durationMin >= 60
+            ? `${Math.floor(durationMin / 60)} hour${durationMin >= 120 ? 's' : ''}` +
+              (durationMin % 60 !== 0 ? ` ${durationMin % 60} min` : "")
+            : `${durationMin} min`
+          : "an unknown duration";
+  
+        const userName = `Participant ${participantNumber}`;  
+        if (captionBox) {
+          captionBox.textContent = `${userName} engages in ${details.name.toLowerCase()} for ${readableDuration}.`;
+        }
+      }
+    } else {
+      if (activityInfo) {
+        activityInfo.innerHTML = `
+          <p>Current Activity:</p>
+          <h4>No Recorded Activity</h4>
+        `;
+      }
+      if (captionBox) {
+        captionBox.textContent = "No activity data available.";
+      }
     }
-  } 
-  else if (activityInfo) {
-    activityInfo.innerHTML = `
-                <p>Current Activity:</p>
-                <h4>No Recorded Activity</h4>
-                `;
-    }
-}
+  }
 
 function interpolateHeartRateData(data) {
     if (!data || data.length < 2) return data;
