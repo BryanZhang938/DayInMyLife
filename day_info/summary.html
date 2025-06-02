@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <title>Summary Stats</title>
   <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
     body {
       margin: 0;
@@ -49,6 +50,47 @@
   color: #1f2937; /* dark gray */
   line-height: 1.2;
 }
+#home-button {
+  background-color: rgba(255,255,255,0.5);
+  color: var(--accent-color, #2563eb);
+  border: 1px solid rgba(255,255,255,0.2);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  padding: 0.5rem;
+  border-radius: 9999px;
+  font-size: 1rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: background-color 0.2s ease, color 0.2s ease;
+  margin-left: 0.75rem;
+}
+.nav-buttons button {
+  background-color: rgba(255,255,255,0.5);
+  color: var(--accent-color, #2563eb);
+  border: 1px solid rgba(255,255,255,0.2);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: background-color 0.2s ease, color 0.2s ease;
+  margin-right: 0.75rem;
+}
+
+.nav-buttons button:hover {
+  background-color: var(--accent-color, #2563eb);
+  color: white;
+}
   </style>
 </head>
 <body>
@@ -59,10 +101,10 @@
     <button onclick="window.location.href=`index.html?user=${user}`">
       ← Back to Day View
     </button>
-    <button onclick="window.location.href='../index.html'">
-      🏠 Home
+    <button class="home-button" title="Return to Home" onclick="window.location.href='../index.html'">
+      <i class="fas fa-home"></i>
     </button>
-     <button id="conclusion-button" class="control-button tutorial-button">
+    <button id="conclusion-button" class="control-button tutorial-button">
       Conclusion
     </button>
   </div>
