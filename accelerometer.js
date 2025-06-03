@@ -67,8 +67,10 @@ d3.csv("../assets/cleaned_data/acc.csv", d => {
 
   const playPauseBtn = d3.select("#play-pause-btn");
   const fastBtn = d3.select("#fast");
+  const slowBtn = d3.select("#slow");
+  const scrollSpeed = d3.select("#scroll-speed");
 
-  let currentSpeed = 1;
+  let currentSpeed = 1.5;
   const baseInterval = 50;
   const step = 15;
   
@@ -81,7 +83,7 @@ d3.csv("../assets/cleaned_data/acc.csv", d => {
       playPauseBtn.text("▶");
     } else if (playPauseBtn.text() === "↻") {
       // If button says Reset, scroll top and switch to play
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo({ top: 0, behavior: "auto" });
       playPauseBtn.text("▶");
     } else {
       // Start auto-scroll
@@ -100,26 +102,31 @@ d3.csv("../assets/cleaned_data/acc.csv", d => {
               } else {
           isAutoScrolling = true;
           lastScrollTime = Date.now();
-          window.scrollTo({ top: current + distance, behavior: currentSpeed > 1 ? "auto" : "smooth" });
+          window.scrollTo({ top: current + distance, behavior: "auto" });
         }
       }, baseInterval);
     }
   });
 
   fastBtn.on("click", () => {
-    // Cycle through speeds: 1x -> 2x -> 4x -> 1x
-    if (currentSpeed === 1) {
+    if (currentSpeed === 0.5) {
+      currentSpeed = 1;
+      scrollSpeed.text("1×");
+    } else if (currentSpeed === 1) {
       currentSpeed = 1.5;
-      fastBtn.text("fast 1.5×");
+      scrollSpeed.text("1.5×");
     } else if (currentSpeed === 1.5) {
       currentSpeed = 2;
-      fastBtn.text("fast 2×");
+      scrollSpeed.text("2×");
+    } else if (currentSpeed === 2) {
+      currentSpeed = 2.5;
+      scrollSpeed.text("2.5×");
     } else {
-      currentSpeed = 1;
-      fastBtn.text("fast 1×");
+      currentSpeed = 1.5;
+      scrollSpeed.text("1.5×");
     }
+
   
-    // If playing, restart the interval with new speed
     if (isPlaying) {
       clearInterval(autoScrollInterval);
       autoScrollInterval = setInterval(() => {
@@ -133,7 +140,45 @@ d3.csv("../assets/cleaned_data/acc.csv", d => {
         } else {
           isAutoScrolling = true;
           lastScrollTime = Date.now();
-          window.scrollTo({ top: current + distance, behavior: currentSpeed > 1 ? "auto" : "smooth" });
+          window.scrollTo({ top: current + distance, behavior: "auto" });
+        }
+      }, baseInterval);
+    }
+
+  });
+
+  slowBtn.on("click", () => {
+    if (currentSpeed === 2.5) {
+      currentSpeed = 2;
+      scrollSpeed.text("2×");
+    } else if (currentSpeed === 2) {
+      currentSpeed = 1.5;
+      scrollSpeed.text("1.5×");
+    } else if (currentSpeed === 1.5) {
+      currentSpeed = 1;
+      scrollSpeed.text("1×");
+    } else if (currentSpeed === 1) {
+      currentSpeed = 0.5;
+      scrollSpeed.text("0.5×");
+    } else {
+      currentSpeed = 1.5;
+      scrollSpeed.text("1.5×");
+    }
+
+    if (isPlaying) {
+      clearInterval(autoScrollInterval);
+      autoScrollInterval = setInterval(() => {
+        const maxScroll = document.body.scrollHeight - window.innerHeight;
+        const current = window.scrollY;
+        const distance = step * currentSpeed;
+  
+        if (current + distance >= maxScroll) {
+          window.scrollTo({ top: maxScroll });
+          stopAutoScroll();
+        } else {
+          isAutoScrolling = true;
+          lastScrollTime = Date.now();
+          window.scrollTo({ top: current + distance, behavior: "auto" });
         }
       }, baseInterval);
     }
