@@ -122,8 +122,8 @@ d3.csv("../assets/cleaned_data/acc.csv", d => {
       currentSpeed = 2.5;
       scrollSpeed.text("2.5×");
     } else {
-      currentSpeed = 1.5;
-      scrollSpeed.text("1.5×");
+      currentSpeed = 2.5;
+      scrollSpeed.text("2.5×");
     }
 
   
@@ -161,8 +161,8 @@ d3.csv("../assets/cleaned_data/acc.csv", d => {
       currentSpeed = 0.5;
       scrollSpeed.text("0.5×");
     } else {
-      currentSpeed = 1.5;
-      scrollSpeed.text("1.5×");
+      currentSpeed = 0.5;
+      scrollSpeed.text("0.5×");
     }
 
     if (isPlaying) {
