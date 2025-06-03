@@ -142,7 +142,8 @@ window.addEventListener("scroll", () => {
       return;
     }
 
-    const totalTimeRangeMs = timeExtent[1] - timeExtent[0] - 1 * 60 * 60 * 1000;
+    const scrollableTimeRangeMs = timeExtent[1] - timeExtent[0];
+    const totalTimeRangeMs = Math.max(0, scrollableTimeRangeMs - 1 * 60 * 60 * 1000);
     const yExtent = d3.extent(userData, d => d.magnitude);
 
     window.addEventListener("scroll", () => {
