@@ -49,9 +49,9 @@ const activityDetailsMap = {
     1: { name: "Sleeping", file: "../assets/animations/sleeping.mp4" },
     2: { name: "Laying Down", file: "../assets/animations/laying_down.mp4" },
     3: { name: "Sitting (e.g. studying, eating, driving)", file: "../assets/animations/sitting.mp4" },
-    4: { name: "Light Movement (e.g. slow/medium walk, chores, work)", file: "../assets/animations/light_movement.mp4" },
-    5: { name: "Medium Movement (e.g. fast walk, bike)", file: "../assets/animations/medium_movement.mp4" },
-    6: { name: "Heavy Movement (e.g. gym, running)", file: "../assets/animations/heavy_movement.mp4" },
+    4: { name: "Light Movement (e.g. walking, chores)", file: "../assets/animations/light_movement.mp4" },
+    5: { name: "Medium Movement (e.g. running, bike)", file: "../assets/animations/medium_movement.mp4" },
+    6: { name: "Heavy Movement (e.g. gym)", file: "../assets/animations/heavy_movement.mp4" },
     7: { name: "Eating", file: "../assets/animations/eating.mp4" },
     8: { name: "Small Screen Usage (e.g. smartphone, computer)", file: "../assets/animations/small_screen_usage.mp4" },
     9: { name: "Large Screen Usage (e.g. TV, cinema)", file: "../assets/animations/large_screen_usage.mp4" },
@@ -642,6 +642,7 @@ function updateTheme(time) {
   document.querySelector('.title-card h1')?.style.setProperty('color', theme.accent);
   document.querySelector('.time-display')?.style.setProperty('color', theme.accent);
   document.querySelector('.progress-fill')?.style.setProperty('background-color', theme.accent);
+  document.querySelector('#play-pause-btn')?.style.setProperty('color', theme.accent);
 
   // Update chart colors
   svg.selectAll(".tick text").style("fill", theme.accent);

@@ -280,18 +280,17 @@
     }
 
     #play-pause-btn {
-      /*margin-top: 10px;*/
-      padding: 6px 12px;
-      font-size: 14px;
+      height: 50px;
+      width: 50px;
+      /*padding: 6px 12px;*/
       border: none;
-      background-color: #007acc;
-      color: white;
-      border-radius: 5px;
+      border-radius: 2rem;
+      font-size: 2rem;
+      font-weight: 600;
       cursor: pointer;
-    }
-
-    #play-pause-btn:hover {
-      background-color: #005f99;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease;
+      z-index: 9999; /* stays on top */
     }
 
     #loading-overlay-hr, #loading-overlay-acc {
@@ -520,9 +519,9 @@ h3{
       </div>
 
       <div id="autoscroller">
-        <button id="slow" title="Slow"></button>
-        <button id="play-pause-btn">▶ Auto-Scroll</button>
-        <button id="fast" title="Fast Forward"></button>
+        <button id="slow" title="Slow">slow</button>
+        <button id="play-pause-btn">▶</button>
+        <button id="fast" title="Fast Forward">fast</button>
       </div>
 
     </div>

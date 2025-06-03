@@ -71,15 +71,15 @@ d3.csv("../assets/cleaned_data/acc.csv", d => {
       // If currently playing, pause auto-scroll
       isPlaying = false;
       clearInterval(autoScrollInterval);
-      playPauseBtn.text("▶ Auto-Scroll");
-    } else if (playPauseBtn.text() === "↻ Reset") {
+      playPauseBtn.text("▶");
+    } else if (playPauseBtn.text() === "↻") {
       // If button says Reset, scroll top and switch to play
       window.scrollTo({ top: 0, behavior: "smooth" });
-      playPauseBtn.text("▶ Auto-Scroll");
+      playPauseBtn.text("▶");
     } else {
       // Start auto-scroll
       isPlaying = true;
-      playPauseBtn.text("⏸ Pause");
+      playPauseBtn.text("⏸");
   
       autoScrollInterval = setInterval(() => {
         const maxScroll = document.body.scrollHeight - window.innerHeight;
