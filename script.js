@@ -1,23 +1,192 @@
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import { parseActivity, drawActivity } from './activity.js';
 import { parseHeartRate, drawHeartRate } from './heartrate.js';
 
 const params = new URLSearchParams(window.location.search);
 const selectedUser = params.get("user");
-// Load and process data
+
+// Load and process all data
 Promise.all([
-  d3.csv("assets/cleaned_data/all_actigraph.csv", parseActivity),
-  d3.csv("cleaned_data/all_actigraph.csv", parseHeartRate)
-]).then(([activityData, heartRateData]) => {
+  d3.csv("../assets/cleaned_data/all_actigraph.csv", parseActivity),
+  d3.csv("../assets/cleaned_data/all_actigraph.csv", parseHeartRate),
+  d3.csv("../assets/cleaned_data/all_sleep.csv", d => {
+    const anchor = new Date(2000, 0, 1);
+    const dayOffset = +d["In Bed Date"];
+    const timeStr = d["In Bed Time"];
+    if (!timeStr || !d["In Bed Date"]) return null;
+
+    const [hour, minute] = timeStr.split(":").map(Number);
+    const datetime = new Date(anchor);
+    datetime.setDate(anchor.getDate() + dayOffset - 1);
+    datetime.setHours(hour);
+    datetime.setMinutes(minute);
+
+    return {
+      user: d.user.trim(),
+      datetime: datetime,
+      efficiency: +d.Efficiency,
+      totalSleep: +d["Total Sleep Time (TST)"],
+      waso: +d["Wake After Sleep Onset (WASO)"],
+      latency: +d.Latency,
+      awakenings: +d["Number of Awakenings"],
+      avgAwakeningLength: +d["Average Awakening Length"],
+      movementIndex: +d["Movement Index"],
+      fragmentationIndex: +d["Fragmentation Index"]
+    };
+  }),
+  d3.csv("../assets/cleaned_data/all_saliva.csv", d => ({
+    user: d.user.trim(),
+    sample: d.SAMPLES.toLowerCase(),
+    cortisol: +d["Cortisol NORM"],
+    melatonin: +d["Melatonin NORM"]
+  }))
+]).then(([activityData, heartRateData, sleepData, salivaData]) => {
   if (selectedUser) {
+    // Filter data for selected user
     const filteredActivity = activityData.filter(d => d.user === selectedUser);
     const filteredHeartRate = heartRateData.filter(d => d.user === selectedUser);
+    const filteredSleep = sleepData.filter(d => d.user === selectedUser);
+    const filteredSaliva = salivaData.filter(d => d.user === selectedUser);
 
+    // Display all metrics
     drawActivity(filteredActivity);
     drawHeartRate(filteredHeartRate);
+    displaySleepMetrics(filteredSleep[filteredSleep.length - 1]);
+    displayHormoneMetrics(filteredSaliva);
   } else {
     console.warn("No user selected in URL (use ?user=user_1)");
   }
 });
+
+// Add metric descriptions
+const metricDescriptions = {
+  totalSleep: "The total amount of time spent sleeping during the night.",
+  efficiency: "The percentage of time spent asleep while in bed.",
+  latency: "The time it takes to fall asleep after getting into bed.",
+  awakenings: "The number of times you woke up during the night.",
+  avgAwakeningLength: "The average duration of each awakening during sleep.",
+  waso: "The total time spent awake after initially falling asleep.",
+  movementIndex: "A measure of how much movement occurred during sleep.",
+  fragmentationIndex: "A measure of how fragmented your sleep was.",
+  cortisol: "A stress hormone that follows a daily rhythm, typically highest in the morning.",
+  melatonin: "A sleep-promoting hormone that rises in the evening and peaks during sleep."
+};
+
+function showInfoTooltip(x, y, text) {
+  let tooltip = d3.select("#metric-info-tooltip");
+  if (tooltip.empty()) {
+    tooltip = d3.select("body").append("div")
+      .attr("id", "metric-info-tooltip")
+      .style("position", "absolute")
+      .style("background-color", "var(--popover)")
+      .style("color", "var(--popover-foreground)")
+      .style("border", "1px solid var(--border)")
+      .style("border-radius", "var(--radius-md)")
+      .style("padding", "0.5rem 0.75rem")
+      .style("font-size", "0.875rem")
+      .style("box-shadow", "0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06)")
+      .style("z-index", "1010")
+      .style("pointer-events", "none")
+      .style("max-width", "250px")
+      .style("line-height", "1.5")
+      .style("transition", "opacity 0.15s ease-in-out");
+  }
+
+  tooltip
+    .html(text)
+    .style("left", `${x + 12}px`)
+    .style("top", `${y - 10}px`)
+    .style("visibility", "visible")
+    .style("opacity", "1");
+}
+
+function hideInfoTooltip() {
+  const tooltip = d3.select("#metric-info-tooltip");
+  if (!tooltip.empty()) {
+    tooltip
+      .style("visibility", "hidden")
+      .style("opacity", "0");
+  }
+}
+
+function displaySleepMetrics(data) {
+  if (!data) return;
+  
+  const metricsContainer = d3.select('#sleep-metrics');
+  metricsContainer.html(""); // clear existing
+
+  const metrics = [
+    { key: 'totalSleep', label: 'Total Sleep', value: `${Math.floor(data.totalSleep/60)} h ${data.totalSleep%60} m` },
+    { key: 'efficiency', label: 'Sleep Efficiency', value: `${isNaN(data.efficiency) ? "N/A" : data.efficiency.toFixed(1)} %` },
+    { key: 'latency', label: 'Sleep Latency', value: `${data.latency} m` },
+    { key: 'awakenings', label: 'Number of Awakenings', value: `${data.awakenings}` },
+    { key: 'avgAwakeningLength', label: 'Average Awakening Length', value: `${data.avgAwakeningLength.toFixed(1)} s` },
+    { key: 'waso', label: 'Wake After Sleep Onset', value: `${data.waso} m` },
+    { key: 'movementIndex', label: 'Movement Index', value: `${data.movementIndex.toFixed(1)} %` },
+    { key: 'fragmentationIndex', label: 'Fragmentation Index', value: `${data.fragmentationIndex.toFixed(1)} %` }
+  ];
+
+  metrics.forEach(metric => {
+    const metricDiv = metricsContainer.append('div').attr('class', 'metric');
+    
+    const labelGroup = metricDiv.append('div').attr('class', 'metric-label-group');
+    labelGroup.append('span').attr('class', 'metric-label-text').text(metric.label);
+
+    if (metricDescriptions[metric.key]) {
+      labelGroup.append('span')
+        .attr('class', 'info-icon')
+        .html(' <i class="fas fa-info-circle"></i>')
+        .on('mouseover', (event) => {
+          showInfoTooltip(event.pageX, event.pageY, metricDescriptions[metric.key]);
+        })
+        .on('mouseout', hideInfoTooltip);
+    }
+
+    metricDiv.append('span')
+      .attr('class', 'metric-value-badge')
+      .text(metric.value);
+  });
+}
+
+function displayHormoneMetrics(data) {
+  if (!data || data.length !== 2) return;
+
+  const container = d3.select("#hormone-metrics");
+  container.html(""); // clear existing
+
+  // Sort to ensure before sleep comes first
+  const sorted = data.sort((a, b) =>
+    a.sample === "before sleep" ? -1 : 1
+  );
+
+  const metrics = [
+    { key: 'cortisol', label: 'Cortisol (Before Sleep)', value: `${sorted[0].cortisol.toFixed(4)} µg/dL` },
+    { key: 'cortisol', label: 'Cortisol (After Sleep)', value: `${sorted[1].cortisol.toFixed(4)} µg/dL` },
+    { key: 'melatonin', label: 'Melatonin (Before Sleep)', value: `${sorted[0].melatonin.toFixed(4)} pg/mL` },
+    { key: 'melatonin', label: 'Melatonin (After Sleep)', value: `${sorted[1].melatonin.toFixed(4)} pg/mL` }
+  ];
+
+  metrics.forEach(metric => {
+    const metricDiv = container.append('div').attr('class', 'metric');
+    
+    const labelGroup = metricDiv.append('div').attr('class', 'metric-label-group');
+    labelGroup.append('span').attr('class', 'metric-label-text').text(metric.label);
+
+    if (metricDescriptions[metric.key]) {
+      labelGroup.append('span')
+        .attr('class', 'info-icon')
+        .html(' <i class="fas fa-info-circle"></i>')
+        .on('mouseover', (event) => {
+          showInfoTooltip(event.pageX, event.pageY, metricDescriptions[metric.key]);
+        })
+        .on('mouseout', hideInfoTooltip);
+    }
+
+    metricDiv.append('span')
+      .attr('class', 'metric-value-badge')
+      .text(metric.value);
+  });
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   // Smooth scroll for "Start Exploring" link

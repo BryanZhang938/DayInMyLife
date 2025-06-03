@@ -3,150 +3,120 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Summary Stats</title>
-  <link rel="stylesheet" href="../styles.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <style>
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, sans-serif;
-      background-color: #fafafa;
-      padding: 2rem;
-      color: #1f2937;
-    }
-    .card {
-      background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(8px);
-      border-radius: 1rem;
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-      border: 1px solid rgba(0,0,0,0.1);
-    }
-    .metric {
-  display: inline-block;
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.75rem;
-  padding: 0.75rem 1rem;
-  min-width: 120px;
-  text-align: center;
-  margin: 0.5rem;
-  font-family: system-ui, -apple-system, sans-serif;
-}
-
-.metric-value {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #f97316; /* orange */
-  margin-bottom: 0.25rem;
-  line-height: 1.2;
-}
-.metric {
-  font-family: system-ui, -apple-system, sans-serif;
-}
-.metric-label {
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #1f2937; /* dark gray */
-  line-height: 1.2;
-}
-#home-button {
-  background-color: rgba(255,255,255,0.5);
-  color: var(--accent-color, #2563eb);
-  border: 1px solid rgba(255,255,255,0.2);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  padding: 0.5rem;
-  border-radius: 9999px;
-  font-size: 1rem;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  transition: background-color 0.2s ease, color 0.2s ease;
-  margin-left: 0.75rem;
-}
-.nav-buttons button {
-  background-color: rgba(255,255,255,0.5);
-  color: var(--accent-color, #2563eb);
-  border: 1px solid rgba(255,255,255,0.2);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  padding: 0.5rem 1rem;
-  border-radius: 9999px;
-  font-size: 1rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  transition: background-color 0.2s ease, color 0.2s ease;
-  margin-right: 0.75rem;
-}
-
-.nav-buttons button:hover {
-  background-color: var(--accent-color, #2563eb);
-  color: white;
-}
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Summary</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-  <script>
-    const user = new URLSearchParams(window.location.search).get("user");
-  </script>
-  <div class="nav-buttons">
-    <button onclick="window.location.href=`index.html?user=${user}`">
-      ← Back to Day View
-    </button>
-    <button class="home-button" title="Return to Home" onclick="window.location.href='../index.html'">
-      <i class="fas fa-home"></i>
-    </button>
-    <button id="conclusion-button" class="control-button tutorial-button">
-      Conclusion
-    </button>
-  </div>
-
-  <div id="conclusion-modal" class="modal-overlay">
-    <div class="modal-content large-modal">
-      <button id="conclusion-close-button" class="modal-close-button">&times;</button>
-      <div class="tutorial-header">
-        <h3 id="conclusion-title"></h3>
+  <div class="page-container">
+    <header class="summary-header">
+      <div class="header-navigation">
+        <a href="index.html" class="nav-link"><i class="fas fa-arrow-left"></i> Back</a>
+        <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
       </div>
-      <p id="conclusion-text" class="tutorial-text"></p>
-    </div>
-  </div>
-  <h1>Summary Statistics</h1>
-  
+    </header>
 
-  <div class="card">
-    <h2>Sleep Summary</h2>
-    <div id="sleep-container">
-      <div id="sleep-metrics" class="metrics"></div>
+    <div class="page-title-section">
+      <div class="page-title-content">
+        <h1>Your Daily Summary</h1>
+        <p class="subtitle">A comprehensive overview of your biometric data, sleep patterns, and activity levels from your day.</p>
+      </div>
     </div>
 
+    <main class="main-content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon-wrapper bg-accent-sleep">
+            <i class="fas fa-moon"></i>
+          </div>
+          <h2>Sleep Summary</h2>
+        </div>
+        <div class="card-content">
+          <div id="sleep-metrics" class="metrics-grid"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon-wrapper bg-accent-hormone">
+            <i class="fas fa-flask"></i>
+          </div>
+          <h2>Hormone Summary</h2>
+        </div>
+        <div class="card-content">
+          <div id="hormone-metrics" class="metrics-grid"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon-wrapper bg-accent-heart">
+            <i class="fas fa-heartbeat"></i>
+          </div>
+          <h2>Heart Rate Summary</h2>
+        </div>
+        <div class="card-content">
+          <div class="chart-peak-info">
+            <div class="peak-value-display">
+              <span id="heartrate-peak-value" class="peak-value-amount">N/A</span>
+            </div>
+            <span id="heartrate-peak-time" class="peak-time-label">Peak at N/A</span>
+          </div>
+          <div id="heartrate-metrics" class="metrics-grid card-metrics-inline"></div>
+          <svg id="heartrate-chart" class="chart"></svg>
+          <div class="chart-legend">
+            <div class="legend-item">
+              <span class="legend-color-box regular"></span>
+              Regular hours
+            </div>
+            <div class="legend-item">
+              <span class="legend-color-box peak"></span>
+              Peak hour
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon-wrapper bg-accent-activity">
+            <i class="fas fa-walking"></i>
+          </div>
+          <h2>Activity Summary</h2>
+        </div>
+        <div class="card-content">
+          <div class="chart-peak-info">
+            <div class="peak-value-display">
+              <span id="activity-peak-value" class="peak-value-amount">N/A</span>
+            </div>
+            <span id="activity-peak-time" class="peak-time-label">Peak at N/A</span>
+          </div>
+          <div id="activity-metrics" class="metrics-grid card-metrics-inline"></div>
+          <svg id="activity-chart" class="chart"></svg>
+          <div class="chart-legend">
+            <div class="legend-item">
+              <span class="legend-color-box regular"></span>
+              Regular hours
+            </div>
+            <div class="legend-item">
+              <span class="legend-color-box peak"></span>
+              Peak hour
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="page-footer">
+      <div class="footer-content">
+        <button class="btn btn-primary" onclick="window.location.href='index.html'">
+          <i class="fas fa-arrow-left"></i> Back to Timeline
+        </button>
+      </div>
+    </footer>
   </div>
 
-  <div class="card">
-    <h2>Heart Rate Summary</h2>
-    <div id="heartrate-metrics" class="metrics"></div>
-    <svg id="heartrate-chart" class="chart" width="650" height="300"></svg>
-  </div>
-
-  <div class="card">
-    <h2>Activity Summary</h2>
-    <div id="activity-metrics" class="metrics"></div>
-    <svg id="activity-chart" class="chart" width="650" height="250"></svg>
-  </div>
-
-  <script type="module" src="../sleep.js"></script>
-  <script type="module" src="../heartrate.js"></script>
-  <script type="module" src="../activity.js"></script>
-  <script type="module">
-    import { initializeConclusionModal } from './takeaway.js';
-    initializeConclusionModal();
-  </script>
+  <script type="module" src="../script.js"></script>
 </body>
 </html>

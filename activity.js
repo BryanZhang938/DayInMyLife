@@ -37,27 +37,54 @@ function drawActivity(data) {
     ? hourlyData.reduce((a, b) => b.avgActivity > a.avgActivity ? b : a, hourlyData[0])
     : null;
 
-    d3.select("#activity-metrics").html(`
-    <div class="metric">
-      <div class="metric-value">${peakHour ? peakHour.avgActivity.toFixed(1) : 'N/A'}</div>
-      <div class="metric-label">Peak Hourly Activity Level</div>
-    </div>
-    <div class="metric">
-      <div class="metric-value">${peakHour ? d3.timeFormat("%-I %p")(peakHour.hour) : 'N/A'}</div>
-      <div class="metric-label">Peak Hour</div>
-    </div>
-  `);
+  // Update peak value display
+  const peakValueElement = document.getElementById('activity-peak-value');
+  const peakTimeElement = document.getElementById('activity-peak-time');
+  
+  if (peakValueElement && peakTimeElement) {
+    peakValueElement.textContent = peakHour ? `${peakHour.avgActivity.toFixed(1)}` : 'N/A';
+    peakTimeElement.textContent = peakHour ? `Peak at ${d3.timeFormat("%-I %p")(peakHour.hour)}` : 'Peak at N/A';
+  }
+
+  // Update metrics grid
+  const metricsContainer = d3.select("#activity-metrics");
+  metricsContainer.html(""); // clear existing
+
+  const metrics = [
+    { key: 'avgActivity', label: 'Average Activity Level', value: `${d3.mean(hourlyData, d => d.avgActivity).toFixed(1)}` },
+    { key: 'minActivity', label: 'Minimum Activity Level', value: `${d3.min(hourlyData, d => d.avgActivity).toFixed(1)}` },
+    { key: 'maxActivity', label: 'Maximum Activity Level', value: `${d3.max(hourlyData, d => d.avgActivity).toFixed(1)}` },
+    { key: 'activityRange', label: 'Activity Level Range', value: `${(d3.max(hourlyData, d => d.avgActivity) - d3.min(hourlyData, d => d.avgActivity)).toFixed(1)}` }
+  ];
+
+  metrics.forEach(metric => {
+    const metricDiv = metricsContainer.append('div').attr('class', 'metric');
+    
+    const labelGroup = metricDiv.append('div').attr('class', 'metric-label-group');
+    labelGroup.append('span').attr('class', 'metric-label-text').text(metric.label);
+
+    metricDiv.append('span')
+      .attr('class', 'metric-value-badge')
+      .text(metric.value);
+  });
 
   if (hourlyData.length === 0) return;
 
   const svg = d3.select("#activity-chart");
-  const { width, height } = svg.node().getBoundingClientRect();
+  const width = svg.node().getBoundingClientRect().width;
+  const height = 400;
   const margin = { top: 40, right: 20, bottom: 50, left: 50 };
+
+  svg
+    .attr("viewBox", `0 0 ${width} ${height}`)
+    .attr("preserveAspectRatio", "xMidYMid meet")
+    .style("width", "100%")
+    .style("height", `${height}px`);
 
   svg.selectAll("*").remove();
 
   const hourExtent = d3.extent(hourlyData, d => d.hour);
-  const barPaddingMs = 30 * 60 * 1000; // half an hour padding on each side
+  const barPaddingMs = 30 * 60 * 1000; // half an hour on each side
   const x = d3.scaleTime()
     .domain([new Date(hourExtent[0].getTime() - barPaddingMs), new Date(hourExtent[1].getTime() + barPaddingMs)])
     .range([margin.left, width - margin.right]);
@@ -66,31 +93,26 @@ function drawActivity(data) {
     .domain([0, d3.max(hourlyData, d => d.avgActivity)]).nice()
     .range([height - margin.bottom, margin.top]);
 
-  if (d3.select("body").select("#tooltip-activity").empty()) {
-    d3.select("body")
+  let tooltip = d3.select("body").select("#tooltip-activity");
+
+  if (tooltip.empty()) {
+    tooltip = d3.select("body")
       .append("div")
       .attr("id", "tooltip-activity")
-      .style("position", "absolute")
-      .style("background", "#fff")
-      .style("padding", "6px")
-      .style("border", "1px solid #999")
-      .style("border-radius", "4px")
-      .style("pointer-events", "none")
-      .style("opacity", 0);
+      .attr("class", "chart-tooltip");
   }
 
-  const tooltip = d3.select("#tooltip-activity");
-  const barWidth = (width - margin.left - margin.right) / hourlyData.length * 0.8;
+  const barW = ((width - margin.left - margin.right) / hourlyData.length) * 0.8;
 
   svg.append("g")
     .selectAll("rect")
     .data(hourlyData)
     .join("rect")
-    .attr("x", d => x(d.hour) - barWidth / 2)
+    .attr("x", d => x(d.hour) - barW / 2)
     .attr("y", d => y(d.avgActivity))
-    .attr("width", barWidth)
-    .attr("height", d => y(0) - y(d.avgActivity))
-    .attr("fill", d => peakHour && d.hour.getTime() === peakHour.hour.getTime() ? "#ff7f0e" : "steelblue")
+    .attr("width", barW)
+    .attr("height", d => height - margin.bottom - y(d.avgActivity))
+    .attr("fill", d => peakHour && d.hour.getTime() === peakHour.hour.getTime() ? "var(--accent-activity)" : "var(--primary)")
     .attr("opacity", 0.6)
     .on("mouseover", function (event, d) {
       tooltip
@@ -128,30 +150,21 @@ function drawActivity(data) {
 
   svg.append("text")
     .attr("class", "axis-label")
-    .attr("transform", `translate(${width / 2}, ${height - 5})`)
+    .attr("transform", `translate(${width/2}, ${height - 5})`)
     .style("text-anchor", "middle")
-    .style("font-size", "17px")
-    .style("font-weight", "bold")
+    .style("font-size", "14px")
+    .style("font-weight", "500")
     .text("Hour of Day");
 
   svg.append("text")
     .attr("class", "axis-label")
     .attr("transform", "rotate(-90)")
-    .attr("x", -height / 2)
+    .attr("x", -height/2)
     .attr("y", 15)
     .style("text-anchor", "middle")
-    .style("font-size", "17px")
-    .style("font-weight", "bold")
+    .style("font-size", "14px")
+    .style("font-weight", "500")
     .text("Average Activity Level");
-
-  svg.append("text")
-    .attr("class", "chart-title")
-    .attr("x", width / 2)
-    .attr("y", margin.top / 1.5)
-    .style("text-anchor", "middle")
-    .style("font-size", "20px")
-    .style("font-weight", "bold")
-    .text("Average Activity Level Per Hour");
 }
 
 export { parseActivity, drawActivity };

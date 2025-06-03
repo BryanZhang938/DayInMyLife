@@ -1,7 +1,9 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
 const data = {};
+
 function parseSleep(d) {
-  const anchor = new Date(2000, 0, 1); // Jan 1, 2000
+  const anchor = new Date(2000, 0, 1);
   const dayOffset = +d["In Bed Date"];
   const timeStr = d["In Bed Time"];
   if (!timeStr || !d["In Bed Date"]) {
@@ -29,6 +31,7 @@ function parseSleep(d) {
     fragmentationIndex: +d["Fragmentation Index"]
   };
 }
+
 const params = new URLSearchParams(window.location.search);
 const selectedUser = params.get("user");
 
@@ -53,7 +56,6 @@ d3.csv("../assets/cleaned_data/all_sleep.csv", parseSleep).then(sleepData => {
     const userData = sleepData.filter(d => d.user === selectedUser);
     if (userData.length > 0) {
       displaySleepMetrics(userData[userData.length - 1]); // latest entry
-      // drawSleep(userData);
     } else {
       console.warn(`No sleep data found for user: ${selectedUser}`);
     }
@@ -132,19 +134,24 @@ function displaySleepMetrics(data) {
   ];
 
   metrics.forEach(metric => {
-    const div = metricsContainer.append('div').attr('class', 'metric');
-    div.append('strong').text(metric.value);
-    const labelDiv = div.append('div').attr('class', 'label');
-    labelDiv.text(metric.label);
+    const metricDiv = metricsContainer.append('div').attr('class', 'metric');
+    
+    const labelGroup = metricDiv.append('div').attr('class', 'metric-label-group');
+    labelGroup.append('span').attr('class', 'metric-label-text').text(metric.label);
 
-    // Add info icon with tooltip
-    labelDiv.append('span')
-      .attr('class', 'info-icon')
-      .text(' ⓘ')
-      .on('mouseover', (event) => {
-        showInfoTooltip(event.pageX, event.pageY, metricDescriptions[metric.key]);
-      })
-      .on('mouseout', hideInfoTooltip);
+    if (metricDescriptions[metric.key]) {
+      labelGroup.append('span')
+        .attr('class', 'info-icon')
+        .html(' <i class="fas fa-info-circle" title="' + metricDescriptions[metric.key] + '"></i>')
+        .on('mouseover', (event) => {
+          showInfoTooltip(event.pageX, event.pageY, metricDescriptions[metric.key]);
+        })
+        .on('mouseout', hideInfoTooltip);
+    }
+
+    metricDiv.append('span')
+      .attr('class', 'metric-value-badge')
+      .text(metric.value);
   });
 }
 
@@ -152,16 +159,7 @@ function showInfoTooltip(x, y, text) {
   let tooltip = d3.select("#metric-info-tooltip");
   if (tooltip.empty()) {
     tooltip = d3.select("body").append("div")
-      .attr("id", "metric-info-tooltip")
-      .style("position", "absolute")
-      .style("max-width", "240px")
-      .style("padding", "8px 12px")
-      .style("background", "#999")
-      .style("color", "white")
-      .style("border-radius", "5px")
-      .style("font-size", "13px")
-      .style("pointer-events", "none")
-      .style("z-index", 1000);
+      .attr("id", "metric-info-tooltip");
   }
 
   tooltip
@@ -174,7 +172,6 @@ function showInfoTooltip(x, y, text) {
 function hideInfoTooltip() {
   d3.select("#metric-info-tooltip").style("visibility", "hidden");
 }
-
 
 function initScrolly() {
   console.log("Initializing Scrollama");
@@ -373,39 +370,22 @@ d3.csv("../assets/cleaned_data/all_saliva.csv", parseSaliva).then(salivaData => 
   const userSaliva = salivaData.filter(d => d.user === selectedUser);
   if (userSaliva.length !== 2) return;
 
-  // Insert subheading row outside of #sleep-metrics
   const container = d3.select("#sleep-container");
 
-// Add Hormone Summary title
+  // Add Hormone Summary title
   container.append("h3")
-    .text("Hormone Summary")
-    .style("margin-top", "2rem")
-    .style("font-size", "1.25rem")
-    .style("font-weight", "600");
+    .attr("class", "hormone-summary-title")
+    .text("Hormone Summary");
 
   const subheadingRow = container.append("div")
-    .style("display", "flex")
-    .style("width", "100%")
-    .style("margin-top", "2rem");
+    .attr("class", "hormone-subheading-row");
 
-  subheadingRow.append("div")
-    .style("flex", "1")
-    .style("text-align", "center")
-    .style("font-weight", "600")
-    .style("font-size", "1.2rem")
-    .text("Before Sleep");
-
-  subheadingRow.append("div")
-    .style("flex", "1")
-    .style("text-align", "center")
-    .style("font-weight", "600")
-    .style("font-size", "1.2rem")
-    .text("Wake Up");
+  subheadingRow.append("div").text("Before Sleep");
+  subheadingRow.append("div").text("Wake Up");
 
   const hormoneSection = container.append("div")
-  .attr("id", "hormone-metrics")
-  .attr("class", "metrics") // this ensures it matches original styling
-  .style("margin-top", "0.5rem");
+    .attr("id", "hormone-metrics-grid")
+    .attr("class", "metrics-grid");
 
   // Sort again just to be safe
   const sorted = userSaliva.sort((a, b) =>
@@ -420,26 +400,26 @@ d3.csv("../assets/cleaned_data/all_saliva.csv", parseSaliva).then(salivaData => 
 });
 
 function appendHormoneMetric(container, value, label) {
-  const box = container.append('div').attr('class', 'metric');
-
-  box.append('strong')
-    .text(value.toExponential(2)); // or value.toFixed(3) if you prefer decimals
-
-  const labelDiv = box.append('div').attr('class', 'label');
-  labelDiv.text(label);
+  const metricDiv = container.append('div').attr('class', 'metric');
+  
+  const labelGroup = metricDiv.append('div').attr('class', 'metric-label-group');
+  labelGroup.append('span').attr('class', 'metric-label-text').text(label);
 
   // Match the key to our metricDescriptions object
   const infoKey = label.toLowerCase().includes('cortisol') ? 'cortisol' : 'melatonin';
 
-  labelDiv.append('span')
+  labelGroup.append('span')
     .attr('class', 'info-icon')
-    .text(' ⓘ')
+    .html(' <i class="fas fa-info-circle" title="' + metricDescriptions[infoKey] + '"></i>')
     .on('mouseover', (event) => {
       showInfoTooltip(event.pageX, event.pageY, metricDescriptions[infoKey]);
     })
     .on('mouseout', hideInfoTooltip);
-}
 
+  metricDiv.append('span')
+    .attr('class', 'metric-value-badge')
+    .text(value.toFixed(4));
+}
 
 // Saliva parser
 function parseSaliva(d) {

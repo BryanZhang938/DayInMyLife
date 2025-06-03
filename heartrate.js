@@ -43,16 +43,36 @@ function processHeartRateData(data) {
 function drawHeartRate(data) {
   const { hourlyData, peakHour } = processHeartRateData(data);
 
-  d3.select("#heartrate-metrics").html(`
-  <div class="metric">
-    <div class="metric-value">${peakHour ? peakHour.avgRate.toFixed(1) : 'N/A'}</div>
-    <div class="metric-label">Peak Hourly Heart Rate</div>
-  </div>
-  <div class="metric">
-    <div class="metric-value">${peakHour ? d3.timeFormat("%-I %p")(peakHour.hour) : 'N/A'}</div>
-    <div class="metric-label">Peak Hour</div>
-  </div>
-`);
+  // Update peak value display
+  const peakValueElement = document.getElementById('heartrate-peak-value');
+  const peakTimeElement = document.getElementById('heartrate-peak-time');
+  
+  if (peakValueElement && peakTimeElement) {
+    peakValueElement.textContent = peakHour ? `${peakHour.avgRate.toFixed(1)} bpm` : 'N/A';
+    peakTimeElement.textContent = peakHour ? `Peak at ${d3.timeFormat("%-I %p")(peakHour.hour)}` : 'Peak at N/A';
+  }
+
+  // Update metrics grid
+  const metricsContainer = d3.select("#heartrate-metrics");
+  metricsContainer.html(""); // clear existing
+
+  const metrics = [
+    { key: 'avgHeartRate', label: 'Average Heart Rate', value: `${d3.mean(hourlyData, d => d.avgRate).toFixed(1)} bpm` },
+    { key: 'minHeartRate', label: 'Minimum Heart Rate', value: `${d3.min(hourlyData, d => d.avgRate).toFixed(1)} bpm` },
+    { key: 'maxHeartRate', label: 'Maximum Heart Rate', value: `${d3.max(hourlyData, d => d.avgRate).toFixed(1)} bpm` },
+    { key: 'heartRateRange', label: 'Heart Rate Range', value: `${(d3.max(hourlyData, d => d.avgRate) - d3.min(hourlyData, d => d.avgRate)).toFixed(1)} bpm` }
+  ];
+
+  metrics.forEach(metric => {
+    const metricDiv = metricsContainer.append('div').attr('class', 'metric');
+    
+    const labelGroup = metricDiv.append('div').attr('class', 'metric-label-group');
+    labelGroup.append('span').attr('class', 'metric-label-text').text(metric.label);
+
+    metricDiv.append('span')
+      .attr('class', 'metric-value-badge')
+      .text(metric.value);
+  });
 
   if (hourlyData.length === 0) return;
 
@@ -79,20 +99,16 @@ function drawHeartRate(data) {
     .domain([0, d3.max(hourlyData, d => d.avgRate)]).nice()
     .range([height - margin.bottom, margin.top]);
 
-    let tooltip = d3.select("body").select("#tooltip-heartrate");
+  let tooltip = d3.select("body").select("#tooltip-heartrate");
 
-    if (tooltip.empty()) {
-      tooltip = d3.select("body")
-        .append("div")
-        .attr("id", "tooltip-heartrate")
-        .style("position", "absolute")
-        .style("background", "#fff")
-        .style("padding", "6px")
-        .style("border", "1px solid #999")
-        .style("border-radius", "4px")
-        .style("pointer-events", "none")
-        .style("opacity", 0);
-    }  const barW = ((width - margin.left - margin.right) / hourlyData.length) * 0.8;
+  if (tooltip.empty()) {
+    tooltip = d3.select("body")
+      .append("div")
+      .attr("id", "tooltip-heartrate")
+      .attr("class", "chart-tooltip");
+  }
+
+  const barW = ((width - margin.left - margin.right) / hourlyData.length) * 0.8;
 
   svg.append("g")
     .selectAll("rect")
@@ -101,16 +117,16 @@ function drawHeartRate(data) {
     .attr("x", d => x(d.hour) - barW / 2)
     .attr("y", d => y(d.avgRate))
     .attr("width", barW)
-    .attr("height", d => y(0) - y(d.avgRate))
-    .attr("fill", d => peakHour && d.hour.getTime() === peakHour.hour.getTime() ? "#ff7f0e" : "steelblue")
+    .attr("height", d => height - margin.bottom - y(d.avgRate))
+    .attr("fill", d => peakHour && d.hour.getTime() === peakHour.hour.getTime() ? "var(--accent-heart)" : "var(--primary)")
     .attr("opacity", 0.6)
     .on("mouseover", function (event, d) {
       tooltip
         .style("opacity", 1)
         .html(`
-  <strong>Time:</strong> ${d3.timeFormat("%-I %p")(d.hour)}<br>
-  <strong>Heart Rate:</strong> ${d.avgRate.toFixed(1)} bpm
-`);
+          <strong>Time:</strong> ${d3.timeFormat("%-I %p")(d.hour)}<br>
+          <strong>Heart Rate:</strong> ${d.avgRate.toFixed(1)} bpm
+        `);
       d3.select(this).attr("opacity", 1);
     })
     .on("mousemove", function (event) {
@@ -142,8 +158,8 @@ function drawHeartRate(data) {
     .attr("class", "axis-label")
     .attr("transform", `translate(${width/2}, ${height - 5})`)
     .style("text-anchor", "middle")
-    .style("font-size", "17px")
-    .style("font-weight", "bold")
+    .style("font-size", "14px")
+    .style("font-weight", "500")
     .text("Hour of Day");
 
   svg.append("text")
@@ -152,18 +168,9 @@ function drawHeartRate(data) {
     .attr("x", -height/2)
     .attr("y", 15)
     .style("text-anchor", "middle")
-    .style("font-size", "17px")
-    .style("font-weight", "bold")
+    .style("font-size", "14px")
+    .style("font-weight", "500")
     .text("Average Heart Rate (bpm)");
-
-  svg.append("text")
-    .attr("class", "chart-title")
-    .attr("x", width/2)
-    .attr("y", margin.top/1.5)
-    .style("text-anchor", "middle")
-    .style("font-size", "20px")
-    .style("font-weight", "bold")
-    .text("Average Heart Rate Per Hour");
 }
 
 export { parseHeartRate, drawHeartRate };

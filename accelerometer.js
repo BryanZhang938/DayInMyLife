@@ -40,7 +40,9 @@ if (tooltip.empty()) {
 }
 
 loadingOverlay.style("display", "flex");
-loadingText.text("Loading data...");
+if (loadingText.node()) {
+  loadingText.text("Loading data...");
+}
 
 d3.csv("../assets/cleaned_data/acc.csv", d => {
   // const time = parseTime(d.time);
@@ -62,7 +64,9 @@ d3.csv("../assets/cleaned_data/acc.csv", d => {
     .attr("value", d => d)
     .text(d => d);
 
-  loadingText.text("Loading graph...");
+  if (loadingText.node()) {
+    loadingText.text("Loading graph...");
+  }
   updateChart(selectedUser);
 
   const playPauseBtn = d3.select("#play-pause-btn");
@@ -76,6 +80,8 @@ d3.csv("../assets/cleaned_data/acc.csv", d => {
   
 
   playPauseBtn.on("click", () => {
+    if (!playPauseBtn || !playPauseBtn.node()) return;
+    
     if (isPlaying) {
       // If currently playing, pause auto-scroll
       isPlaying = false;
@@ -97,9 +103,8 @@ d3.csv("../assets/cleaned_data/acc.csv", d => {
   
         if (current + distance >= maxScroll) {
           window.scrollTo({ top: maxScroll });
-        // …then flip to ↻ Reset
-        stopAutoScroll();
-              } else {
+          stopAutoScroll();
+        } else {
           isAutoScrolling = true;
           lastScrollTime = Date.now();
           window.scrollTo({ top: current + distance, behavior: "auto" });
@@ -188,7 +193,9 @@ d3.csv("../assets/cleaned_data/acc.csv", d => {
   function stopAutoScroll() {
     isPlaying = false;
     clearInterval(autoScrollInterval);
-    playPauseBtn.text("↻");
+    if (playPauseBtn && playPauseBtn.node()) {
+      playPauseBtn.text("↻");
+    }
   }
   
   window.addEventListener("wheel", () => {
@@ -207,11 +214,11 @@ d3.csv("../assets/cleaned_data/acc.csv", d => {
     }
   }, { passive: true });
   
-  // if we’re in “↻ Reset” but the user scrolls up off the bottom, flip back to ▶ Auto-Scroll
+  // if we're in "↻ Reset" but the user scrolls up off the bottom, flip back to ▶ Auto-Scroll
 window.addEventListener("scroll", () => {
   const maxScroll = document.body.scrollHeight - window.innerHeight;
   // only when we're showing Reset and we're no longer at the bottom
-  if (playPauseBtn.text() === "↻" && window.scrollY < maxScroll) {
+  if (playPauseBtn && playPauseBtn.node() && playPauseBtn.text() === "↻" && window.scrollY < maxScroll) {
     playPauseBtn.text("▶");
   }
 }, { passive: true });
@@ -413,3 +420,175 @@ function interpolateAccelerometerData(data) {
   
   return interpolatedData;
 }
+
+function parseAccelerometer(d) {
+  return {
+    user: d.user,
+    datetime: new Date(`2024-01-${String(d.day).padStart(2, '0')}T${d.time}`),
+    magnitude: +d["Vector Magnitude"]
+  };
+}
+
+function processAccelerometerData(data) {
+  if (!data || data.length === 0) {
+    console.error("No accelerometer data available");
+    return { hourlyData: [], peakHour: null };
+  }
+
+  const validData = data.filter(d => !isNaN(d.magnitude) && d.datetime instanceof Date);
+
+  if (validData.length === 0) {
+    console.error("No valid accelerometer data points found");
+    return { hourlyData: [], peakHour: null };
+  }
+
+  const hourlyData = Array.from(
+    d3.rollup(
+      validData,
+      v => d3.mean(v, d => d.magnitude),
+      d => d3.timeHour(d.datetime)
+    ),
+    ([hour, avgMagnitude]) => ({ hour, avgMagnitude })
+  ).sort((a, b) => a.hour - b.hour);
+
+  const peakHour = hourlyData.length > 0 
+    ? hourlyData.reduce((a, b) => b.avgMagnitude > a.avgMagnitude ? b : a, hourlyData[0])
+    : null;
+
+  return { hourlyData, peakHour };
+}
+
+function drawAccelerometer(data) {
+  const { hourlyData, peakHour } = processAccelerometerData(data);
+
+  // Update peak value display
+  const peakValueElement = document.getElementById('accelerometer-peak-value');
+  const peakTimeElement = document.getElementById('accelerometer-peak-time');
+  
+  if (peakValueElement && peakTimeElement) {
+    peakValueElement.textContent = peakHour ? `${peakHour.avgMagnitude.toFixed(1)}` : 'N/A';
+    peakTimeElement.textContent = peakHour ? `Peak at ${d3.timeFormat("%-I %p")(peakHour.hour)}` : 'Peak at N/A';
+  }
+
+  // Update metrics grid
+  const metricsContainer = d3.select("#accelerometer-metrics");
+  metricsContainer.html(""); // clear existing
+
+  const metrics = [
+    { key: 'avgMagnitude', label: 'Average Movement', value: `${d3.mean(hourlyData, d => d.avgMagnitude).toFixed(1)}` },
+    { key: 'minMagnitude', label: 'Minimum Movement', value: `${d3.min(hourlyData, d => d.avgMagnitude).toFixed(1)}` },
+    { key: 'maxMagnitude', label: 'Maximum Movement', value: `${d3.max(hourlyData, d => d.avgMagnitude).toFixed(1)}` },
+    { key: 'magnitudeRange', label: 'Movement Range', value: `${(d3.max(hourlyData, d => d.avgMagnitude) - d3.min(hourlyData, d => d.avgMagnitude)).toFixed(1)}` }
+  ];
+
+  metrics.forEach(metric => {
+    const metricDiv = metricsContainer.append('div').attr('class', 'metric');
+    
+    const labelGroup = metricDiv.append('div').attr('class', 'metric-label-group');
+    labelGroup.append('span').attr('class', 'metric-label-text').text(metric.label);
+
+    metricDiv.append('span')
+      .attr('class', 'metric-value-badge')
+      .text(metric.value);
+  });
+
+  if (hourlyData.length === 0) return;
+
+  const svg = d3.select("#accelerometer-chart");
+  const width = svg.node().getBoundingClientRect().width;
+  const height = 400;
+  const margin = { top: 40, right: 20, bottom: 50, left: 50 };
+
+  svg
+    .attr("viewBox", `0 0 ${width} ${height}`)
+    .attr("preserveAspectRatio", "xMidYMid meet")
+    .style("width", "100%")
+    .style("height", `${height}px`);
+
+  svg.selectAll("*").remove();
+
+  const hourExtent = d3.extent(hourlyData, d => d.hour);
+  const barPaddingMs = 30 * 60 * 1000; // half an hour on each side
+  const x = d3.scaleTime()
+    .domain([new Date(hourExtent[0].getTime() - barPaddingMs), new Date(hourExtent[1].getTime() + barPaddingMs)])
+    .range([margin.left, width - margin.right]);
+
+  const y = d3.scaleLinear()
+    .domain([0, d3.max(hourlyData, d => d.avgMagnitude)]).nice()
+    .range([height - margin.bottom, margin.top]);
+
+  let tooltip = d3.select("body").select("#tooltip-accelerometer");
+
+  if (tooltip.empty()) {
+    tooltip = d3.select("body")
+      .append("div")
+      .attr("id", "tooltip-accelerometer")
+      .attr("class", "chart-tooltip");
+  }
+
+  const barW = ((width - margin.left - margin.right) / hourlyData.length) * 0.8;
+
+  svg.append("g")
+    .selectAll("rect")
+    .data(hourlyData)
+    .join("rect")
+    .attr("x", d => x(d.hour) - barW / 2)
+    .attr("y", d => y(d.avgMagnitude))
+    .attr("width", barW)
+    .attr("height", d => height - margin.bottom - y(d.avgMagnitude))
+    .attr("fill", d => peakHour && d.hour.getTime() === peakHour.hour.getTime() ? "var(--accent-activity)" : "var(--primary)")
+    .attr("opacity", 0.6)
+    .on("mouseover", function (event, d) {
+      tooltip
+        .style("opacity", 1)
+        .html(`
+          <strong>Time:</strong> ${d3.timeFormat("%-I %p")(d.hour)}<br>
+          <strong>Movement Level:</strong> ${d.avgMagnitude.toFixed(1)}
+        `);
+      d3.select(this).attr("opacity", 1);
+    })
+    .on("mousemove", function (event) {
+      tooltip
+        .style("left", (event.pageX + 10) + "px")
+        .style("top", (event.pageY - 28) + "px");
+    })
+    .on("mouseout", function () {
+      tooltip.style("opacity", 0);
+      d3.select(this).attr("opacity", 0.6);
+    });
+
+  svg.append("g")
+    .attr("transform", `translate(0,${height - margin.bottom})`)
+    .call(d3.axisBottom(x)
+      .ticks(d3.timeHour.every(1))
+      .tickFormat(d3.timeFormat("%-I %p")))
+    .selectAll("text")
+    .style("text-anchor", "middle")
+    .style("font-size", "12px");
+
+  svg.append("g")
+    .attr("transform", `translate(${margin.left},0)`)
+    .call(d3.axisLeft(y))
+    .selectAll("text")
+    .style("font-size", "12px");
+
+  svg.append("text")
+    .attr("class", "axis-label")
+    .attr("transform", `translate(${width/2}, ${height - 5})`)
+    .style("text-anchor", "middle")
+    .style("font-size", "14px")
+    .style("font-weight", "500")
+    .text("Hour of Day");
+
+  svg.append("text")
+    .attr("class", "axis-label")
+    .attr("transform", "rotate(-90)")
+    .attr("x", -height/2)
+    .attr("y", 15)
+    .style("text-anchor", "middle")
+    .style("font-size", "14px")
+    .style("font-weight", "500")
+    .text("Average Movement Level");
+}
+
+export { parseAccelerometer, drawAccelerometer };
