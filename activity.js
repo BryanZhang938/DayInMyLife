@@ -51,9 +51,24 @@ function drawActivity(data) {
   metricsContainer.html(""); // clear existing
 
   const metrics = [
-    { key: 'minActivity', label: 'Minimum Activity Level', value: `${d3.min(hourlyData, d => d.avgActivity).toFixed(1)}` },
-    { key: 'avgActivity', label: 'Average Activity Level', value: `${d3.mean(hourlyData, d => d.avgActivity).toFixed(1)}` },
-    { key: 'maxActivity', label: 'Maximum Activity Level', value: `${d3.max(hourlyData, d => d.avgActivity).toFixed(1)}` }
+    { 
+      key: 'minActivity', 
+      label: 'Minimum Activity Level', 
+      value: `${d3.min(hourlyData, d => d.avgActivity).toFixed(1)}`,
+      time: d3.timeFormat("%-I %p")(hourlyData.find(d => d.avgActivity === d3.min(hourlyData, d => d.avgActivity)).hour)
+    },
+    { 
+      key: 'avgActivity', 
+      label: 'Average Activity Level', 
+      value: `${d3.mean(hourlyData, d => d.avgActivity).toFixed(1)}`,
+      time: `Day ${hourlyData[0].hour.getDate()} (${d3.timeFormat("%-I %p")(hourlyData[0].hour)}) through Day ${hourlyData[hourlyData.length - 1].hour.getDate()} (${d3.timeFormat("%-I %p")(hourlyData[hourlyData.length - 1].hour)})`
+    },
+    { 
+      key: 'maxActivity', 
+      label: 'Maximum Activity Level', 
+      value: `${d3.max(hourlyData, d => d.avgActivity).toFixed(1)}`,
+      time: d3.timeFormat("%-I %p")(hourlyData.find(d => d.avgActivity === d3.max(hourlyData, d => d.avgActivity)).hour)
+    }
   ];
 
   metrics.forEach(metric => {
@@ -62,9 +77,16 @@ function drawActivity(data) {
     const labelGroup = metricDiv.append('div').attr('class', 'metric-label-group');
     labelGroup.append('span').attr('class', 'metric-label-text').text(metric.label);
 
-    metricDiv.append('span')
+    const valueGroup = metricDiv.append('div').attr('class', 'metric-value-group');
+    valueGroup.append('span')
       .attr('class', 'metric-value-badge')
       .text(metric.value);
+    
+    if (metric.time) {
+      valueGroup.append('span')
+        .attr('class', 'metric-time')
+        .text(metric.key === 'avgActivity' ? metric.time : `at ${metric.time}`);
+    }
   });
 
   if (hourlyData.length === 0) return;
@@ -98,7 +120,8 @@ function drawActivity(data) {
     tooltip = d3.select("body")
       .append("div")
       .attr("id", "tooltip-activity")
-      .attr("class", "chart-tooltip");
+      .attr("class", "chart-tooltip")
+      .style("opacity", 0);
   }
 
   const barW = ((width - margin.left - margin.right) / hourlyData.length) * 0.8;
@@ -111,6 +134,7 @@ function drawActivity(data) {
     .attr("y", d => y(d.avgActivity))
     .attr("width", barW)
     .attr("height", d => height - margin.bottom - y(d.avgActivity))
+    .attr("rx", 4)
     .attr("fill", d => peakHour && d.hour.getTime() === peakHour.hour.getTime() ? "var(--accent-activity)" : "var(--primary)")
     .attr("opacity", 0.6)
     .on("mouseover", function (event, d) {
@@ -136,10 +160,63 @@ function drawActivity(data) {
     .attr("transform", `translate(0,${height - margin.bottom})`)
     .call(d3.axisBottom(x)
       .ticks(d3.timeHour.every(1))
-      .tickFormat(d3.timeFormat("%-I %p")))
+      .tickFormat(d => {
+        const hour = d.getHours();
+        const date = d.getDate();
+        // Show hour for first occurrence of each hour in each day
+        const isFirstOccurrence = hourlyData.findIndex(d2 => 
+          d2.hour.getHours() === hour && d2.hour.getDate() === date
+        ) === hourlyData.findIndex(d2 => d2.hour.getTime() === d.getTime());
+        return isFirstOccurrence ? d3.timeFormat("%-I %p")(d) : "";
+      }))
     .selectAll("text")
     .style("text-anchor", "middle")
     .style("font-size", "12px");
+
+  // Add day markers
+  const dayChanges = hourlyData.reduce((acc, curr, idx) => {
+    if (idx > 0 && curr.hour.getDate() !== hourlyData[idx - 1].hour.getDate()) {
+      acc.push(curr.hour);
+    }
+    return acc;
+  }, []);
+
+  // Add Day 1 marker at the start
+  const firstDay = hourlyData[0].hour;
+  svg.append("line")
+    .attr("x1", x(firstDay))
+    .attr("x2", x(firstDay))
+    .attr("y1", height - margin.bottom)
+    .attr("y2", height - margin.bottom + 10)
+    .attr("stroke", "var(--border)")
+    .attr("stroke-width", 2);
+
+  svg.append("text")
+    .attr("x", x(firstDay))
+    .attr("y", height - margin.bottom + 35)
+    .attr("text-anchor", "middle")
+    .style("font-size", "12px")
+    .style("fill", "var(--muted-foreground)")
+    .text("Day 1");
+
+  // Add markers for day changes
+  dayChanges.forEach(dayChange => {
+    svg.append("line")
+      .attr("x1", x(dayChange))
+      .attr("x2", x(dayChange))
+      .attr("y1", height - margin.bottom)
+      .attr("y2", height - margin.bottom + 10)
+      .attr("stroke", "var(--border)")
+      .attr("stroke-width", 2);
+
+    svg.append("text")
+      .attr("x", x(dayChange))
+      .attr("y", height - margin.bottom + 35)
+      .attr("text-anchor", "middle")
+      .style("font-size", "12px")
+      .style("fill", "var(--muted-foreground)")
+      .text(`Day ${dayChange.getDate()}`);
+  });
 
   svg.append("g")
     .attr("transform", `translate(${margin.left},0)`)

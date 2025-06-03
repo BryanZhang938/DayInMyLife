@@ -323,10 +323,26 @@ body {
   color: var(--foreground);
 }
 
+.metric-value-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-height: 2.5rem;
+  justify-content: flex-end;
+}
+
+.metric-time {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  font-weight: 500;
+  height: 1.25rem;
+}
+
 .metric-value-badge {
   font-size: 1.125rem;
   font-weight: 600;
   color: var(--foreground);
+  line-height: 1.25rem;
 }
 
 /* Chart Styles */
@@ -402,7 +418,6 @@ svg text.chart-title {
 #tooltip-heartrate,
 #metric-info-tooltip {
   position: absolute;
-  visibility: hidden;
   opacity: 0;
   background-color: var(--popover);
   color: var(--popover-foreground);
