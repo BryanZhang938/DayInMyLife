@@ -75,15 +75,19 @@
     .header-content {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
       margin-top: -30px;
+      position: relative;
     }
 
     .title-card {
       flex: 1;
+      text-align: center;
     }
 
     .time-display {
+      position: absolute;
+      right: 0;
       background: rgba(255, 255, 255, 0.8);
       -webkit-backdrop-filter: blur(8px);
       backdrop-filter: blur(8px);
@@ -259,41 +263,94 @@
 
     #autoscroller {
       position: fixed;
-      bottom: 20px; 
+      bottom: 30px; 
       left: 50%;
       transform: translateX(-50%);
       z-index: 1000; 
-      background-color: rgba(255,255,255,0.5);
+      background: rgba(255, 255, 255, 0.8);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
       color: var(--accent-color);
-      border: 1px solid rgba(255,255,255,0.2);
-      -webkit-backdrop-filter: blur(8px);
-      backdrop-filter: blur(8px);
-      padding: 0.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 1rem 2rem;
       border-radius: 100px;
       font-size: 1rem;
-      width: 200px;
-      height: 50px;
+      width: 280px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: all 0.2s ease;
+    }
+
+    #autoscroller button {
+      background: rgba(255, 255, 255, 0.8);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      color: var(--accent-color);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 0.5rem;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      transition: background-color 0.2s ease, color 0.2s ease;
-        
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    #autoscroller button:hover {
+      background: rgba(255, 255, 255, 0.9);
+      transform: scale(1.1);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
 
     #play-pause-btn {
-      height: 50px;
-      width: 50px;
-      /*padding: 6px 12px;*/
+      height: 45px;
+      width: 45px;
       border: none;
-      border-radius: 2rem;
-      font-size: 2rem;
+      border-radius: 50%;
+      background: var(--accent-color);
+      color: white;
+      font-size: 1.3rem;
       font-weight: 600;
       cursor: pointer;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      transition: background-color 0.2s ease;
-      z-index: 9999; /* stays on top */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      position: relative;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    #play-pause-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      filter: brightness(1.1);
+    }
+
+    #scroll-speed {
+      position: absolute;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: monospace;
+      font-weight: 600;
+      color: var(--accent-color);
+      font-size: 1rem;
+      background: rgba(255, 255, 255, 0.8);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      padding: 0.35rem 0.75rem;
+      border-radius: 100px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      white-space: nowrap;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
 
     #loading-overlay-hr, #loading-overlay-acc {
@@ -324,7 +381,7 @@
       font-weight: bold;
     }
 
-    /* Theme-specific styles */
+    /* Theme-specific styles with enhanced colors */
     .theme-dawn {
       --accent-color: #ea580c;
       --card-bg: rgba(255, 237, 213, 0.8);
@@ -495,6 +552,10 @@ h3{
   transform: scale(1.05);
 }
 
+#home-button {
+  position: absolute;
+  left: 0;
+}
 
   </style>
 </head>
@@ -558,10 +619,10 @@ h3{
       </div>
 
       <div id="autoscroller">
-        <button id="slow" title="Slow">slow</button>
+        <button id="slow" title="Slow"><i class="fas fa-backward"></i></button>
         <button id="play-pause-btn">▶</button>
         <p id="scroll-speed">1.5×</p>
-        <button id="fast" title="Fast Forward">fast</button>
+        <button id="fast" title="Fast Forward"><i class="fas fa-forward"></i></button>
       </div>
 
     </div>
