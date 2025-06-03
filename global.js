@@ -118,7 +118,7 @@ d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
   circles
       .on("mouseover", function (event, d) {
         tooltip.style("visibility", "visible")
-          .html(`<strong>Participant ${d.user}</strong><br>` +
+          .html(`<strong>Participant ${d.user.replace('user_', '')}</strong><br>` +
                 `Age: ${d.Age}<br>` +
                 `Height: ${d.Height} cm<br>` +
                 `Weight: ${d.Weight} kg<br>` +
