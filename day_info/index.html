@@ -284,6 +284,47 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       transition: all 0.2s ease;
     }
+    #autoscroller {
+  position: fixed;
+  bottom: 25px; 
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000; 
+  background: rgba(255, 255, 255, 0.8);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  color: var(--accent-color);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.5rem 1rem;
+  border-radius: 100px;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px; /* Add this line */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  width: auto;
+  height: auto;
+}
+
+#autoscroller button {
+  background: rgba(255, 255, 255, 0.8);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: var(--accent-color);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.3rem;
+  width: 30px;
+  height: 30px;
+  font-size: 0.9rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
 
     #autoscroller button {
       background: rgba(255, 255, 255, 0.8);
@@ -303,6 +344,7 @@
       justify-content: center;
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
+    
 
     #autoscroller button:hover {
       background: rgba(255, 255, 255, 0.9);
