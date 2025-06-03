@@ -57,10 +57,9 @@ function drawHeartRate(data) {
   metricsContainer.html(""); // clear existing
 
   const metrics = [
-    { key: 'avgHeartRate', label: 'Average Heart Rate', value: `${d3.mean(hourlyData, d => d.avgRate).toFixed(1)} bpm` },
     { key: 'minHeartRate', label: 'Minimum Heart Rate', value: `${d3.min(hourlyData, d => d.avgRate).toFixed(1)} bpm` },
-    { key: 'maxHeartRate', label: 'Maximum Heart Rate', value: `${d3.max(hourlyData, d => d.avgRate).toFixed(1)} bpm` },
-    { key: 'heartRateRange', label: 'Heart Rate Range', value: `${(d3.max(hourlyData, d => d.avgRate) - d3.min(hourlyData, d => d.avgRate)).toFixed(1)} bpm` }
+    { key: 'avgHeartRate', label: 'Average Heart Rate', value: `${d3.mean(hourlyData, d => d.avgRate).toFixed(1)} bpm` },
+    { key: 'maxHeartRate', label: 'Maximum Heart Rate', value: `${d3.max(hourlyData, d => d.avgRate).toFixed(1)} bpm` }
   ];
 
   metrics.forEach(metric => {

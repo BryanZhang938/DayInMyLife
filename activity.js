@@ -51,10 +51,9 @@ function drawActivity(data) {
   metricsContainer.html(""); // clear existing
 
   const metrics = [
-    { key: 'avgActivity', label: 'Average Activity Level', value: `${d3.mean(hourlyData, d => d.avgActivity).toFixed(1)}` },
     { key: 'minActivity', label: 'Minimum Activity Level', value: `${d3.min(hourlyData, d => d.avgActivity).toFixed(1)}` },
-    { key: 'maxActivity', label: 'Maximum Activity Level', value: `${d3.max(hourlyData, d => d.avgActivity).toFixed(1)}` },
-    { key: 'activityRange', label: 'Activity Level Range', value: `${(d3.max(hourlyData, d => d.avgActivity) - d3.min(hourlyData, d => d.avgActivity)).toFixed(1)}` }
+    { key: 'avgActivity', label: 'Average Activity Level', value: `${d3.mean(hourlyData, d => d.avgActivity).toFixed(1)}` },
+    { key: 'maxActivity', label: 'Maximum Activity Level', value: `${d3.max(hourlyData, d => d.avgActivity).toFixed(1)}` }
   ];
 
   metrics.forEach(metric => {

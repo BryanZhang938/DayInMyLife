@@ -60,16 +60,16 @@ Promise.all([
 
 // Add metric descriptions
 const metricDescriptions = {
-  totalSleep: "The total amount of time spent sleeping during the night.",
-  efficiency: "The percentage of time spent asleep while in bed.",
-  latency: "The time it takes to fall asleep after getting into bed.",
-  awakenings: "The number of times you woke up during the night.",
-  avgAwakeningLength: "The average duration of each awakening during sleep.",
-  waso: "The total time spent awake after initially falling asleep.",
-  movementIndex: "A measure of how much movement occurred during sleep.",
-  fragmentationIndex: "A measure of how fragmented your sleep was.",
-  cortisol: "A stress hormone that follows a daily rhythm, typically highest in the morning.",
-  melatonin: "A sleep-promoting hormone that rises in the evening and peaks during sleep."
+  totalSleep: "Total time the user spent sleeping, in minutes.",
+  efficiency: "Percentage of time in bed that the user was actually asleep.",
+  latency: "Time it took to fall asleep after going to bed.",
+  awakenings: "Number of times the user woke up during sleep.",
+  avgAwakeningLength: "Average duration of each awakening, in minutes.",
+  waso: "Total number of minutes the participant spent awake after initially falling asleep.",
+  movementIndex: "Percentage of time spent immobile (no arm movement) during the movement phase of sleep.",
+  fragmentationIndex: "Percentage of time spent moving during what should have been immobile sleep phases.",
+  cortisol: "Cortisol concentration measured in μg of cortisol per 100 μg of protein. Typically higher after waking, it reflects physiological stress and alertness.",
+  melatonin: "Melatonin concentration measured in μg of melatonin per μg of protein. Typically higher before sleep, it reflects readiness for sleep and circadian rhythm."
 };
 
 function showInfoTooltip(x, y, text) {

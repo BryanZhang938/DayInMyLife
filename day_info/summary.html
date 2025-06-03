@@ -74,6 +74,14 @@
       <div class="nav-buttons">
         <script>
           const user = new URLSearchParams(window.location.search).get("user");
+          const participantNumber = user ? user.replace('user_', '') : "Unknown";
+          
+          // Set the title and subtitle text content
+          document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('.page-title-content h1').textContent = `Participant ${participantNumber}'s Daily Summary`;
+            document.querySelector('.page-title-content .subtitle').textContent = `A comprehensive overview of Participant ${participantNumber}'s biometric data, sleep patterns, and activity levels from their day.`;
+            document.querySelector('footer p').textContent = `Thank you for exploring Participant ${participantNumber}'s data story. Their biometric patterns reveal fascinating insights about their daily rhythms.`;
+          });
         </script>
         <button onclick="window.location.href=`index.html?user=${user}`">
           ← Back to Day View
@@ -81,10 +89,6 @@
         <button class="home-button" title="Return to Home" onclick="window.location.href='../index.html'">
           <i class="fas fa-home"></i>
         </button>
-        <button id="conclusion-button" class="control-button tutorial-button">
-          Conclusion
-        </button>
-
       </div>
     </header>
 
@@ -100,8 +104,8 @@
 
     <div class="page-title-section">
       <div class="page-title-content">
-        <h1>Your Daily Summary</h1>
-        <p class="subtitle">A comprehensive overview of your biometric data, sleep patterns, and activity levels from your day.</p>
+        <h1>Daily Summary</h1>
+        <p class="subtitle">A comprehensive overview of biometric data, sleep patterns, and activity levels.</p>
       </div>
     </div>
 
@@ -138,12 +142,6 @@
           <h2>Heart Rate Summary</h2>
         </div>
         <div class="card-content">
-          <div class="chart-peak-info">
-            <div class="peak-value-display">
-              <span id="heartrate-peak-value" class="peak-value-amount">N/A</span>
-            </div>
-            <span id="heartrate-peak-time" class="peak-time-label">Peak at N/A</span>
-          </div>
           <div id="heartrate-metrics" class="metrics-grid card-metrics-inline"></div>
           <svg id="heartrate-chart" class="chart"></svg>
           <div class="chart-legend">
@@ -167,12 +165,6 @@
           <h2>Activity Summary</h2>
         </div>
         <div class="card-content">
-          <div class="chart-peak-info">
-            <div class="peak-value-display">
-              <span id="activity-peak-value" class="peak-value-amount">N/A</span>
-            </div>
-            <span id="activity-peak-time" class="peak-time-label">Peak at N/A</span>
-          </div>
           <div id="activity-metrics" class="metrics-grid card-metrics-inline"></div>
           <svg id="activity-chart" class="chart"></svg>
           <div class="chart-legend">
@@ -189,7 +181,7 @@
       </div>
     </main>
 
-  </div>
+    </div>
 
   <script type="module" src="../script.js"></script>
   <script type="module" src="../sleep.js"></script>
@@ -199,6 +191,17 @@
     import { initializeConclusionModal } from './takeaway.js';
     initializeConclusionModal();
   </script>
+
+  <footer>
+    <p style="text-align: center; margin-bottom: 1rem;">Thank you for exploring this data story.</p>
+    <div class="footer-buttons-container">
+      <button class="control-button footer-button-white" onclick="window.location.href='../index.html'">View Another Story</button>
+      <button id="conclusion-button" class="control-button footer-button-purple">
+        Conclusion
+      </button>
+      <a href="https://physionet.org/content/mmash/1.0.0/" class="control-button footer-button-white" target="_blank" rel="noopener">View Dataset</a>
+    </div>
+  </footer>
 
 </body>
 </html>

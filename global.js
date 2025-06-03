@@ -35,6 +35,28 @@ const participantDetailsContent = hoverPreviewHelper.select(".participant-detail
 let selectedCircle = null; // Keep track of the currently selected circle
 let currentlySelectedData = null; // Keep track of data for the selected circle
 
+const userDisplayMap = {
+    "user_1": 1,
+    "user_2": 2,
+    "user_3": 3,
+    "user_4": 4,
+    "user_5": 5,
+    "user_6": 6,
+    "user_7": 7,
+    "user_9": 9,
+    "user_10": 10,
+    "user_12": 12,
+    "user_13": 13,
+    "user_14": 14,
+    "user_15": 15,
+    "user_16": 16,
+    "user_17": 17,
+    "user_19": 19,
+    "user_20": 20,
+    "user_21": 21,
+    "user_22": 22
+};
+
 d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
   data = data.filter(d => d.user !== "user_11" && d.user !== "user_8");
 
@@ -118,7 +140,7 @@ d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
   circles
       .on("mouseover", function (event, d) {
         tooltip.style("visibility", "visible")
-          .html(`<strong>Participant ${d.user.replace('user_', '')}</strong><br>` +
+          .html(`<strong>Participant ${userDisplayMap[d.original_user]}</strong><br>` +
                 `Age: ${d.Age}<br>` +
                 `Height: ${d.Height} cm<br>` +
                 `Weight: ${d.Weight} kg<br>` +
@@ -137,7 +159,7 @@ d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
             if (!hoverPreviewHelper.empty()) {
                 placeholderContent.style("display", "none");
                 const detailsHtml = `
-                    <span class="avatar-placeholder">Participant ${d.user.replace('user_', '')}</span>
+                    <span class="avatar-placeholder">Participant ${userDisplayMap[d.original_user]}</span>
                     <ul>
                         <li><span class="label">Age:</span> <span class="value">${d.Age}</span></li>
                         <li><span class="label">Height:</span> <span class="value">${d.Height} cm</span></li>
@@ -218,7 +240,7 @@ d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
           if (!hoverPreviewHelper.empty()) {
             placeholderContent.style("display", "none");
             const detailsHtml = `
-                <span class="avatar-placeholder">Participant ${d.user.replace('user_', '')}</span>
+                <span class="avatar-placeholder">Participant ${userDisplayMap[d.original_user]}</span>
                 <ul>
                     <li><span class="label">Age:</span> <span class="value">${d.Age}</span></li>
                     <li><span class="label">Height:</span> <span class="value">${d.Height} cm</span></li>
