@@ -459,7 +459,7 @@ h3{
 }
 
 #home-button:hover {
-  background-color: rgba(255,255,255,0.8);
+  background-color: rgba(255,255,255,0.9);
   transform: scale(1.1);
   box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
@@ -468,6 +468,33 @@ h3{
   transform: scale(0.95);
   background-color: rgba(255,255,255,0.9);
 }
+
+#view-summary-btn {
+  display: none;
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  z-index: 10000;
+
+  padding: 20px 30px;
+  font-size: 1.2rem;
+  font-family: inherit;
+  background: rgba(255,255,255,0.8);
+  color: #333;
+  border: none;
+  border-radius: 50px;
+
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+/* Hover effect */
+#view-summary-btn:hover {
+  background: rgba(255,255,255,0.9);
+  transform: scale(1.05);
+}
+
 
   </style>
 </head>
@@ -483,7 +510,7 @@ h3{
           </div>
           <div class="time-display" style="color: var(--accent-color); transition: color 0.5s ease;">00:00 AM</div>
           <button id="home-button" title="Return to Home" style="
-            background-color: rgba(255,255,255,0.5);
+            background-color: rgba(255,255,255,0.8);
             color: var(--accent-color);
             border: 1px solid rgba(255,255,255,0.2);
             -webkit-backdrop-filter: blur(8px);
@@ -557,8 +584,7 @@ h3{
 
   </div>
 
-  <button id="view-summary-btn"
-    style="display: none; position: fixed; bottom: 20px; right: 20px; z-index: 10000; padding: 10px 20px; font-size: 1rem;">
+  <button id="view-summary-btn">
     View Summary Stats
   </button>
 

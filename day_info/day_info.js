@@ -474,7 +474,7 @@ function renderChart(dataSlice, windowStart, windowEnd, yExtent, activitiesForCh
     svg.append("text")
         .attr("class", "y-axis-label")
         .attr("x", -(height / 2))
-        .attr("y", margin.left - 50) 
+        .attr("y", margin.left - 55) 
         .attr("transform", "rotate(-90)")
         .attr("text-anchor", "middle")
         .text("Beats Per Minute")
@@ -645,17 +645,17 @@ function updateTheme(time) {
   document.querySelector('#play-pause-btn')?.style.setProperty('color', theme.accent);
 
   // Update chart colors
-  svg.selectAll(".tick text").style("fill", theme.accent);
-  svg.selectAll(".domain, .tick line").style("stroke", theme.accent);
-  svg.selectAll("text.axis-label").style("fill", theme.accent);
-  svg.select("text[text-anchor='middle']").style("fill", theme.accent);
+//   svg.selectAll(".tick text").style("fill", theme.accent);
+//   console.log(svg.selectAll(".tick text"));
+//   svg.selectAll(".domain, .tick line").style("stroke", theme.accent);
+//   svg.selectAll("text.axis-label").style("fill", theme.accent);
+//   svg.select("text[text-anchor='middle']").style("fill", theme.accent);
   
   // Update card and activity section colors
   document.querySelectorAll('.card h3').forEach(h3 => h3.style.color = theme.accent);
-  // document.querySelector('.activity-title')?.style.setProperty('background', theme.card);
   document.querySelector('.activity-title p')?.style.setProperty('color', theme.accent, 'important');
   document.querySelector('.activity-title h4')?.style.setProperty('color', theme.accent);
-  // document.querySelector('.activity-container')?.style.setProperty('background', theme.card);
+  document.querySelector('.activity-caption-box')?.style.setProperty('color', theme.accent);
 
   // Update button colors
   const homeButton = document.getElementById('home-button');
@@ -664,7 +664,7 @@ function updateTheme(time) {
   }
   const summaryButton = document.getElementById('view-summary-btn');
   if (summaryButton) {
-    summaryButton.style.backgroundColor = theme.accent;
+    summaryButton.style.color = theme.accent;
   }
 }
 
