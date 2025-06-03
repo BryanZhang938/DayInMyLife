@@ -246,9 +246,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const stepDotsContainer = document.getElementById('tutorial-step-dots');
   const stepIndicatorContainer = document.querySelector('.tutorial-header .step-indicator-container');
 
-  console.log('Tutorial Button:', showTutorialButton);
-  console.log('Tutorial Modal:', tutorialModal);
-
   const tutorialSteps = [
       {
           title: "Welcome to A Day in My Life!",
@@ -355,6 +352,8 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
       document.body.classList.add('loaded');
   }, 100); // 100ms delay, adjust if needed
+
+
 });
 
 const intro = document.getElementById("intro-screen");
