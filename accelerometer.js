@@ -66,6 +66,13 @@ d3.csv("../assets/cleaned_data/acc.csv", d => {
   updateChart(selectedUser);
 
   const playPauseBtn = d3.select("#play-pause-btn");
+  const fastBtn = d3.select("#fast");
+
+  let currentSpeed = 1;
+  const baseInterval = 50;
+  const step = 15;
+  
+
   playPauseBtn.on("click", () => {
     if (isPlaying) {
       // If currently playing, pause auto-scroll
@@ -84,32 +91,66 @@ d3.csv("../assets/cleaned_data/acc.csv", d => {
       autoScrollInterval = setInterval(() => {
         const maxScroll = document.body.scrollHeight - window.innerHeight;
         const current = window.scrollY;
-        const step = 50; // pixels per tick
+        const distance = step * currentSpeed;
   
-        if (current + step >= maxScroll) {
+        if (current + distance >= maxScroll) {
           window.scrollTo({ top: maxScroll });
         // …then flip to ↻ Reset
         stopAutoScroll();
               } else {
           isAutoScrolling = true;
           lastScrollTime = Date.now();
-          window.scrollTo({ top: current + step, behavior: "smooth" });
+          window.scrollTo({ top: current + distance, behavior: currentSpeed > 1 ? "auto" : "smooth" });
         }
-      }, 100);
+      }, baseInterval);
     }
   });
+
+  fastBtn.on("click", () => {
+    // Cycle through speeds: 1x -> 2x -> 4x -> 1x
+    if (currentSpeed === 1) {
+      currentSpeed = 1.5;
+      fastBtn.text("fast 1.5×");
+    } else if (currentSpeed === 1.5) {
+      currentSpeed = 2;
+      fastBtn.text("fast 2×");
+    } else {
+      currentSpeed = 1;
+      fastBtn.text("fast 1×");
+    }
+  
+    // If playing, restart the interval with new speed
+    if (isPlaying) {
+      clearInterval(autoScrollInterval);
+      autoScrollInterval = setInterval(() => {
+        const maxScroll = document.body.scrollHeight - window.innerHeight;
+        const current = window.scrollY;
+        const distance = step * currentSpeed;
+  
+        if (current + distance >= maxScroll) {
+          window.scrollTo({ top: maxScroll });
+          stopAutoScroll();
+        } else {
+          isAutoScrolling = true;
+          lastScrollTime = Date.now();
+          window.scrollTo({ top: current + distance, behavior: currentSpeed > 1 ? "auto" : "smooth" });
+        }
+      }, baseInterval);
+    }
+  });
+  
   
   function stopAutoScroll() {
     isPlaying = false;
     clearInterval(autoScrollInterval);
-    playPauseBtn.text("↻ Reset");
+    playPauseBtn.text("↻");
   }
   
   window.addEventListener("wheel", () => {
     if (isPlaying) {
       isPlaying = false;
       clearInterval(autoScrollInterval);
-      playPauseBtn.text("▶ Auto-Scroll");
+      playPauseBtn.text("▶");
     }
   }, { passive: true });
   
@@ -117,7 +158,7 @@ d3.csv("../assets/cleaned_data/acc.csv", d => {
     if (isPlaying) {
       isPlaying = false;
       clearInterval(autoScrollInterval);
-      playPauseBtn.text("▶ Auto-Scroll");
+      playPauseBtn.text("▶");
     }
   }, { passive: true });
   
@@ -125,8 +166,8 @@ d3.csv("../assets/cleaned_data/acc.csv", d => {
 window.addEventListener("scroll", () => {
   const maxScroll = document.body.scrollHeight - window.innerHeight;
   // only when we're showing Reset and we're no longer at the bottom
-  if (playPauseBtn.text() === "↻ Reset" && window.scrollY < maxScroll) {
-    playPauseBtn.text("▶ Auto-Scroll");
+  if (playPauseBtn.text() === "↻" && window.scrollY < maxScroll) {
+    playPauseBtn.text("▶");
   }
 }, { passive: true });
 
