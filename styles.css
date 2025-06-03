@@ -746,6 +746,7 @@ body.loaded .legend-container {
 .control-button.active-filter .filter-icon {
   color: #3b82f6; /* Blue icon */
 }
+
 #home-button {
   position: fixed;
   top: 25px;
@@ -1013,11 +1014,6 @@ svg text.axis-label {
 /* Circle selection styles */
 svg circle {
   transition: stroke 0.2s ease, stroke-width 0.2s ease, opacity 0.2s ease; /* Smooth transitions */
-}
-
-/* Style for the selected circle */
-svg circle.selected {
-  /* Additional styles can be added here if needed */
 }
 
 /* Style for the "Explore Their Day" button */
