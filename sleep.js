@@ -47,7 +47,6 @@ const metricDescriptions = {
 
 // load CSV once at startup
 d3.csv("../assets/cleaned_data/all_sleep.csv", parseSleep).then(sleepData => {
-  console.log("Sleep data loaded:", sleepData);
   data.sleep = sleepData;
   
   if (selectedUser) {

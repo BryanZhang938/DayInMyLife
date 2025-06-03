@@ -207,15 +207,15 @@ function setupActivityDisplayElements() {
     videoWrapperElement.appendChild(noActivityMsgElement);
     container.appendChild(videoWrapperElement);
     activitySection.appendChild(title);
-activitySection.appendChild(container);
+    activitySection.appendChild(container);
 
-// NEW: Create caption box and append
-const caption = document.createElement("div");
-caption.id = "activity-caption";
-caption.className = "activity-caption-box";
-caption.textContent = "No activity data available.";
+    // NEW: Create caption box and append
+    const caption = document.createElement("div");
+    caption.id = "activity-caption";
+    caption.className = "activity-caption-box";
+    caption.textContent = "No activity data available.";
 
-activitySection.appendChild(caption);  // ← added inside the same fixed box
+    activitySection.appendChild(caption);  // ← added inside the same fixed box
     
     // Prepend to body or append to a specific placeholder if you have one
     const animationDiv = document.querySelector('.animation-section');
@@ -279,7 +279,7 @@ function updateActivityAnimationView(nowDateTime, activities) {
                 preloadVideoElement.onloadeddata = () => {
                     // Check if this video is still the desired one (user might have scrolled fast)
                     const stillRelevantActivity = getActiveActivity(nowDateTime, activities);
-                    if (stillRelevantActivity && activityDetailsMap[stillRelevantActivity.activityCode] &&
+                    if (stillRelevantActivity && activityDetailsMap[stillRelevantActivity.activityCode] && 
                         new URL(activityDetailsMap[stillRelevantActivity.activityCode].file, window.location.href).href === preloadVideoElement.currentSrc) {
                         
                         currentVideoElement.style.display = 'none';
@@ -526,8 +526,10 @@ function renderChart(dataSlice, windowStart, windowEnd, yExtent, activitiesForCh
                 } catch (e) { console.warn("Error selecting activity rect:", e); }
                 tooltipHtml += `<strong style="color:${activityColor(overlappingActivity.activity)}">${activityLabels[overlappingActivity.activity]}</strong><br/>`;
                 updateActivityInfo(overlappingActivity);
+                updateTheme(currentScrollTime);  
             } else {
                 updateActivityInfo();
+                updateTheme(currentScrollTime);  
             }
 
             if (d_hr) {
@@ -559,6 +561,7 @@ function renderChart(dataSlice, windowStart, windowEnd, yExtent, activitiesForCh
             updateActivityAnimationView(hoveredTime, allUserActivities); // Ensure 'allUserActivities' is defined and passed
             const currentActivity = getActiveActivity(hoveredTime, allUserActivities);
             updateActivityInfo(currentActivity);
+            updateTheme(currentScrollTime);  
         })
         .on("mouseleave", () => {
             tooltip.style("display", "none");
@@ -578,6 +581,7 @@ function renderChart(dataSlice, windowStart, windowEnd, yExtent, activitiesForCh
                  updateActivityAnimationView(currentScrollTime, allUserActivities);
                  const currentActivity = getActiveActivity(currentScrollTime, allUserActivities);
                  updateActivityInfo(currentActivity);
+                 updateTheme(currentScrollTime);  
             }
         });
 
@@ -647,10 +651,10 @@ function updateTheme(time) {
   
   // Update card and activity section colors
   document.querySelectorAll('.card h3').forEach(h3 => h3.style.color = theme.accent);
-  document.querySelector('.activity-title')?.style.setProperty('background', theme.card);
-  document.querySelector('.activity-title p')?.style.setProperty('color', theme.accent);
+  // document.querySelector('.activity-title')?.style.setProperty('background', theme.card);
+  document.querySelector('.activity-title p')?.style.setProperty('color', theme.accent, 'important');
   document.querySelector('.activity-title h4')?.style.setProperty('color', theme.accent);
-  document.querySelector('.activity-container')?.style.setProperty('background', theme.card);
+  // document.querySelector('.activity-container')?.style.setProperty('background', theme.card);
 
   // Update button colors
   const homeButton = document.getElementById('home-button');
@@ -699,7 +703,8 @@ function updateScrollProgress() {
     if (progressFill) {
       progressFill.style.width = `${scrollProgress * 100}%`;
     }
-  }
+}
+
   let timeExtent = null;
   function updateActivityInfo(activity) {
     const activityInfo = document.querySelector('.activity-title');
@@ -923,9 +928,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const windowStart = new Date(timeExtent[0].getTime() + offsetMs);
             const windowEnd = new Date(windowStart.getTime() + viewWindowDurationMs);
             currentScrollTime = new Date(windowStart.getTime());
-
-            // Update theme based on current time
-            updateTheme(currentScrollTime);
             
             // Update scroll progress indicators
             updateScrollProgress(scrollProgress);
@@ -991,6 +993,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Update activity info
             const currentActivity = getActiveActivity(currentScrollTime, allUserActivities);
             updateActivityInfo(currentActivity);
+            updateTheme(currentScrollTime);  
         }
         updateTimeDisplay();
 
@@ -1026,6 +1029,7 @@ if (introScreen) {
         // Initial activity info
         const initialActivity = getActiveActivity(currentScrollTime, allUserActivities);
         updateActivityInfo(initialActivity);
+        updateTheme(currentScrollTime);  
 
         // Click handler for video wrapper to attempt play if paused by browser
         if (videoWrapperElement) {

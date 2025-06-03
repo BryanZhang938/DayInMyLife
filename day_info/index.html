@@ -181,7 +181,7 @@
     /* Activity Section Styles */
     .activity-section {
       position: fixed;
-      top: 100px;
+      top: 170px;
       right: 130px;
       width: 600px;
       height: 500px;
@@ -196,6 +196,7 @@
       backdrop-filter: blur(8px);
       margin: 0;
       border: 1px solid rgba(255, 255, 255, 0.2);
+      border-bottom: none;
       border-radius: 1rem 1rem 0 0;
       text-align: center;
     }
@@ -215,11 +216,12 @@
       padding: 10px;
       border-radius: 0 0 1rem 1rem;
       border: 1px solid rgba(255, 255, 255, 0.2);
+      border-top: none;
     }
 
     .video-wrapper {
       width: 100%;
-      height: 270px;
+      height: 315px;
       position: relative;
       overflow: hidden;
       border: 1px solid rgba(255, 255, 255, 0.2);
@@ -258,10 +260,27 @@
       left: 50%;
       transform: translateX(-50%);
       z-index: 1000; 
+      background-color: rgba(255,255,255,0.5);
+      color: var(--accent-color);
+      border: 1px solid rgba(255,255,255,0.2);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      padding: 0.5rem;
+      border-radius: 100px;
+      font-size: 1rem;
+      width: 200px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: background-color 0.2s ease, color 0.2s ease;
+        
     }
 
     #play-pause-btn {
-      margin-top: 10px;
+      /*margin-top: 10px;*/
       padding: 6px 12px;
       font-size: 14px;
       border: none;
@@ -501,7 +520,9 @@ h3{
       </div>
 
       <div id="autoscroller">
+        <button id="slow" title="Slow"></button>
         <button id="play-pause-btn">▶ Auto-Scroll</button>
+        <button id="fast" title="Fast Forward"></button>
       </div>
 
     </div>
