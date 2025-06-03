@@ -557,6 +557,157 @@ h3{
   left: 0;
 }
 
+/* Tutorial Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-overlay.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  max-width: 500px;
+  width: 90%;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  transform: translateY(20px);
+  transition: transform 0.3s ease;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-overlay.visible .modal-content {
+  transform: translateY(0);
+}
+
+.modal-close-button {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  font-size: 1.5rem;
+  padding: 0.5rem;
+  transition: color 0.2s ease;
+}
+
+.modal-close-button:hover {
+  color: #1f2937;
+}
+
+.tutorial-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  flex-shrink: 0;
+}
+
+.tutorial-header .step-indicator-container {
+  background-color: #e0e7ff;
+    color: #3b82f6;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  border-radius: 50%;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.tutorial-header h3 {
+  color: #1f2937;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.tutorial-text {
+  color: #4b5563;
+  line-height: 1.4;
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+}
+
+.tutorial-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  flex-shrink: 0;
+}
+
+.step-dots {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.step-dots .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #d1d5db; /* Light grey from image */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.step-dots .dot.active {
+  background: #3b82f6; /* Blue from image */
+}
+
+#tutorial-next-button {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+#tutorial-next-button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+#tutorial-next-button:disabled {
+  background: #e5e7eb;
+  cursor: not-allowed;
+  transform: none;
+}
+
   </style>
 </head>
 <body>
@@ -683,6 +834,128 @@ h3{
     <p>Loading your day...</p>
   </div>
 </div>
+
+<div id="tutorial-modal" class="modal-overlay">
+  <div class="modal-content">
+    <button id="modal-close-button" class="modal-close-button">&times;</button>
+    <div class="tutorial-header">
+      <div class="step-indicator-container">1</div>
+      <h3 id="tutorial-title">Welcome to Your Day!</h3>
+    </div>
+    <p id="tutorial-text" class="tutorial-text">Let's take a quick tour of how to navigate through your daily data visualization.</p>
+    <div class="tutorial-navigation">
+      <div id="tutorial-step-dots" class="step-dots">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+      <button id="tutorial-next-button" class="control-button">Next</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Tutorial functionality
+  document.addEventListener('DOMContentLoaded', () => {
+    const tutorialModal = document.getElementById('tutorial-modal');
+    const modalCloseButton = document.getElementById('modal-close-button');
+    const tutorialNextButton = document.getElementById('tutorial-next-button');
+    const stepDots = document.querySelectorAll('.step-dots .dot');
+    const stepIndicator = document.querySelector('.step-indicator-container');
+    const tutorialTitleElement = document.getElementById('tutorial-title');
+    const tutorialTextElement = document.getElementById('tutorial-text');
+    let currentStep = 1;
+
+    const tutorialSteps = [
+      {
+        title: "Welcome to Your Day!",
+        text: "Let's take a quick tour of how to navigate through your daily data visualization."
+      },
+      {
+        title: "Control Bar",
+        text: "Use the control bar at the bottom to play/pause the visualization and adjust the speed. The time display shows your current position in the day."
+      },
+      {
+        title: "Scroll Through Time",
+        text: "Scroll down to progress through your day. The background color changes to reflect different times of day (dawn, day, sunset, and night)."
+      },
+      {
+        title: "Interactive Graphs",
+        text: "Hover over the heart rate and activity graphs to see detailed statistics for specific moments in your day."
+      },
+      {
+        title: "Summary Statistics",
+        text: "Scroll all the way to the bottom to view a comprehensive summary of your day's activities and statistics."
+      }
+    ];
+
+    // Get selected user from URL and extract number
+    let selectedUser = new URLSearchParams(window.location.search).get("user");
+    let participantNumber = selectedUser; // Default to the raw value
+
+    if (selectedUser && selectedUser.startsWith('user_')) {
+      participantNumber = selectedUser.substring(5); // Remove 'user_' prefix
+    }
+
+    const participantString = participantNumber ? `Participant ${participantNumber}'s` : "Your"; // Default to 'Your' if no user
+    const participantStringLower = participantNumber ? `Participant ${participantNumber}'s` : "your"; // Default to 'your' if no user
+
+    // Show tutorial after loading screen
+    setTimeout(() => {
+      document.getElementById('intro-loading-screen').style.opacity = '0';
+      setTimeout(() => {
+        document.getElementById('intro-loading-screen').style.display = 'none';
+        tutorialModal.classList.add('visible');
+      }, 800);
+    }, 2000);
+
+    function updateStep(step) {
+      stepDots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === step - 1);
+      });
+      
+      stepIndicator.textContent = step;
+
+      let stepData = tutorialSteps[step - 1];
+      let updatedTitle = stepData.title;
+      let updatedText = stepData.text;
+
+      // Replace 'Your'/'your' with participant string
+      updatedTitle = updatedTitle.replace("Your", participantString);
+      updatedText = updatedText.replace(/\byour\b/g, participantStringLower);
+
+      tutorialTitleElement.textContent = updatedTitle;
+      tutorialTextElement.textContent = updatedText;
+      
+      tutorialNextButton.textContent = step === tutorialSteps.length ? 'Finish' : 'Next';
+    }
+
+    tutorialNextButton.addEventListener('click', () => {
+      if (currentStep < tutorialSteps.length) {
+        currentStep++;
+        updateStep(currentStep);
+      } else {
+        tutorialModal.classList.remove('visible');
+      }
+    });
+
+    modalCloseButton.addEventListener('click', () => {
+      tutorialModal.classList.remove('visible');
+    });
+
+    stepDots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        currentStep = index + 1;
+        updateStep(currentStep);
+      });
+    });
+
+    // Initial update
+    updateStep(currentStep);
+  });
+</script>
 
 </body>
 </html>
