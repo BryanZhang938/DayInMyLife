@@ -259,36 +259,3 @@ if (selectedUser) {
     console.error("Failed to load steps CSV:", error);
   });
 }
-
-d3.csv("../assets/cleaned_data/all_actigraph.csv", d => ({
-  user: d.user,
-  steps: +d["Steps"],
-  datetime: new Date(`2024-01-${String(d.day).padStart(2, '0')}T${d.time}`)
-})).then(data => {
-  const valid = data.filter(d => !isNaN(d.steps) && d.datetime instanceof Date);
-
-  const userHourly = d3.group(
-    valid,
-    d => d.user,
-    d => d3.timeHour(d.datetime)
-  );
-
-  const userStats = Array.from(userHourly, ([user, hourMap]) => {
-    const hourlySums = Array.from(hourMap, ([hour, entries]) => ({
-      hour,
-      totalSteps: d3.sum(entries, d => d.steps)
-    }));
-    const min = d3.min(hourlySums, d => d.totalSteps);
-    const max = d3.max(hourlySums, d => d.totalSteps);
-    const avg = d3.mean(hourlySums, d => d.totalSteps);
-    return { user, min, max, avg };
-  });
-
-  const meanOfMins = d3.mean(userStats, d => d.min);
-  const meanOfMaxes = d3.mean(userStats, d => d.max);
-  const meanOfAvgs = d3.mean(userStats, d => d.avg);
-
-  console.log("Mean of Participants' Minimum Steps:", Math.round(meanOfMins));
-  console.log("Mean of Participants' Maximum Steps:", Math.round(meanOfMaxes));
-  console.log("Mean of Participants' Average Steps:", Math.round(meanOfAvgs));
-});
