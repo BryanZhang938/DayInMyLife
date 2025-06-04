@@ -56,26 +56,31 @@ function drawHeartRate(data) {
   const metricsContainer = d3.select("#heartrate-metrics");
   metricsContainer.html(""); // clear existing
 
-  const metrics = [
-    { 
-      key: 'minHeartRate', 
-      label: 'Minimum Heart Rate', 
-      value: `${d3.min(hourlyData, d => d.avgRate).toFixed(1)} bpm`,
-      time: d3.timeFormat("%-I %p")(hourlyData.find(d => d.avgRate === d3.min(hourlyData, d => d.avgRate)).hour)
-    },
-    { 
-      key: 'avgHeartRate', 
-      label: 'Average Heart Rate', 
-      value: `${d3.mean(hourlyData, d => d.avgRate).toFixed(1)} bpm`,
-      time: `Day ${hourlyData[0].hour.getDate()} (${d3.timeFormat("%-I %p")(hourlyData[0].hour)}) through Day ${hourlyData[hourlyData.length - 1].hour.getDate()} (${d3.timeFormat("%-I %p")(hourlyData[hourlyData.length - 1].hour)})`
-    },
-    { 
-      key: 'maxHeartRate', 
-      label: 'Maximum Heart Rate', 
-      value: `${d3.max(hourlyData, d => d.avgRate).toFixed(1)} bpm`,
-      time: d3.timeFormat("%-I %p")(hourlyData.find(d => d.avgRate === d3.max(hourlyData, d => d.avgRate)).hour)
-    }
-  ];
+  const minRate = d3.min(hourlyData, d => d.avgRate);
+const maxRate = d3.max(hourlyData, d => d.avgRate);
+const minHour = hourlyData.find(d => d.avgRate === minRate).hour;
+const maxHour = hourlyData.find(d => d.avgRate === maxRate).hour;
+
+const metrics = [
+  { 
+    key: 'minHeartRate', 
+    label: 'Minimum Heart Rate', 
+    value: `${minRate.toFixed(1)} bpm`,
+    time: `on Day ${minHour.getDate()} at ${d3.timeFormat("%-I %p")(minHour)}`
+  },
+  { 
+    key: 'avgHeartRate', 
+    label: 'Average Heart Rate', 
+    value: `${d3.mean(hourlyData, d => d.avgRate).toFixed(1)} bpm`,
+    time: `for Day ${hourlyData[0].hour.getDate()} (${d3.timeFormat("%-I %p")(hourlyData[0].hour)}) through Day ${hourlyData[hourlyData.length - 1].hour.getDate()} (${d3.timeFormat("%-I %p")(hourlyData[hourlyData.length - 1].hour)})`
+  },
+  { 
+    key: 'maxHeartRate', 
+    label: 'Maximum Heart Rate', 
+    value: `${maxRate.toFixed(1)} bpm`,
+    time: `on Day ${maxHour.getDate()} at ${d3.timeFormat("%-I %p")(maxHour)}`
+  }
+];
 
   metrics.forEach(metric => {
     const metricDiv = metricsContainer.append('div').attr('class', 'metric');
@@ -91,7 +96,7 @@ function drawHeartRate(data) {
     if (metric.time) {
       valueGroup.append('span')
         .attr('class', 'metric-time')
-        .text(`at ${metric.time}`);
+        .text(`${metric.time}`);
     }
   });
 
