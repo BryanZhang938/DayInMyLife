@@ -481,15 +481,17 @@
 .step-box {
   width: 12px;
   height: 12px;
-  background-color: green;
+  background-color: var(--accent-color);
   border: 1px solid #000;
   opacity: 0.8;
   border-radius: 3px;
 }
 
 .step-box.partial {
-  background: linear-gradient(to right, green 50%, transparent 50%);
+  --fill-percent: 50%;
+  background: linear-gradient(to right, var(--accent-color) var(--fill-percent), transparent var(--fill-percent));
 }
+
 .step-box.inline-box {
   display: inline-block;
   margin: 0 2px 0 12px;

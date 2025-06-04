@@ -975,7 +975,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (partialFraction > 0) {
                     const partialBox = document.createElement("div");
                     partialBox.className = "step-box partial";
-                    partialBox.style.background = `linear-gradient(to right, green ${partialFraction * 100}%, transparent ${partialFraction * 100}%)`;
+                    partialBox.style.setProperty('--fill-percent', `${partialFraction * 100}%`);
                     stepBoxContainer.appendChild(partialBox);
                 }
             }
