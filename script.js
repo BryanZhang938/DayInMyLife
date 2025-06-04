@@ -10,10 +10,14 @@ Promise.all([
   d3.csv("../assets/cleaned_data/all_actigraph.csv", parseActivity),
   d3.csv("../assets/cleaned_data/all_actigraph.csv", parseHeartRate),
   d3.csv("../assets/cleaned_data/all_sleep.csv", d => {
+    // Ensure 'd' is not null or undefined before trying to access its properties
+    if (!d || !d["In Bed Date"] || !d["In Bed Time"]) return null;
+
     const anchor = new Date(2000, 0, 1);
     const dayOffset = +d["In Bed Date"];
     const timeStr = d["In Bed Time"];
-    if (!timeStr || !d["In Bed Date"]) return null;
+    // Additional check for timeStr validity can be added if needed
+    // e.g. if (!/^\d{1,2}:\d{2}$/.test(timeStr)) return null;
 
     const [hour, minute] = timeStr.split(":").map(Number);
     const datetime = new Date(anchor);
@@ -22,7 +26,7 @@ Promise.all([
     datetime.setMinutes(minute);
 
     return {
-      user: d.user.trim(),
+      user: d.user ? d.user.trim() : null, // Ensure user exists
       datetime: datetime,
       efficiency: +d.Efficiency,
       totalSleep: +d["Total Sleep Time (TST)"],
@@ -34,25 +38,116 @@ Promise.all([
       fragmentationIndex: +d["Fragmentation Index"]
     };
   }),
-  d3.csv("../assets/cleaned_data/all_saliva.csv", d => ({
-    user: d.user.trim(),
-    sample: d.SAMPLES.toLowerCase(),
-    cortisol: +d["Cortisol NORM"],
-    melatonin: +d["Melatonin NORM"]
-  }))
+  d3.csv("../assets/cleaned_data/all_saliva.csv", d => {
+    if (!d || !d.user || !d.SAMPLES) return null; // Basic check for essential fields
+    // Debug log to see the actual sample names
+    console.log('Sample name:', d.SAMPLES);
+    return {
+        user: d.user.trim(),
+        sample: d.SAMPLES.toLowerCase().trim(), // Ensure consistent sample names
+        cortisol: +d["Cortisol NORM"],
+        melatonin: +d["Melatonin NORM"]
+    };
+  })
 ]).then(([activityData, heartRateData, sleepData, salivaData]) => {
-  if (selectedUser) {
-    // Filter data for selected user
-    const filteredActivity = activityData.filter(d => d.user === selectedUser);
-    const filteredHeartRate = heartRateData.filter(d => d.user === selectedUser);
-    const filteredSleep = sleepData.filter(d => d.user === selectedUser);
-    const filteredSaliva = salivaData.filter(d => d.user === selectedUser);
+  
+  // Filter out any null entries that might have occurred during parsing
+  const validSleepData = sleepData.filter(d => d && d.user);
+  const validSalivaData = salivaData.filter(d => d && d.user);
 
-    // Display all metrics
+  // Debug log to see the processed saliva data
+  console.log('Processed saliva data:', validSalivaData);
+
+  // Calculate average sleep metrics for all participants
+  const allParticipantsSleepAverages = {};
+  if (validSleepData && validSleepData.length > 0) {
+      const collectedMetrics = {
+          efficiency: [], totalSleep: [], waso: [], latency: [],
+          awakenings: [], avgAwakeningLength: [], movementIndex: [], fragmentationIndex: []
+      };
+
+      // Use all sleep records instead of just the latest ones
+      validSleepData.forEach(userData => {
+          collectedMetrics.efficiency.push(userData.efficiency);
+          collectedMetrics.totalSleep.push(userData.totalSleep);
+          collectedMetrics.waso.push(userData.waso);
+          collectedMetrics.latency.push(userData.latency);
+          collectedMetrics.awakenings.push(userData.awakenings);
+          collectedMetrics.avgAwakeningLength.push(userData.avgAwakeningLength);
+          collectedMetrics.movementIndex.push(userData.movementIndex);
+          collectedMetrics.fragmentationIndex.push(userData.fragmentationIndex);
+      });
+
+      for (const key in collectedMetrics) {
+          const validValues = collectedMetrics[key].filter(v => v !== null && !isNaN(v));
+          if (validValues.length > 0) {
+              allParticipantsSleepAverages[key] = d3.mean(validValues);
+          } else {
+              allParticipantsSleepAverages[key] = null;
+          }
+      }
+  }
+
+  // Calculate average hormone metrics for all participants
+  const allParticipantsHormoneAverages = {};
+  if (validSalivaData && validSalivaData.length > 0) {
+      const samplesByUser = d3.group(validSalivaData, d => d.user);
+
+      const userAverages = {
+          cortisolBeforeSleep: [], cortisolAfterSleep: [],
+          melatoninBeforeSleep: [], melatoninAfterSleep: []
+      };
+
+      samplesByUser.forEach(userSamples => {
+          let cortisolBefore = null, cortisolAfter = null;
+          let melatoninBefore = null, melatoninAfter = null;
+
+          userSamples.forEach(sample => {
+              if (sample.sample === 'before sleep') {
+                  cortisolBefore = sample.cortisol;
+                  melatoninBefore = sample.melatonin;
+              } else if (sample.sample === 'wake up') {  // Changed from 'after sleep' to 'wake up'
+                  cortisolAfter = sample.cortisol;
+                  melatoninAfter = sample.melatonin;
+              }
+          });
+
+          // Only add values if both before and after measurements exist
+          if (cortisolBefore !== null && !isNaN(cortisolBefore)) userAverages.cortisolBeforeSleep.push(cortisolBefore);
+          if (cortisolAfter !== null && !isNaN(cortisolAfter)) userAverages.cortisolAfterSleep.push(cortisolAfter);
+          if (melatoninBefore !== null && !isNaN(melatoninBefore)) userAverages.melatoninBeforeSleep.push(melatoninBefore);
+          if (melatoninAfter !== null && !isNaN(melatoninAfter)) userAverages.melatoninAfterSleep.push(melatoninAfter);
+      });
+      
+      for (const key in userAverages) {
+          const validValues = userAverages[key].filter(v => v !== null && !isNaN(v));
+          if (validValues.length > 0) {
+              allParticipantsHormoneAverages[key] = d3.mean(validValues);
+          } else {
+              allParticipantsHormoneAverages[key] = null;
+          }
+      }
+
+      // Debug log to verify averages
+      console.log('Hormone Averages:', allParticipantsHormoneAverages);
+  }
+
+  if (selectedUser) {
+    const filteredActivity = activityData.filter(d => d && d.user === selectedUser);
+    const filteredHeartRate = heartRateData.filter(d => d && d.user === selectedUser);
+    const filteredSleep = validSleepData.filter(d => d.user === selectedUser);
+    const filteredSaliva = validSalivaData.filter(d => d.user === selectedUser);
+
     drawActivity(filteredActivity);
     drawHeartRate(filteredHeartRate);
-    displaySleepMetrics(filteredSleep[filteredSleep.length - 1]);
-    displayHormoneMetrics(filteredSaliva);
+    // Pass the calculated global averages to the display functions
+    if (filteredSleep.length > 0) {
+        displaySleepMetrics(filteredSleep[filteredSleep.length - 1], allParticipantsSleepAverages);
+    }
+    if (filteredSaliva.length > 0) { // Ensure there's data for the selected user
+        displayHormoneMetrics(filteredSaliva, allParticipantsHormoneAverages);
+    }
+
   } else {
     console.warn("No user selected in URL (use ?user=user_1)");
   }
@@ -109,7 +204,7 @@ function hideInfoTooltip() {
   }
 }
 
-function displaySleepMetrics(data) {
+function displaySleepMetrics(data, allAverages) {
   if (!data) return;
   
   const metricsContainer = d3.select('#sleep-metrics');
@@ -145,10 +240,34 @@ function displaySleepMetrics(data) {
     metricDiv.append('span')
       .attr('class', 'metric-value-badge')
       .text(metric.value);
+
+    // Append the average subtext
+    if (allAverages && allAverages[metric.key] !== null && !isNaN(allAverages[metric.key])) {
+        const avgValue = allAverages[metric.key];
+        let avgText = "";
+        if (metric.key === 'totalSleep') {
+            avgText = `Avg: ${Math.floor(avgValue/60)} h ${Math.round(avgValue%60)} m`;
+        } else if (metric.key === 'efficiency' || metric.key === 'movementIndex' || metric.key === 'fragmentationIndex') {
+            avgText = `Avg: ${avgValue.toFixed(1)} %`;
+        } else if (metric.key === 'latency' || metric.key === 'waso') {
+            avgText = `Avg: ${avgValue.toFixed(1)} m`;
+        } else if (metric.key === 'avgAwakeningLength') {
+            avgText = `Avg: ${avgValue.toFixed(1)} s`;
+        } else { // awakenings
+             avgText = `Avg: ${avgValue.toFixed(1)}`;
+        }
+        metricDiv.append('span')
+            .attr('class', 'metric-average-subtext')
+            .style('font-size', '0.75em')
+            .style('color', '#555') // Slightly darker for better readability
+            .style('display', 'block')
+            .style('margin-top', '5px')
+            .text(avgText);
+    }
   });
 }
 
-function displayHormoneMetrics(data) {
+function displayHormoneMetrics(data, allAverages) {
   if (!data || data.length !== 2) return;
 
   const container = d3.select("#hormone-metrics");
@@ -160,10 +279,10 @@ function displayHormoneMetrics(data) {
   );
 
   const metrics = [
-    { key: 'cortisol', label: 'Cortisol (Before Sleep)', value: `${sorted[0].cortisol.toFixed(4)} µg` },
-    { key: 'cortisol', label: 'Cortisol (After Sleep)', value: `${sorted[1].cortisol.toFixed(4)} µg` },
-    { key: 'melatonin', label: 'Melatonin (Before Sleep)', value: `${(sorted[0].melatonin * 1000*1000*1000).toFixed(4)} fg` },
-    { key: 'melatonin', label: 'Melatonin (After Sleep)', value: `${(sorted[1].melatonin * 1000*1000*1000).toFixed(4)} fg` }
+    { key: 'cortisolBeforeSleep', label: 'Cortisol (Before Sleep)', value: `${sorted[0].cortisol.toFixed(4)} µg` },
+    { key: 'cortisolAfterSleep', label: 'Cortisol (After Sleep)', value: `${sorted[1].cortisol.toFixed(4)} µg` },
+    { key: 'melatoninBeforeSleep', label: 'Melatonin (Before Sleep)', value: `${(sorted[0].melatonin * 1000*1000*1000).toFixed(4)} fg` },
+    { key: 'melatoninAfterSleep', label: 'Melatonin (After Sleep)', value: `${(sorted[1].melatonin * 1000*1000*1000).toFixed(4)} fg` }
   ];
 
   metrics.forEach(metric => {
@@ -172,12 +291,14 @@ function displayHormoneMetrics(data) {
     const labelGroup = metricDiv.append('div').attr('class', 'metric-label-group');
     labelGroup.append('span').attr('class', 'metric-label-text').text(metric.label);
 
-    if (metricDescriptions[metric.key]) {
+    // Use the base key 'cortisol' or 'melatonin' for descriptions
+    const descriptionKey = metric.key.toLowerCase().includes('cortisol') ? 'cortisol' : 'melatonin';
+    if (metricDescriptions[descriptionKey]) {
       labelGroup.append('span')
         .attr('class', 'info-icon')
         .html(' <i class="fas fa-info-circle"></i>')
         .on('mouseover', (event) => {
-          showInfoTooltip(event.pageX, event.pageY, metricDescriptions[metric.key]);
+          showInfoTooltip(event.pageX, event.pageY, metricDescriptions[descriptionKey]);
         })
         .on('mouseout', hideInfoTooltip);
     }
@@ -185,6 +306,25 @@ function displayHormoneMetrics(data) {
     metricDiv.append('span')
       .attr('class', 'metric-value-badge')
       .text(metric.value);
+
+    // Append the average subtext
+    if (allAverages && allAverages[metric.key] !== null && !isNaN(allAverages[metric.key])) {
+        const avgValue = allAverages[metric.key];
+        let avgText = "";
+        if (metric.key.toLowerCase().includes('melatonin')) {
+            avgText = `Avg: ${(avgValue * 1000*1000*1000).toFixed(4)} fg`;
+        } else { // Cortisol
+            avgText = `Avg: ${avgValue.toFixed(4)} µg`;
+        }
+
+        metricDiv.append('span')
+            .attr('class', 'metric-average-subtext')
+            .style('font-size', '0.75em')
+            .style('color', '#555')
+            .style('display', 'block')
+            .style('margin-top', '5px')
+            .text(avgText);
+    }
   });
 }
 
