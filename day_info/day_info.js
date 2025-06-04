@@ -18,18 +18,18 @@ const userDisplayMap = {
     "user_5": 5,
     "user_6": 6,
     "user_7": 7,
-    "user_9": 9,
-    "user_10": 10,
-    "user_12": 12,
-    "user_13": 13,
-    "user_14": 14,
-    "user_15": 15,
-    "user_16": 16,
-    "user_17": 17,
-    "user_19": 19,
-    "user_20": 20,
-    "user_21": 21,
-    "user_22": 22
+    "user_9": 8,
+    "user_10": 9,
+    "user_12": 10,
+    "user_13": 11,
+    "user_14": 12,
+    "user_15": 13,
+    "user_16": 14,
+    "user_17": 15,
+    "user_19": 16,
+    "user_20": 17,
+    "user_21": 18,
+    "user_22": 19
   };
 const participantNumber = userDisplayMap[selectedUser] ?? "X";
 
@@ -975,7 +975,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (partialFraction > 0) {
                     const partialBox = document.createElement("div");
                     partialBox.className = "step-box partial";
-                    partialBox.style.background = `linear-gradient(to right, green ${partialFraction * 100}%, transparent ${partialFraction * 100}%)`;
+                    partialBox.style.setProperty('--fill-percent', `${partialFraction * 100}%`);
                     stepBoxContainer.appendChild(partialBox);
                 }
             }
