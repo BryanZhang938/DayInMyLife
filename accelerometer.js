@@ -476,12 +476,8 @@ function drawAccelerometer(data) {
   const metricsContainer = d3.select("#accelerometer-metrics");
   metricsContainer.html(""); // clear existing
 
-  const metrics = [
-    { key: 'avgMagnitude', label: 'Average Movement', value: `${d3.mean(hourlyData, d => d.avgMagnitude).toFixed(1)}` },
-    { key: 'minMagnitude', label: 'Minimum Movement', value: `${d3.min(hourlyData, d => d.avgMagnitude).toFixed(1)}` },
-    { key: 'maxMagnitude', label: 'Maximum Movement', value: `${d3.max(hourlyData, d => d.avgMagnitude).toFixed(1)}` },
-    { key: 'magnitudeRange', label: 'Movement Range', value: `${(d3.max(hourlyData, d => d.avgMagnitude) - d3.min(hourlyData, d => d.avgMagnitude)).toFixed(1)}` }
-  ];
+  
+
 
   metrics.forEach(metric => {
     const metricDiv = metricsContainer.append('div').attr('class', 'metric');
