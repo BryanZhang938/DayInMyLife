@@ -50,27 +50,31 @@ function drawActivity(data) {
   const metricsContainer = d3.select("#activity-metrics");
   metricsContainer.html(""); // clear existing
 
-  const metrics = [
-    { 
-      key: 'minActivity', 
-      label: 'Minimum Activity Level', 
-      value: `${d3.min(hourlyData, d => d.avgActivity).toFixed(1)}`,
-      time: d3.timeFormat("%-I %p")(hourlyData.find(d => d.avgActivity === d3.min(hourlyData, d => d.avgActivity)).hour)
-    },
-    { 
-      key: 'avgActivity', 
-      label: 'Average Activity Level', 
-      value: `${d3.mean(hourlyData, d => d.avgActivity).toFixed(1)}`,
-      time: `Day ${hourlyData[0].hour.getDate()} (${d3.timeFormat("%-I %p")(hourlyData[0].hour)}) through Day ${hourlyData[hourlyData.length - 1].hour.getDate()} (${d3.timeFormat("%-I %p")(hourlyData[hourlyData.length - 1].hour)})`
-    },
-    { 
-      key: 'maxActivity', 
-      label: 'Maximum Activity Level', 
-      value: `${d3.max(hourlyData, d => d.avgActivity).toFixed(1)}`,
-      time: d3.timeFormat("%-I %p")(hourlyData.find(d => d.avgActivity === d3.max(hourlyData, d => d.avgActivity)).hour)
-    }
-  ];
+  const minActivity = d3.min(hourlyData, d => d.avgActivity);
+const maxActivity = d3.max(hourlyData, d => d.avgActivity);
+const minHour = hourlyData.find(d => d.avgActivity === minActivity).hour;
+const maxHour = hourlyData.find(d => d.avgActivity === maxActivity).hour;
 
+const metrics = [
+  { 
+    key: 'minActivity', 
+    label: 'Minimum Activity Level', 
+    value: `${minActivity.toFixed(1)}`,
+    time: `on Day ${minHour.getDate()} at ${d3.timeFormat("%-I %p")(minHour)}`
+  },
+  { 
+    key: 'avgActivity', 
+    label: 'Average Activity Level', 
+    value: `${d3.mean(hourlyData, d => d.avgActivity).toFixed(1)}`,
+    time: `for Day ${hourlyData[0].hour.getDate()} (${d3.timeFormat("%-I %p")(hourlyData[0].hour)}) through Day ${hourlyData[hourlyData.length - 1].hour.getDate()} (${d3.timeFormat("%-I %p")(hourlyData[hourlyData.length - 1].hour)})`
+  },
+  { 
+    key: 'maxActivity', 
+    label: 'Maximum Activity Level', 
+    value: `${maxActivity.toFixed(1)}`,
+    time: `on Day ${maxHour.getDate()} at ${d3.timeFormat("%-I %p")(maxHour)}`
+  }
+];
   metrics.forEach(metric => {
     const metricDiv = metricsContainer.append('div').attr('class', 'metric');
     
@@ -85,7 +89,7 @@ function drawActivity(data) {
     if (metric.time) {
       valueGroup.append('span')
         .attr('class', 'metric-time')
-        .text(metric.key === 'avgActivity' ? metric.time : `at ${metric.time}`);
+        .text(metric.key === 'avgActivity' ? metric.time : `${metric.time}`);
     }
   });
 
