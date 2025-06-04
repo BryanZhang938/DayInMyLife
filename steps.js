@@ -159,6 +159,52 @@ const x = d3.scaleTime()
     .style("text-anchor", "middle")
     .style("font-size", "12px");
 
+  // Identify day changes
+const dayChanges = hourlyData.reduce((acc, curr, idx) => {
+  if (idx > 0 && curr.hour.getDate() !== hourlyData[idx - 1].hour.getDate()) {
+    acc.push(curr.hour);
+  }
+  return acc;
+}, []);
+
+// Add Day 1 marker at start
+const firstDay = hourlyData[0].hour;
+svg.append("line")
+  .attr("x1", x(firstDay))
+  .attr("x2", x(firstDay))
+  .attr("y1", height - margin.bottom)
+  .attr("y2", height - margin.bottom + 10)
+  .attr("stroke", "var(--border)")
+  .attr("stroke-width", 2);
+
+svg.append("text")
+  .attr("x", x(firstDay))
+  .attr("y", height - margin.bottom + 35)
+  .attr("text-anchor", "middle")
+  .style("font-size", "12px")
+  .style("fill", "var(--muted-foreground)")
+  .text("Day 1");
+
+// Add markers for subsequent days
+dayChanges.forEach(dayChange => {
+  svg.append("line")
+    .attr("x1", x(dayChange))
+    .attr("x2", x(dayChange))
+    .attr("y1", height - margin.bottom)
+    .attr("y2", height - margin.bottom + 10)
+    .attr("stroke", "var(--border)")
+    .attr("stroke-width", 2);
+
+  svg.append("text")
+    .attr("x", x(dayChange))
+    .attr("y", height - margin.bottom + 35)
+    .attr("text-anchor", "middle")
+    .style("font-size", "12px")
+    .style("fill", "var(--muted-foreground)")
+    .text(`Day ${dayChange.getDate()}`);
+});
+
+
   svg.append("g")
     .attr("transform", `translate(${margin.left},0)`)
     .call(d3.axisLeft(y))
