@@ -198,9 +198,9 @@ const metrics = [
     .attr("x1", x(firstDay))
     .attr("x2", x(firstDay))
     .attr("y1", height - margin.bottom)
-    .attr("y2", height - margin.bottom + 10)
-    .attr("stroke", "var(--border)")
-    .attr("stroke-width", 2);
+    .attr("y2", height - margin.bottom + 6)
+    .attr("stroke", "#000")
+    .attr("stroke-width", 1);
 
   svg.append("text")
     .attr("x", x(firstDay))
@@ -216,9 +216,9 @@ const metrics = [
       .attr("x1", x(dayChange))
       .attr("x2", x(dayChange))
       .attr("y1", height - margin.bottom)
-      .attr("y2", height - margin.bottom + 10)
-      .attr("stroke", "var(--border)")
-      .attr("stroke-width", 2);
+      .attr("y2", height - margin.bottom + 6)
+      .attr("stroke", "#000")
+      .attr("stroke-width", 1);
 
     svg.append("text")
       .attr("x", x(dayChange))

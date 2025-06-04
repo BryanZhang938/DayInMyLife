@@ -147,8 +147,32 @@
     <header class="summary-header">
       <div class="nav-buttons">
         <script>
-          const user = new URLSearchParams(window.location.search).get("user");
-          const participantNumber = user ? user.replace('user_', '') : "Unknown";
+          // Get selected user from URL and map to participant number
+          const userDisplayMap = {
+            "user_1": 1,
+            "user_2": 2,
+            "user_3": 3,
+            "user_4": 4,
+            "user_5": 5,
+            "user_6": 6,
+            "user_7": 7,
+            "user_9": 8,
+            "user_10": 9,
+            "user_12": 10,
+            "user_13": 11,
+            "user_14": 12,
+            "user_15": 13,
+            "user_16": 14,
+            "user_17": 15,
+            "user_19": 16,
+            "user_20": 17,
+            "user_21": 18,
+            "user_22": 19
+          };
+
+          const selectedUser = new URLSearchParams(window.location.search).get("user");
+          const participantNumber = userDisplayMap[selectedUser] ?? selectedUser;
+
           
           // Set the title and subtitle text content
           document.addEventListener('DOMContentLoaded', function() {

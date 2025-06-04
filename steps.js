@@ -157,7 +157,8 @@ const x = d3.scaleTime()
     .call(d3.axisBottom(x).ticks(d3.timeHour.every(1)).tickFormat(d3.timeFormat("%-I %p")))
     .selectAll("text")
     .style("text-anchor", "middle")
-    .style("font-size", "12px");
+    .style("font-size", "12px")
+    .style("fill", "#000");
 
   // Identify day changes
 const dayChanges = hourlyData.reduce((acc, curr, idx) => {
@@ -173,27 +174,27 @@ svg.append("line")
   .attr("x1", x(firstDay))
   .attr("x2", x(firstDay))
   .attr("y1", height - margin.bottom)
-  .attr("y2", height - margin.bottom + 10)
-  .attr("stroke", "var(--border)")
-  .attr("stroke-width", 2);
+  .attr("y2", height - margin.bottom + 6)
+  .attr("stroke", "#000")
+  .attr("stroke-width", 1);
 
 svg.append("text")
   .attr("x", x(firstDay))
   .attr("y", height - margin.bottom + 35)
   .attr("text-anchor", "middle")
   .style("font-size", "12px")
-  .style("fill", "var(--muted-foreground)")
+  .style("fill", "#000")
   .text("Day 1");
 
-// Add markers for subsequent days
+
 dayChanges.forEach(dayChange => {
   svg.append("line")
     .attr("x1", x(dayChange))
     .attr("x2", x(dayChange))
     .attr("y1", height - margin.bottom)
-    .attr("y2", height - margin.bottom + 10)
-    .attr("stroke", "var(--border)")
-    .attr("stroke-width", 2);
+    .attr("y2", height - margin.bottom + 6)
+    .attr("stroke", "#000")
+    .attr("stroke-width", 1);
 
   svg.append("text")
     .attr("x", x(dayChange))
