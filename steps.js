@@ -45,28 +45,28 @@ function drawSteps(data) {
   const metricsContainer = d3.select("#steps-metrics");
   metricsContainer.html("");
 
-const minSteps = d3.min(hourlyData, d => d.totalSteps);
-const maxSteps = d3.max(hourlyData, d => d.totalSteps);
-const minHour = hourlyData.find(d => d.totalSteps === minSteps).hour;
-const maxHour = hourlyData.find(d => d.totalSteps === maxSteps).hour;
-
-const metrics = [
-  {
-    label: 'Minimum Steps',
-    value: `${minSteps} steps`,
-    time: `Day ${minHour.getDate()} at ${d3.timeFormat("%-I %p")(minHour)}`
-  },
-  {
-    label: 'Average Steps',
-    value: `${Math.round(d3.mean(hourlyData, d => d.totalSteps))} steps`,
-    time: `Day ${hourlyData[0].hour.getDate()} (${d3.timeFormat("%-I %p")(hourlyData[0].hour)}) through Day ${hourlyData[hourlyData.length - 1].hour.getDate()} (${d3.timeFormat("%-I %p")(hourlyData[hourlyData.length - 1].hour)})`
-  },
-  {
-    label: 'Maximum Steps',
-    value: `${maxSteps} steps`,
-    time: `Day ${maxHour.getDate()} at ${d3.timeFormat("%-I %p")(maxHour)}`
-  }
-];
+  const minSteps = d3.min(hourlyData, d => d.totalSteps);
+  const maxSteps = d3.max(hourlyData, d => d.totalSteps);
+  const minHour = hourlyData.find(d => d.totalSteps === minSteps).hour;
+  const maxHour = hourlyData.find(d => d.totalSteps === maxSteps).hour;
+  
+  const metrics = [
+    {
+      label: 'Minimum Steps',
+      value: `${minSteps} steps`,
+      time: `on Day ${minHour.getDate()} at ${d3.timeFormat("%-I %p")(minHour)}`
+    },
+    {
+      label: 'Average Steps',
+      value: `${Math.round(d3.mean(hourlyData, d => d.totalSteps))} steps`,
+      time: `for Day ${hourlyData[0].hour.getDate()} (${d3.timeFormat("%-I %p")(hourlyData[0].hour)}) through Day ${hourlyData[hourlyData.length - 1].hour.getDate()} (${d3.timeFormat("%-I %p")(hourlyData[hourlyData.length - 1].hour)})`
+    },
+    {
+      label: 'Maximum Steps',
+      value: `${maxSteps} steps`,
+      time: `on Day ${maxHour.getDate()} at ${d3.timeFormat("%-I %p")(maxHour)}`
+    }
+  ];
 
   metrics.forEach(metric => {
     const metricDiv = metricsContainer.append("div").attr("class", "metric");
@@ -75,8 +75,7 @@ const metrics = [
 
     const valueGroup = metricDiv.append("div").attr("class", "metric-value-group");
     valueGroup.append("span").attr("class", "metric-value-badge").text(metric.value);
-    valueGroup.append("span").attr("class", "metric-time").text(`at ${metric.time}`);
-  });
+    valueGroup.append("span").attr("class", "metric-time").text(metric.time);  });
 
   if (hourlyData.length === 0) return;
 
