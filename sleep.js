@@ -368,34 +368,24 @@ d3.csv("../assets/cleaned_data/all_saliva.csv", parseSaliva).then(salivaData => 
   if (!selectedUser) return;
 
   const userSaliva = salivaData.filter(d => d.user === selectedUser);
-  if (userSaliva.length !== 2) return;
+  
+  // If there isn't exactly 2 entries, hide the hormone card
+  if (userSaliva.length !== 2) {
+    const hormoneCard = document.getElementById('hormone-card');
+    if (hormoneCard) hormoneCard.style.display = 'none';
+    return;
+  }
 
-  const container = d3.select("#sleep-container");
+  const container = d3.select("#hormone-metrics");
 
-  // Add Hormone Summary title
-  container.append("h3")
-    .attr("class", "hormone-summary-title")
-    .text("Hormone Summary");
-
-  const subheadingRow = container.append("div")
-    .attr("class", "hormone-subheading-row");
-
-  subheadingRow.append("div").text("Before Sleep");
-  subheadingRow.append("div").text("Wake Up");
-
-  const hormoneSection = container.append("div")
-    .attr("id", "hormone-metrics-grid")
-    .attr("class", "metrics-grid");
-
-  // Sort again just to be safe
+  // Sort and display hormone data
   const sorted = userSaliva.sort((a, b) =>
     a.sample === "before sleep" ? -1 : 1
   );
 
-  // Add Cortisol and Melatonin boxes for each sample
   sorted.forEach(entry => {
-    appendHormoneMetric(hormoneSection, entry.cortisol, "Cortisol Norm");
-    appendHormoneMetric(hormoneSection, entry.melatonin, "Melatonin Norm");
+    appendHormoneMetric(container, entry.cortisol, "Cortisol Norm");
+    appendHormoneMetric(container, entry.melatonin, "Melatonin Norm");
   });
 });
 
