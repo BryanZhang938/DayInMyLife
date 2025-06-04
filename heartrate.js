@@ -53,9 +53,9 @@ function drawHeartRate(data) {
     );
 
     const hourlyGlobal = Array.from(grouped, ([hour, avgRate]) => ({ hour, avgRate }));
-    const minGlobal = 55.2;
-    const maxGlobal = 92.8;
-    const avgGlobal = 68.4;
+    const minGlobal = 56.4;
+    const maxGlobal = 113.7;
+    const avgGlobal = 76.4;
 
     updateHeartRateMetrics(hourlyData, peakHour, { minGlobal, maxGlobal, avgGlobal });
   });
@@ -340,3 +340,40 @@ function updateHeartRateMetrics(hourlyData, peakHour, globalAverages) {
       .text(`Average across all Participants: ${metric.global}`);
   });
 }
+
+d3.csv("../assets/cleaned_data/all_actigraph.csv", d => ({
+  user: d.user,
+  heartRate: +d["HR"],
+  datetime: new Date(`2024-01-${String(d.day).padStart(2, '0')}T${d.time}`)
+})).then(data => {
+  const valid = data.filter(d => !isNaN(d.heartRate) && d.datetime instanceof Date);
+
+  // Group data: user → hour → array of entries
+  const userHourly = d3.group(
+    valid,
+    d => d.user,
+    d => d3.timeHour(d.datetime)
+  );
+
+  // For each user, compute their min, max, and average hourly heart rate
+  const userStats = Array.from(userHourly, ([user, hourMap]) => {
+    const hourlyAvgs = Array.from(hourMap, ([hour, entries]) => ({
+      hour,
+      avgHR: d3.mean(entries, d => d.heartRate)
+    }));
+    const min = d3.min(hourlyAvgs, d => d.avgHR);
+    const max = d3.max(hourlyAvgs, d => d.avgHR);
+    const avg = d3.mean(hourlyAvgs, d => d.avgHR);
+    return { user, min, max, avg };
+  });
+
+  // Compute average of those values across all participants
+  const meanOfMins = d3.mean(userStats, d => d.min);
+  const meanOfMaxes = d3.mean(userStats, d => d.max);
+  const meanOfAvgs = d3.mean(userStats, d => d.avg);
+
+  // Print results
+  console.log("Mean of Participants' Minimum Heart Rate:", meanOfMins.toFixed(1), "bpm");
+  console.log("Mean of Participants' Maximum Heart Rate:", meanOfMaxes.toFixed(1), "bpm");
+  console.log("Mean of Participants' Average Heart Rate:", meanOfAvgs.toFixed(1), "bpm");
+});

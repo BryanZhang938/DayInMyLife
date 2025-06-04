@@ -55,24 +55,33 @@ const maxActivity = d3.max(hourlyData, d => d.avgActivity);
 const minHour = hourlyData.find(d => d.avgActivity === minActivity).hour;
 const maxHour = hourlyData.find(d => d.avgActivity === maxActivity).hour;
 
+const globalActivityAverages = {
+  avg: 35.4,
+  min: 0.5,
+  max: 104.4
+};
+
 const metrics = [
   { 
     key: 'minActivity', 
     label: 'Minimum Activity Level', 
     value: `${minActivity.toFixed(1)}`,
-    time: `on Day ${minHour.getDate()} at ${d3.timeFormat("%-I %p")(minHour)}`
+    time: `on Day ${minHour.getDate()} at ${d3.timeFormat("%-I %p")(minHour)}`,
+    global: `${globalActivityAverages.min.toFixed(1)}`
   },
   { 
     key: 'avgActivity', 
     label: 'Average Activity Level', 
     value: `${d3.mean(hourlyData, d => d.avgActivity).toFixed(1)}`,
-    time: `for Day ${hourlyData[0].hour.getDate()} (${d3.timeFormat("%-I %p")(hourlyData[0].hour)}) through Day ${hourlyData[hourlyData.length - 1].hour.getDate()} (${d3.timeFormat("%-I %p")(hourlyData[hourlyData.length - 1].hour)})`
+    time: `for Day ${hourlyData[0].hour.getDate()} (${d3.timeFormat("%-I %p")(hourlyData[0].hour)}) through Day ${hourlyData[hourlyData.length - 1].hour.getDate()} (${d3.timeFormat("%-I %p")(hourlyData[hourlyData.length - 1].hour)})`,
+    global: `${globalActivityAverages.avg.toFixed(1)}`
   },
   { 
     key: 'maxActivity', 
     label: 'Maximum Activity Level', 
     value: `${maxActivity.toFixed(1)}`,
-    time: `on Day ${maxHour.getDate()} at ${d3.timeFormat("%-I %p")(maxHour)}`
+    time: `on Day ${maxHour.getDate()} at ${d3.timeFormat("%-I %p")(maxHour)}`,
+    global: `${globalActivityAverages.max.toFixed(1)}`
   }
 ];
   metrics.forEach(metric => {
@@ -91,6 +100,16 @@ const metrics = [
         .attr('class', 'metric-time')
         .text(metric.key === 'avgActivity' ? metric.time : `${metric.time}`);
     }
+
+    if (metric.global) {
+      valueGroup.append('div')
+        .attr('class', 'metric-subtext')
+        .style('font-size', '13px')
+        .style('color', 'var(--muted-foreground)')
+        .style('margin-top', '0.25rem')
+        .text(`Average Across All Participants: ${metric.global}`);
+    }
+
   });
 
   if (hourlyData.length === 0) return;
