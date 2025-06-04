@@ -81,19 +81,19 @@ const maxHour = hourlyData.find(d => d.avgRate === maxRate).hour;
 const metrics = [
   { 
     key: 'minHeartRate', 
-    label: 'Minimum Heart Rate', 
+    label: 'Minimum Hourly Heart Rate', 
     value: `${minRate.toFixed(1)} bpm`,
     time: `on Day ${minHour.getDate()} at ${d3.timeFormat("%-I %p")(minHour)}`
   },
   { 
     key: 'avgHeartRate', 
-    label: 'Average Heart Rate', 
+    label: 'Average Hourly Heart Rate', 
     value: `${d3.mean(hourlyData, d => d.avgRate).toFixed(1)} bpm`,
     time: `for Day ${hourlyData[0].hour.getDate()} (${d3.timeFormat("%-I %p")(hourlyData[0].hour)}) through Day ${hourlyData[hourlyData.length - 1].hour.getDate()} (${d3.timeFormat("%-I %p")(hourlyData[hourlyData.length - 1].hour)})`
   },
   { 
     key: 'maxHeartRate', 
-    label: 'Maximum Heart Rate', 
+    label: 'Maximum Hourly Heart Rate', 
     value: `${maxRate.toFixed(1)} bpm`,
     time: `on Day ${maxHour.getDate()} at ${d3.timeFormat("%-I %p")(maxHour)}`
   }
@@ -299,21 +299,21 @@ function updateHeartRateMetrics(hourlyData, peakHour, globalAverages) {
   const metrics = [
     {
       key: 'minHeartRate',
-      label: 'Minimum Heart Rate',
+      label: 'Minimum Hourly Heart Rate',
       value: `${minRate.toFixed(1)} bpm`,
       time: `on Day ${minHour.getDate()} at ${d3.timeFormat("%-I %p")(minHour)}`,
       global: `${globalAverages.minGlobal.toFixed(1)} bpm`
     },
     {
       key: 'avgHeartRate',
-      label: 'Average Heart Rate',
+      label: 'Average Hourly Heart Rate',
       value: `${d3.mean(hourlyData, d => d.avgRate).toFixed(1)} bpm`,
       time: `for Day ${hourlyData[0].hour.getDate()} through Day ${hourlyData[hourlyData.length - 1].hour.getDate()}`,
       global: `${globalAverages.avgGlobal.toFixed(1)} bpm`
     },
     {
       key: 'maxHeartRate',
-      label: 'Maximum Heart Rate',
+      label: 'Maximum Hourly Heart Rate',
       value: `${maxRate.toFixed(1)} bpm`,
       time: `on Day ${maxHour.getDate()} at ${d3.timeFormat("%-I %p")(maxHour)}`,
       global: `${globalAverages.maxGlobal.toFixed(1)} bpm`

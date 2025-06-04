@@ -216,7 +216,6 @@ d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
             .attr("opacity", 0.7); // Revert to default opacity
           selectedCircle = null;
           currentlySelectedData = null;
-          console.log(`Participant ${d.user} deselected.`);
           
           // Revert to placeholder
           if (!hoverPreviewHelper.empty()) {
@@ -234,7 +233,6 @@ d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
             .attr("opacity", 1); // Full opacity when selected
           selectedCircle = d3.select(clickedNode);
           currentlySelectedData = d;
-          console.log(`Participant ${d.user} (Original ID: ${d.original_user}) selected.`);
 
           // Update hover-preview-helper with selected participant's details
           if (!hoverPreviewHelper.empty()) {
@@ -256,7 +254,6 @@ d3.csv("assets/cleaned_data/relevant_user_info.csv", d3.autoType).then(data => {
             const startStoryButton = participantDetailsContent.select("#start-story-button");
             if (!startStoryButton.empty()) {
                 startStoryButton.on("click", () => {
-                    console.log(`Navigating to day_info for ${currentlySelectedData.user}`);
                     const encodedUser = encodeURIComponent(currentlySelectedData.original_user);
                     window.location.href = `day_info/index.html?user=${encodedUser}`;
                 });
@@ -306,7 +303,6 @@ svg.on("click", function() {
             .attr("opacity", 0.7);
         selectedCircle = null;
         currentlySelectedData = null;
-        console.log("Selection cleared by clicking background.");
 
         if (!hoverPreviewHelper.empty()) {
             participantDetailsContent.style("display", "none").html('');

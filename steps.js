@@ -52,17 +52,17 @@ function drawSteps(data) {
   
   const metrics = [
     {
-      label: 'Minimum Steps',
+      label: 'Minimum Hourly Steps',
       value: `${minSteps} steps`,
       time: `on Day ${minHour.getDate()} at ${d3.timeFormat("%-I %p")(minHour)}`
     },
     {
-      label: 'Average Steps',
+      label: 'Average Hourly Steps',
       value: `${Math.round(d3.mean(hourlyData, d => d.totalSteps))} steps`,
       time: `for Day ${hourlyData[0].hour.getDate()} (${d3.timeFormat("%-I %p")(hourlyData[0].hour)}) through Day ${hourlyData[hourlyData.length - 1].hour.getDate()} (${d3.timeFormat("%-I %p")(hourlyData[hourlyData.length - 1].hour)})`
     },
     {
-      label: 'Maximum Steps',
+      label: 'Maximum Hourly Steps',
       value: `${maxSteps} steps`,
       time: `on Day ${maxHour.getDate()} at ${d3.timeFormat("%-I %p")(maxHour)}`
     }

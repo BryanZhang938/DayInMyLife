@@ -41,7 +41,6 @@ Promise.all([
   d3.csv("../assets/cleaned_data/all_saliva.csv", d => {
     if (!d || !d.user || !d.SAMPLES) return null; // Basic check for essential fields
     // Debug log to see the actual sample names
-    console.log('Sample name:', d.SAMPLES);
     return {
         user: d.user.trim(),
         sample: d.SAMPLES.toLowerCase().trim(), // Ensure consistent sample names
@@ -56,7 +55,6 @@ Promise.all([
   const validSalivaData = salivaData.filter(d => d && d.user);
 
   // Debug log to see the processed saliva data
-  console.log('Processed saliva data:', validSalivaData);
 
   // Calculate average sleep metrics for all participants
   const allParticipantsSleepAverages = {};
@@ -129,7 +127,6 @@ Promise.all([
       }
 
       // Debug log to verify averages
-      console.log('Hormone Averages:', allParticipantsHormoneAverages);
   }
 
   if (selectedUser) {
@@ -436,7 +433,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function showModal() {
-      console.log('Showing modal');
       currentTutorialStep = 0;
       displayTutorialStep(currentTutorialStep);
       tutorialModal.style.display = 'flex';
@@ -444,7 +440,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function hideModal() {
-      console.log('Hiding modal');
       tutorialModal.classList.remove('visible');
       setTimeout(() => {
           tutorialModal.style.display = 'none';

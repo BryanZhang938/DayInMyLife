@@ -95,7 +95,6 @@ class CustomRangeSlider {
         // Update track width on window resize
         window.addEventListener('resize', () => {
             this.trackWidth = this.sliderElement.offsetWidth;
-            console.log(`Resized ${this.sliderId} track width:`, this.trackWidth);
             this.updateSliderVisuals();
         });
     }
@@ -161,7 +160,6 @@ class CustomRangeSlider {
 
 // Initialize sliders when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Initializing custom range sliders...');
     
     // Heart Rate Range Slider
     const hrSlider = new CustomRangeSlider({

@@ -64,21 +64,21 @@ const globalActivityAverages = {
 const metrics = [
   { 
     key: 'minActivity', 
-    label: 'Minimum Activity Level', 
+    label: 'Minimum Hourly Activity Level', 
     value: `${minActivity.toFixed(1)}`,
     time: `on Day ${minHour.getDate()} at ${d3.timeFormat("%-I %p")(minHour)}`,
     global: `${globalActivityAverages.min.toFixed(1)}`
   },
   { 
     key: 'avgActivity', 
-    label: 'Average Activity Level', 
+    label: 'Average Hourly Activity Level', 
     value: `${d3.mean(hourlyData, d => d.avgActivity).toFixed(1)}`,
     time: `for Day ${hourlyData[0].hour.getDate()} (${d3.timeFormat("%-I %p")(hourlyData[0].hour)}) through Day ${hourlyData[hourlyData.length - 1].hour.getDate()} (${d3.timeFormat("%-I %p")(hourlyData[hourlyData.length - 1].hour)})`,
     global: `${globalActivityAverages.avg.toFixed(1)}`
   },
   { 
     key: 'maxActivity', 
-    label: 'Maximum Activity Level', 
+    label: 'Maximum Hourly Activity Level', 
     value: `${maxActivity.toFixed(1)}`,
     time: `on Day ${maxHour.getDate()} at ${d3.timeFormat("%-I %p")(maxHour)}`,
     global: `${globalActivityAverages.max.toFixed(1)}`

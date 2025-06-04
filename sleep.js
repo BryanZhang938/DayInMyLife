@@ -174,12 +174,10 @@ function hideInfoTooltip() {
 }
 
 function initScrolly() {
-  console.log("Initializing Scrollama");
   const scroller = scrollama();
   scroller
     .setup({ step: '.step', offset: 0.6 })
     .onStepEnter(({ element }) => {
-      console.log("Step entered:", element.dataset.step);
       if (element.dataset.step === 'sleep') {
         drawSleep(data.sleep);
       }
@@ -187,7 +185,6 @@ function initScrolly() {
 }
 
 function drawSleep(sleepData) {
-  console.log("Drawing sleep visualization with data:", sleepData);
   
   // 1) Enhanced Big‑number panel
   const latest = sleepData[sleepData.length - 1];
