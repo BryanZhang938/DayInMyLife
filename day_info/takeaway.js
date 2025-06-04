@@ -9,14 +9,18 @@ export function initializeConclusionModal() {
   const conclusionContent = {
     title: "Conclusion",
     text: `
-      Looking at the several healthy participants within the study, it is clear that being a “healthy” person can mean many different things. 
-      There is no single structure or lifestyle that is the sole example of what a healthy life consists of. Some individuals live a 
-      healthy lifestyle through high activity levels and consistent movement, while others showed similar outcomes despite more sedentary 
-      routines but excellent sleep patterns or stable heart rates. This diversity highlights that health is multifaceted and personal. It 
-      is shaped by a combination of habits, genetics, and context rather than a one-size-fits-all model. 
+      <em>So, what does healthy really look like?</em> <strong>Even when healthy individuals engage in comparable daily activities</strong>, such as working, exercising, commuting, or resting, <strong>their 
+      physiological and behavioral data</strong> (e.g., heart rate, step count, and sleep quality) <strong>often diverge significantly</strong>. This variation 
+      is <strong>influenced by a complex interplay of factors</strong>, including baseline fitness, environmental context, and lifestyle habits.
       <br><br>
-      Taking the information presented by the participants gives inspiration as to how to live a healthy life. This means being active, 
-      taking the time to rest and recover, sleeping, and even relaxing by enjoying entertainment. 
+      For instance, Participant 3 and Participant 7 both completed 30 minutes of medium-difficulty activity, yet one showed a steep rise 
+      in heart rate, while the other showed only a modest response. These divergences illustrate that <strong>standardized activity labels</strong> 
+      (e.g., "work", "exercise", "sleep") <strong>mask underlying physiological diversity</strong>, making surface-level similarities generalizations that 
+      do not capture the full story. 
+      <br><br>
+      Such insights emphasize the importance of personalized, data-driven approaches in fields like health monitoring, workplace 
+      productivity, and behavioral research. By recognizing that similar routines do not equate to similar responses, systems can be 
+      better tailored to individual needs and biological rhythms, improving outcomes in both well-being and performance.
       <br><br>
       <strong>Thanks for exploring!</strong>
     `,

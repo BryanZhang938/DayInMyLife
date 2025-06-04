@@ -43,6 +43,23 @@ function processHeartRateData(data) {
 function drawHeartRate(data) {
   const { hourlyData, peakHour } = processHeartRateData(data);
 
+  d3.csv("../assets/cleaned_data/all_actigraph.csv", parseHeartRate).then(allData => {
+    const globalData = allData.filter(d => !isNaN(d.heartRate) && d.datetime instanceof Date);
+
+    const grouped = d3.rollup(
+      globalData,
+      v => d3.mean(v, d => d.heartRate),
+      d => d3.timeHour(d.datetime)
+    );
+
+    const hourlyGlobal = Array.from(grouped, ([hour, avgRate]) => ({ hour, avgRate }));
+    const minGlobal = 55.2;
+    const maxGlobal = 92.8;
+    const avgGlobal = 68.4;
+
+    updateHeartRateMetrics(hourlyData, peakHour, { minGlobal, maxGlobal, avgGlobal });
+  });
+
   // Update peak value display
   const peakValueElement = document.getElementById('heartrate-peak-value');
   const peakTimeElement = document.getElementById('heartrate-peak-time');
@@ -267,5 +284,59 @@ if (userParam) {
     }
   }).catch(error => {
     console.error("Failed to load heart rate CSV:", error);
+  });
+}
+
+function updateHeartRateMetrics(hourlyData, peakHour, globalAverages) {
+  const metricsContainer = d3.select("#heartrate-metrics");
+  metricsContainer.html(""); // clear existing
+
+  const minRate = d3.min(hourlyData, d => d.avgRate);
+  const maxRate = d3.max(hourlyData, d => d.avgRate);
+  const minHour = hourlyData.find(d => d.avgRate === minRate).hour;
+  const maxHour = hourlyData.find(d => d.avgRate === maxRate).hour;
+
+  const metrics = [
+    {
+      key: 'minHeartRate',
+      label: 'Minimum Heart Rate',
+      value: `${minRate.toFixed(1)} bpm`,
+      time: `on Day ${minHour.getDate()} at ${d3.timeFormat("%-I %p")(minHour)}`,
+      global: `${globalAverages.minGlobal.toFixed(1)} bpm`
+    },
+    {
+      key: 'avgHeartRate',
+      label: 'Average Heart Rate',
+      value: `${d3.mean(hourlyData, d => d.avgRate).toFixed(1)} bpm`,
+      time: `for Day ${hourlyData[0].hour.getDate()} through Day ${hourlyData[hourlyData.length - 1].hour.getDate()}`,
+      global: `${globalAverages.avgGlobal.toFixed(1)} bpm`
+    },
+    {
+      key: 'maxHeartRate',
+      label: 'Maximum Heart Rate',
+      value: `${maxRate.toFixed(1)} bpm`,
+      time: `on Day ${maxHour.getDate()} at ${d3.timeFormat("%-I %p")(maxHour)}`,
+      global: `${globalAverages.maxGlobal.toFixed(1)} bpm`
+    }
+  ];
+
+  metrics.forEach(metric => {
+    const metricDiv = metricsContainer.append('div').attr('class', 'metric');
+
+    const labelGroup = metricDiv.append('div').attr('class', 'metric-label-group');
+    labelGroup.append('span').attr('class', 'metric-label-text').text(metric.label);
+
+    const valueGroup = metricDiv.append('div').attr('class', 'metric-value-group');
+    valueGroup.append('span').attr('class', 'metric-value-badge').text(metric.value);
+    if (metric.time) {
+      valueGroup.append('span').attr('class', 'metric-time').text(metric.time);
+    }
+
+    valueGroup.append('div')
+      .attr('class', 'metric-subtext')
+      .style('font-size', '13px')
+      .style('color', 'var(--muted-foreground)')
+      .style('margin-top', '0.25rem')
+      .text(`Average across all Participants: ${metric.global}`);
   });
 }
