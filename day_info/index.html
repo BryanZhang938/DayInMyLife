@@ -874,7 +874,7 @@ h3{
 <div id="intro-loading-screen">
   <div class="intro-loading-card">
     <div class="spinner"></div>
-    <p>Loading your day...</p>
+    <p id="intro-loading-text">Generating Participant’s Day...</p>
   </div>
 </div>
 
@@ -942,17 +942,36 @@ h3{
       participantNumber = selectedUser.substring(5); // Remove 'user_' prefix
     }
 
+    const introLoadingText = document.getElementById('intro-loading-text');
+    if (introLoadingText && participantNumber) {
+      introLoadingText.textContent = `Generating Participant ${participantNumber}'s Day...`;
+    }
+
+
     const participantString = participantNumber ? `Participant ${participantNumber}'s` : "Your"; // Default to 'Your' if no user
     const participantStringLower = participantNumber ? `Participant ${participantNumber}'s` : "your"; // Default to 'your' if no user
 
     // Show tutorial after loading screen
-    setTimeout(() => {
-      document.getElementById('intro-loading-screen').style.opacity = '0';
+    if (!sessionStorage.getItem('tutorialShown')) {
       setTimeout(() => {
-        document.getElementById('intro-loading-screen').style.display = 'none';
-        tutorialModal.classList.add('visible');
-      }, 800);
-    }, 2000);
+        document.getElementById('intro-loading-text').textContent = `Generating Participant ${participantNumber}'s Day...`;
+
+        document.getElementById('intro-loading-screen').style.opacity = '0';
+        setTimeout(() => {
+          document.getElementById('intro-loading-screen').style.display = 'none';
+          tutorialModal.classList.add('visible');
+          sessionStorage.setItem('tutorialShown', 'true');  // Mark as shown
+        }, 800);
+      }, 2000);
+    } else {
+      // Still hide the intro screen even if tutorial is skipped
+      setTimeout(() => {
+        document.getElementById('intro-loading-screen').style.opacity = '0';
+        setTimeout(() => {
+          document.getElementById('intro-loading-screen').style.display = 'none';
+        }, 800);
+      }, 2000);
+    }
 
     function updateStep(step) {
       stepDots.forEach((dot, index) => {
