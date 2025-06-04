@@ -250,6 +250,7 @@ body {
 .bg-accent-hormone { background-color: var(--accent-color-hormone); }
 .bg-accent-heart { background-color: var(--accent-color-heart); }
 .bg-accent-activity { background-color: var(--accent-color-activity); }
+.bg-accent-steps { background-color: var(--accent-steps); }
 
 .card-header h2 {
   font-size: 1.125rem;

@@ -68,8 +68,8 @@ const metricDescriptions = {
   waso: "Total number of minutes the participant spent awake after initially falling asleep.",
   movementIndex: "Percentage of time spent immobile (no arm movement) during the movement phase of sleep.",
   fragmentationIndex: "Percentage of time spent moving during what should have been immobile sleep phases.",
-  cortisol: "Cortisol concentration measured in μg of cortisol per 100 μg of protein. Typically higher after waking, it reflects physiological stress and alertness.",
-  melatonin: "Melatonin concentration measured in μg of melatonin per μg of protein. Typically higher before sleep, it reflects readiness for sleep and circadian rhythm."
+  cortisol: "Cortisol concentration measured in microgram (μg) of cortisol per 100 microgram (μg) of protein. Typically higher after waking, it reflects physiological stress and alertness.",
+  melatonin: "Melatonin concentration measured in femtogram (fg) of melatonin per microgram (μg) of protein. Typically higher before sleep, it reflects readiness for sleep and circadian rhythm."
 };
 
 function showInfoTooltip(x, y, text) {
@@ -160,10 +160,10 @@ function displayHormoneMetrics(data) {
   );
 
   const metrics = [
-    { key: 'cortisol', label: 'Cortisol (Before Sleep)', value: `${sorted[0].cortisol.toFixed(4)} µg/dL` },
-    { key: 'cortisol', label: 'Cortisol (After Sleep)', value: `${sorted[1].cortisol.toFixed(4)} µg/dL` },
-    { key: 'melatonin', label: 'Melatonin (Before Sleep)', value: `${sorted[0].melatonin.toFixed(4)} pg/mL` },
-    { key: 'melatonin', label: 'Melatonin (After Sleep)', value: `${sorted[1].melatonin.toFixed(4)} pg/mL` }
+    { key: 'cortisol', label: 'Cortisol (Before Sleep)', value: `${sorted[0].cortisol.toFixed(4)} µg` },
+    { key: 'cortisol', label: 'Cortisol (After Sleep)', value: `${sorted[1].cortisol.toFixed(4)} µg` },
+    { key: 'melatonin', label: 'Melatonin (Before Sleep)', value: `${(sorted[0].melatonin * 1000*1000*1000).toFixed(4)} fg` },
+    { key: 'melatonin', label: 'Melatonin (After Sleep)', value: `${(sorted[1].melatonin * 1000*1000*1000).toFixed(4)} fg` }
   ];
 
   metrics.forEach(metric => {
