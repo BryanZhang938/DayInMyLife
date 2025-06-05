@@ -448,7 +448,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (showTutorialButton && tutorialModal) {
       showTutorialButton.addEventListener('click', () => {
-          console.log('Tutorial button clicked');
           showModal();
       });
   }
