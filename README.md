@@ -13,11 +13,11 @@ Welcome to **A Day In My Life**, where the true meaning of health is unveiled, o
 
 Built using **D3.js** and deployed via **GitHub Pages**.
 
-🔗 <a href="https://bryanzhang938.github.io/DayInMyLife/" target="_blank" rel="noopener noreferrer">See our project here!</a>
+🔗 [See our project here!](https://bryanzhang938.github.io/DayInMyLife/)
 
 ### More Links
 
-<a href="https://www.youtube.com/watch?v=_uCEEygzLm0&ab_channel=ADayInMyLife" target="_blank" rel="noopener noreferrer">Demo Video</a>
+[Demo Video](https://www.youtube.com/watch?v=_uCEEygzLm0&ab_channel=ADayInMyLife)
 
 Source: <a href="https://physionet.org/content/mmash/1.0.0/" target="_blank" rel="noopener noreferrer">Multilevel Monitoring of Activity and Sleep in Healthy People</a> - PhysioNet
 
