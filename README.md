@@ -13,7 +13,7 @@ Welcome to **A Day In My Life**, where the true meaning of health is unveiled, o
 
 Built using **D3.js** and deployed via **GitHub Pages**.
 
-🔗 <a href="https://bryanzhang938.github.io/dsc106final/" target="_blank" rel="noopener noreferrer">See our project here!</a>
+🔗 <a href="https://bryanzhang938.github.io/DayInMyLife/" target="_blank" rel="noopener noreferrer">See our project here!</a>
 
 ### More Links
 
