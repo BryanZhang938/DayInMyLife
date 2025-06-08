@@ -17,7 +17,7 @@ Built using **D3.js** and deployed via **GitHub Pages**.
 
 ### More Links
 
-[Demo Video](https://www.youtube.com/watch?v=_uCEEygzLm0&ab_channel=ADayInMyLife)
+[Demo Video](https://www.youtube.com/watch?v=CXUgsKMDCxA&ab_channel=ADayInMyLife)
 
 Source: <a href="https://physionet.org/content/mmash/1.0.0/" target="_blank" rel="noopener noreferrer">Multilevel Monitoring of Activity and Sleep in Healthy People</a> - PhysioNet
 
