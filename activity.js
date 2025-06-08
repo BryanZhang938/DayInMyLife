@@ -14,6 +14,9 @@ function parseActivity(d) {
 function drawActivity(data) {
   if (!data || data.length === 0) {
     console.error("No activity data available");
+    if (window.markComponentLoaded) {
+      window.markComponentLoaded('activity');
+    }
     return;
   }
 
@@ -21,6 +24,9 @@ function drawActivity(data) {
 
   if (validData.length === 0) {
     console.error("No valid activity data points found");
+    if (window.markComponentLoaded) {
+      window.markComponentLoaded('activity');
+    }
     return;
   }
 
@@ -51,39 +57,40 @@ function drawActivity(data) {
   metricsContainer.html(""); // clear existing
 
   const minActivity = d3.min(hourlyData, d => d.avgActivity);
-const maxActivity = d3.max(hourlyData, d => d.avgActivity);
-const minHour = hourlyData.find(d => d.avgActivity === minActivity).hour;
-const maxHour = hourlyData.find(d => d.avgActivity === maxActivity).hour;
+  const maxActivity = d3.max(hourlyData, d => d.avgActivity);
+  const minHour = hourlyData.find(d => d.avgActivity === minActivity).hour;
+  const maxHour = hourlyData.find(d => d.avgActivity === maxActivity).hour;
 
-const globalActivityAverages = {
-  avg: 35.4,
-  min: 0.5,
-  max: 104.4
-};
+  const globalActivityAverages = {
+    avg: 35.4,
+    min: 0.5,
+    max: 104.4
+  };
 
-const metrics = [
-  { 
-    key: 'minActivity', 
-    label: 'Minimum Hourly Activity Level', 
-    value: `${minActivity.toFixed(1)}`,
-    time: `on Day ${minHour.getDate()} at ${d3.timeFormat("%-I %p")(minHour)}`,
-    global: `${globalActivityAverages.min.toFixed(1)}`
-  },
-  { 
-    key: 'avgActivity', 
-    label: 'Average Hourly Activity Level', 
-    value: `${d3.mean(hourlyData, d => d.avgActivity).toFixed(1)}`,
-    time: `for Day ${hourlyData[0].hour.getDate()} (${d3.timeFormat("%-I %p")(hourlyData[0].hour)}) through Day ${hourlyData[hourlyData.length - 1].hour.getDate()} (${d3.timeFormat("%-I %p")(hourlyData[hourlyData.length - 1].hour)})`,
-    global: `${globalActivityAverages.avg.toFixed(1)}`
-  },
-  { 
-    key: 'maxActivity', 
-    label: 'Maximum Hourly Activity Level', 
-    value: `${maxActivity.toFixed(1)}`,
-    time: `on Day ${maxHour.getDate()} at ${d3.timeFormat("%-I %p")(maxHour)}`,
-    global: `${globalActivityAverages.max.toFixed(1)}`
-  }
-];
+  const metrics = [
+    { 
+      key: 'minActivity', 
+      label: 'Minimum Hourly Activity Level', 
+      value: `${minActivity.toFixed(1)}`,
+      time: `on Day ${minHour.getDate()} at ${d3.timeFormat("%-I %p")(minHour)}`,
+      global: `${globalActivityAverages.min.toFixed(1)}`
+    },
+    { 
+      key: 'avgActivity', 
+      label: 'Average Hourly Activity Level', 
+      value: `${d3.mean(hourlyData, d => d.avgActivity).toFixed(1)}`,
+      time: `for Day ${hourlyData[0].hour.getDate()} (${d3.timeFormat("%-I %p")(hourlyData[0].hour)}) through Day ${hourlyData[hourlyData.length - 1].hour.getDate()} (${d3.timeFormat("%-I %p")(hourlyData[hourlyData.length - 1].hour)})`,
+      global: `${globalActivityAverages.avg.toFixed(1)}`
+    },
+    { 
+      key: 'maxActivity', 
+      label: 'Maximum Hourly Activity Level', 
+      value: `${maxActivity.toFixed(1)}`,
+      time: `on Day ${maxHour.getDate()} at ${d3.timeFormat("%-I %p")(maxHour)}`,
+      global: `${globalActivityAverages.max.toFixed(1)}`
+    }
+  ];
+
   metrics.forEach(metric => {
     const metricDiv = metricsContainer.append('div').attr('class', 'metric');
     
@@ -109,8 +116,12 @@ const metrics = [
         .style('margin-top', '0.25rem')
         .text(`Average Across All Participants: ${metric.global}`);
     }
-
   });
+
+  // Mark activity component as loaded
+  if (window.markComponentLoaded) {
+    window.markComponentLoaded('activity');
+  }
 
   if (hourlyData.length === 0) return;
 

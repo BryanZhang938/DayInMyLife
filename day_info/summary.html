@@ -347,6 +347,28 @@
     // Set loading message with participant number
     document.getElementById('loading-message').textContent = `Generating Participant ${participantNumber}'s summary...`;
 
+    // Track loading state of different components
+    const loadingState = {
+      sleep: false,
+      hormone: false,
+      heartrate: false,
+      activity: false,
+      steps: false
+    };
+
+    // Function to check if all components are loaded
+    function areAllComponentsLoaded() {
+      return Object.values(loadingState).every(state => state === true);
+    }
+
+    // Function to mark a component as loaded
+    function markComponentLoaded(component) {
+      loadingState[component] = true;
+      if (areAllComponentsLoaded()) {
+        hideLoadingScreen();
+      }
+    }
+
     // Hide loading screen when everything is loaded
     window.addEventListener('load', function() {
       // Minimum loading time of 1 second
@@ -355,39 +377,59 @@
 
       // Function to check if visualizations are ready
       function checkVisualizationsReady() {
+        // Check all charts
         const heartrateChart = document.getElementById('heartrate-chart');
         const activityChart = document.getElementById('activity-chart');
+        const stepsChart = document.getElementById('steps-chart');
+
+        // Check all metrics sections
         const sleepMetrics = document.getElementById('sleep-metrics');
         const hormoneMetrics = document.getElementById('hormone-metrics');
         const heartrateMetrics = document.getElementById('heartrate-metrics');
         const activityMetrics = document.getElementById('activity-metrics');
+        const stepsMetrics = document.getElementById('steps-metrics');
 
-        // Check if all elements have content
-        const chartsReady = heartrateChart.innerHTML.trim() !== '' && 
-                          activityChart.innerHTML.trim() !== '';
-        const metricsReady = sleepMetrics.innerHTML.trim() !== '' && 
-                           hormoneMetrics.innerHTML.trim() !== '' && 
-                           heartrateMetrics.innerHTML.trim() !== '' && 
-                           activityMetrics.innerHTML.trim() !== '';
+        // Check if charts have content and proper dimensions
+        const chartsReady = 
+          heartrateChart && heartrateChart.innerHTML.trim() !== '' && heartrateChart.getBoundingClientRect().height > 0 &&
+          activityChart && activityChart.innerHTML.trim() !== '' && activityChart.getBoundingClientRect().height > 0 &&
+          stepsChart && stepsChart.innerHTML.trim() !== '' && stepsChart.getBoundingClientRect().height > 0;
 
-        return chartsReady && metricsReady;
+        // Check if metrics sections have content
+        const metricsReady = 
+          sleepMetrics && sleepMetrics.innerHTML.trim() !== '' &&
+          hormoneMetrics && hormoneMetrics.innerHTML.trim() !== '' &&
+          heartrateMetrics && heartrateMetrics.innerHTML.trim() !== '' &&
+          activityMetrics && activityMetrics.innerHTML.trim() !== '' &&
+          stepsMetrics && stepsMetrics.innerHTML.trim() !== '';
+
+        // Additional check for any loading indicators or spinners
+        const loadingIndicators = document.querySelectorAll('.spinner, .loading');
+        const noLoadingIndicators = loadingIndicators.length === 0;
+
+        return chartsReady && metricsReady && noLoadingIndicators;
       }
 
       // Function to hide loading screen
       function hideLoadingScreen() {
+        const elapsedTime = Date.now() - startTime;
+        if (elapsedTime < minLoadingTime) {
+          setTimeout(hideLoadingScreen, minLoadingTime - elapsedTime);
+          return;
+        }
+
         const loadingScreen = document.getElementById('intro-loading-screen');
         loadingScreen.style.opacity = '0';
+        loadingScreen.style.pointerEvents = 'none'; // Disable pointer events immediately
         setTimeout(() => {
-          loadingScreen.style.display = 'none';
+          loadingScreen.remove(); // Remove from DOM after fade out
         }, 800);
       }
 
       // Check periodically if visualizations are ready
       const checkInterval = setInterval(() => {
-        const elapsedTime = Date.now() - startTime;
         const visualizationsReady = checkVisualizationsReady();
-
-        if (visualizationsReady && elapsedTime >= minLoadingTime) {
+        if (visualizationsReady) {
           clearInterval(checkInterval);
           hideLoadingScreen();
         }
@@ -399,6 +441,9 @@
         hideLoadingScreen();
       }, 5000);
     });
+
+    // Export the markComponentLoaded function to be used by other scripts
+    window.markComponentLoaded = markComponentLoaded;
   </script>
 
 </body>

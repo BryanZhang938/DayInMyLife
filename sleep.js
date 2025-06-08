@@ -58,9 +58,20 @@ d3.csv("../assets/cleaned_data/all_sleep.csv", parseSleep).then(sleepData => {
       displaySleepMetrics(userData[userData.length - 1]); // latest entry
     } else {
       console.warn(`No sleep data found for user: ${selectedUser}`);
+      if (window.markComponentLoaded) {
+        window.markComponentLoaded('sleep');
+      }
     }
   } else {
     console.error("No user specified in the URL (use ?user=user_01)");
+    if (window.markComponentLoaded) {
+      window.markComponentLoaded('sleep');
+    }
+  }
+}).catch(error => {
+  console.error("Failed to load sleep CSV:", error);
+  if (window.markComponentLoaded) {
+    window.markComponentLoaded('sleep');
   }
 });
 
@@ -116,21 +127,25 @@ function initParticipantSelector() {
 }
 
 function displaySleepMetrics(data) {
-  if (!data.latest) {
-    data = { latest: data };
+  if (!data) {
+    if (window.markComponentLoaded) {
+      window.markComponentLoaded('sleep');
+    }
+    return;
   }
+
   const metricsContainer = d3.select('#sleep-metrics');
   metricsContainer.html(""); // clear existing
 
   const metrics = [
-    { key: 'totalSleep', label: 'Total Sleep', value: `${Math.floor(data.latest.totalSleep/60)} h ${data.latest.totalSleep%60} m` },
-    { key: 'efficiency', label: 'Sleep Efficiency', value: `${isNaN(data.latest.efficiency) ? "N/A" : data.latest.efficiency.toFixed(1)} %` },
-    { key: 'latency', label: 'Sleep Latency', value: `${data.latest.latency} m` },
-    { key: 'awakenings', label: 'Number of Awakenings', value: `${data.latest.awakenings}` },
-    { key: 'avgAwakeningLength', label: 'Average Awakening Length', value: `${data.latest.avgAwakeningLength.toFixed(1)} s` },
-    { key: 'waso', label: 'Wake After Sleep Onset', value: `${data.latest.waso} m` },
-    { key: 'movementIndex', label: 'Movement Index', value: `${data.latest.movementIndex.toFixed(1)} %` },
-    { key: 'fragmentationIndex', label: 'Fragmentation Index', value: `${data.latest.fragmentationIndex.toFixed(1)} %` }
+    { key: 'totalSleep', label: 'Total Sleep', value: `${Math.floor(data.totalSleep/60)} h ${data.totalSleep%60} m` },
+    { key: 'efficiency', label: 'Sleep Efficiency', value: `${isNaN(data.efficiency) ? "N/A" : data.efficiency.toFixed(1)} %` },
+    { key: 'latency', label: 'Sleep Latency', value: `${data.latency} m` },
+    { key: 'awakenings', label: 'Number of Awakenings', value: `${data.awakenings}` },
+    { key: 'avgAwakeningLength', label: 'Average Awakening Length', value: `${data.avgAwakeningLength.toFixed(1)} s` },
+    { key: 'waso', label: 'Wake After Sleep Onset', value: `${data.waso} m` },
+    { key: 'movementIndex', label: 'Movement Index', value: `${data.movementIndex.toFixed(1)} %` },
+    { key: 'fragmentationIndex', label: 'Fragmentation Index', value: `${data.fragmentationIndex.toFixed(1)} %` }
   ];
 
   metrics.forEach(metric => {
@@ -153,6 +168,11 @@ function displaySleepMetrics(data) {
       .attr('class', 'metric-value-badge')
       .text(metric.value);
   });
+
+  // Mark sleep component as loaded
+  if (window.markComponentLoaded) {
+    window.markComponentLoaded('sleep');
+  }
 }
 
 function showInfoTooltip(x, y, text) {

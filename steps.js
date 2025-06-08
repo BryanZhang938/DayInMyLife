@@ -31,6 +31,14 @@ function processStepData(data) {
 }
 
 function drawSteps(data) {
+  if (!data || data.length === 0) {
+    console.error("No steps data available");
+    if (window.markComponentLoaded) {
+      window.markComponentLoaded('steps');
+    }
+    return;
+  }
+
   const { hourlyData, peakHour } = processStepData(data);
 
   // Update peak info
@@ -88,8 +96,12 @@ function drawSteps(data) {
       .style("font-size", "13px")
       .style("color", "gray")
       .text(`Average Across All Participants: ${globalAverages[metric.label]}`);
-    
   });
+
+  // Mark steps component as loaded
+  if (window.markComponentLoaded) {
+    window.markComponentLoaded('steps');
+  }
 
   if (hourlyData.length === 0) return;
 
@@ -107,14 +119,14 @@ function drawSteps(data) {
   svg.selectAll("*").remove();
 
   const hourExtent = d3.extent(hourlyData, d => d.hour);
-const barPaddingMs = 30 * 60 * 1000; // 30 minutes of padding on each side
+  const barPaddingMs = 30 * 60 * 1000; // 30 minutes of padding on each side
 
-const x = d3.scaleTime()
-  .domain([
-    new Date(hourExtent[0].getTime() - barPaddingMs),
-    new Date(hourExtent[1].getTime() + barPaddingMs)
-  ])
-  .range([margin.left, width - margin.right]);
+  const x = d3.scaleTime()
+    .domain([
+      new Date(hourExtent[0].getTime() - barPaddingMs),
+      new Date(hourExtent[1].getTime() + barPaddingMs)
+    ])
+    .range([margin.left, width - margin.right]);
 
   const y = d3.scaleLinear()
     .domain([0, d3.max(hourlyData, d => d.totalSteps)]).nice()

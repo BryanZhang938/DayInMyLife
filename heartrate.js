@@ -281,9 +281,17 @@ if (userParam) {
       drawHeartRate(filtered);
     } else {
       console.warn(`No heart rate data found for user: ${userParam}`);
+      // Mark as loaded even if no data to prevent infinite loading
+      if (window.markComponentLoaded) {
+        window.markComponentLoaded('heartrate');
+      }
     }
   }).catch(error => {
     console.error("Failed to load heart rate CSV:", error);
+    // Mark as loaded even if there's an error to prevent infinite loading
+    if (window.markComponentLoaded) {
+      window.markComponentLoaded('heartrate');
+    }
   });
 }
 
@@ -339,4 +347,9 @@ function updateHeartRateMetrics(hourlyData, peakHour, globalAverages) {
       .style('margin-top', '0.25rem')
       .text(`Average across all Participants: ${metric.global}`);
   });
+
+  // Mark heartrate component as loaded
+  if (window.markComponentLoaded) {
+    window.markComponentLoaded('heartrate');
+  }
 }
