@@ -70,9 +70,9 @@ function drawSteps(data) {
 
   metrics.forEach(metric => {
     const globalAverages = {
-      'Minimum Steps': '5 steps',
-      'Average Steps': '505 steps',
-      'Maximum Steps': '1702 steps'
+      'Minimum Hourly Steps': '5 steps',
+      'Average Hourly Steps': '505 steps',
+      'Maximum Hourly Steps': '1702 steps'
     };
 
     const metricDiv = metricsContainer.append("div").attr("class", "metric");
